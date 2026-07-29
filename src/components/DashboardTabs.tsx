@@ -32,6 +32,8 @@ import {
   Fuel,
   Pill,
   Bot,
+  School,
+  Handshake,
 } from "lucide-react";
 import { AppShell, type NavGroup } from "@/components/AppShell";
 import { FarmacieTurno } from "@/components/FarmacieTurno";
@@ -136,6 +138,8 @@ type TabId =
   | "turismo"
   | "porto"
   | "economia"
+  | "istruzione"
+  | "societa"
   | "finanza"
   | "territorio"
   | "ambiente"
@@ -167,9 +171,11 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    label: "Economia e PA",
+    label: "Economia e società",
     items: [
       { id: "economia", label: "Economia", Icon: Factory },
+      { id: "istruzione", label: "Istruzione", Icon: School },
+      { id: "societa", label: "Società", Icon: Handshake },
       { id: "finanza", label: "Finanza", Icon: Landmark },
     ],
   },
@@ -273,9 +279,11 @@ export function DashboardTabs({
         {tab === "panoramica" && (
           <Panoramica kpi={kpi} onNavigate={navigate} />
         )}
-        {tab === "turismo" && <Turismo kpi={kpi} />}
-        {tab === "porto" && <Porto kpi={kpi} />}
+        {tab === "turismo" && <Turismo onNavigate={navigate} />}
+        {tab === "porto" && <Porto />}
         {tab === "economia" && <Economia kpi={kpi} />}
+        {tab === "istruzione" && <Istruzione kpi={kpi} />}
+        {tab === "societa" && <Societa kpi={kpi} />}
         {tab === "finanza" && <Finanza kpi={kpi} />}
         {tab === "territorio" && <Territorio kpi={kpi} />}
         {tab === "ambiente" && <Ambiente kpi={kpi} />}
@@ -304,9 +312,6 @@ function Panoramica({
     detailLabel: tabLabel(id),
     onDetail: () => onNavigate(id),
   });
-  const { detail, loading } = useDettaglio(
-    "demografia,profilo,censimento,redditi,patrimonio",
-  );
   const demo = asRecord(kpi.demografia);
   const turismo = asRecord(kpi.turismo);
   const lavoro = asRecord(kpi.lavoro_profilo);
@@ -330,47 +335,51 @@ function Panoramica({
   const morfo = asRecord(kpi.morfologia_cnr);
   const anagrafica = asRecord(kpi.anagrafica);
 
-  const demoExt = asRecord(detail?.demografia);
-  const fasce = asRecord(demoExt?.fasce_eta);
-  const profilo = asRecord(detail?.profilo);
-  const cens = asRecord(asRecord(detail?.censimento)?.kpi_comune);
-  const piramideFasce = Array.isArray(demoExt?.piramide_fasce)
-    ? (demoExt.piramide_fasce as Array<{ label: string; m: number; f: number; tot: number }>)
-    : [];
-
   return (
     <section>
       <SectionIntro
         title="Cosa ti serve oggi?"
-        description={`Dati aperti di ${String(anagrafica?.nome ?? "San Vincenzo")}: parti dai servizi utili, poi esplora gli indicatori.`}
+        description={`Dati aperti di ${String(anagrafica?.nome ?? "San Vincenzo")}: parti dai servizi utili, poi esplora le sezioni dedicate.`}
       />
 
-      <div className="mb-5 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-5 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
         {(
           [
             {
-              id: "sanita",
+              id: "sanita" as const,
               title: "Farmacie di turno",
               hint: "Orari e punti più vicini",
               Icon: Pill,
             },
             {
-              id: "infra",
+              id: "infra" as const,
               title: "Prezzi carburanti",
               hint: `Benzina self media ${formatDecimal(num(carburanti?.prezzo_medio_benzina_self), 3)} €/L`,
               Icon: Fuel,
             },
             {
-              id: "ambiente",
+              id: "ambiente" as const,
               title: "Mare e balneazione",
               hint: "Qualità acque ARPAT",
               Icon: Waves,
             },
             {
-              id: "meteo",
+              id: "meteo" as const,
               title: "Meteo e radar",
               hint: "Previsioni e precipitazioni",
               Icon: CloudSun,
+            },
+            {
+              id: "istruzione" as const,
+              title: "Scuole e istruzione",
+              hint: "Plessi MIUR e titoli di studio",
+              Icon: School,
+            },
+            {
+              id: "porto" as const,
+              title: "Porto",
+              hint: "Posti barca, webcam e AIS",
+              Icon: Ship,
             },
           ] as const
         ).map(({ id, title, hint, Icon }) => (
@@ -404,6 +413,7 @@ function Panoramica({
           hint={String(demo?.riferimento ?? "")}
           icon={Users}
           variant="info"
+          {...go("societa")}
         />
         <KpiCard
           label="Reddito medio"
@@ -443,96 +453,239 @@ function Panoramica({
         />
       </div>
 
-      <details className="mb-5 panel">
+      <details className="panel">
         <summary className="cursor-pointer text-sm font-bold text-[var(--pa-ink)]">
-          Altri indicatori (demografia, lavoro, PA…)
+          Altri indicatori (collegamenti alle sezioni)
         </summary>
         <div className="mt-3 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3 xl:grid-cols-4">
-          <KpiCard
-            label="Maschi / Femmine"
-            value={`${formatInteger(num(demo?.maschi))} / ${formatInteger(num(demo?.femmine))}`}
-            icon={Users}
-          />
           <KpiCard
             label="Età media"
             value={valueOrMissing(demo?.eta_media, (v) => formatDecimal(v, 1))}
             icon={Users}
+            {...go("societa")}
           />
           <KpiCard
             label="Indice di vecchiaia"
             value={valueOrMissing(demo?.indice_vecchiaia, (v) => formatDecimal(v, 1))}
             icon={TrendingUp}
+            {...go("societa")}
           />
-          <KpiCard label="Indice di dipendenza" value={valueOrMissing(demo?.indice_dipendenza, (v) => formatDecimal(v, 1))} />
           <KpiCard
             label="Tasso occupazione"
             value={valueOrMissing(lavoro?.tasso_occupazione, formatPercent)}
-            hint={lavoro?.anno ? `Anno ${lavoro.anno}` : undefined}
             icon={Briefcase}
             variant="success"
-            {...go("economia")}
-          />
-          <KpiCard
-            label="Tasso disoccupazione"
-            value={valueOrMissing(lavoro?.tasso_disoccupazione, formatPercent)}
-            icon={Briefcase}
             {...go("economia")}
           />
           <KpiCard
             label="Diploma o oltre"
             value={valueOrMissing(istruzione?.pct_diploma_oltre, formatPercent)}
             icon={GraduationCap}
-            {...go("economia")}
-          />
-          <KpiCard
-            label="Terziario"
-            value={valueOrMissing(istruzione?.pct_terziario, formatPercent)}
-            icon={GraduationCap}
-            {...go("economia")}
+            {...go("istruzione")}
           />
           <KpiCard
             label="Consumo di suolo"
             value={valueOrMissing(ambiente?.consumo_suolo_pct, formatPercent)}
-            hint={`${formatDecimal(num(ambiente?.superficie_kmq), 2)} km²`}
             icon={LandPlot}
             variant="warning"
-            {...go("territorio")}
+            {...go("ambiente")}
           />
-          <KpiCard label="Punti ricarica EV" value={valueOrMissing(ev?.n_totale, formatInteger)} hint={`${formatPercent(num(ev?.pct_attivi))} attivi`} {...go("infra")} />
+          <KpiCard
+            label="Punti ricarica EV"
+            value={valueOrMissing(ev?.n_totale, formatInteger)}
+            hint={`${formatPercent(num(ev?.pct_attivi))} attivi`}
+            {...go("infra")}
+          />
           <KpiCard
             label="Veicoli"
             value={valueOrMissing(veicoli?.totale_veicoli, formatInteger)}
-            hint={`${formatDecimal(num(veicoli?.tasso_motorizzazione_per_1000_ab), 0)} /1000 ab.`}
             icon={Car}
             {...go("infra")}
           />
           <KpiCard
             label="Unità locali ASIA"
             value={valueOrMissing(imprese?.ul_totali, formatInteger)}
-            hint={`${formatDecimal(num(imprese?.addetti_totali), 0)} addetti`}
             icon={Building2}
             {...go("economia")}
           />
-          <KpiCard label="Saldo cassa SIOPE" value={valueOrMissing(siope?.saldo_cassa_eur, formatEuroCompact)} hint={`Anno ${String(siope?.anno ?? "")}`} {...go("finanza")} />
-          <KpiCard label="PNRR" value={valueOrMissing(pnrr?.importo_assegnato_eur, formatEuroCompact)} hint={`${formatInteger(num(pnrr?.n_progetti))} progetti`} {...go("finanza")} />
-          <KpiCard label="Opere BDAP" value={valueOrMissing(opere?.n_progetti, formatInteger)} hint={valueOrMissing(opere?.importo_totale_eur, formatEuroCompact)} {...go("finanza")} />
-          <KpiCard label="Contratti ANAC" value={valueOrMissing(anac?.n_aggiudicazioni, formatInteger)} hint={valueOrMissing(anac?.importo_totale_eur, formatEuroCompact)} {...go("finanza")} />
+          <KpiCard
+            label="Saldo cassa SIOPE"
+            value={valueOrMissing(siope?.saldo_cassa_eur, formatEuroCompact)}
+            {...go("finanza")}
+          />
+          <KpiCard
+            label="PNRR"
+            value={valueOrMissing(pnrr?.importo_assegnato_eur, formatEuroCompact)}
+            {...go("finanza")}
+          />
+          <KpiCard
+            label="Opere BDAP"
+            value={valueOrMissing(opere?.n_progetti, formatInteger)}
+            {...go("finanza")}
+          />
+          <KpiCard
+            label="Contratti ANAC"
+            value={valueOrMissing(anac?.n_aggiudicazioni, formatInteger)}
+            {...go("finanza")}
+          />
           <KpiCard
             label="Patrimonio PA"
             value={valueOrMissing(patrimonio?.n_immobili, formatInteger)}
             icon={Building2}
             {...go("finanza")}
           />
-          <KpiCard label="Enti RUNTS" value={valueOrMissing(runts?.n_enti_totali, formatInteger)} {...go("sanita")} />
-          <KpiCard label="Civici ANNCSU" value={valueOrMissing(civici?.n_civici, formatInteger)} hint={`${formatInteger(num(civici?.n_strade))} strade`} {...go("mappa")} />
-          <KpiCard label="Impianti carburanti" value={valueOrMissing(carburanti?.n_impianti, formatInteger)} hint={`Benzina self ${formatDecimal(num(carburanti?.prezzo_medio_benzina_self), 3)} €/L`} {...go("infra")} />
-          <KpiCard label="Pendolarismo netto" value={valueOrMissing(pendol?.saldo_netto, formatInteger)} {...go("infra")} />
-          <KpiCard label="Elevazione media" value={valueOrMissing(morfo?.elev_mean, (v) => `${formatInteger(v)} m`)} {...go("territorio")} />
-          <KpiCard label="CF / Catastale" value={`${String(anagrafica?.codice_fiscale ?? "n.d.")}`} hint={`Catastale ${String(anagrafica?.codice_catastale ?? "")}`} {...go("territorio")} />
+          <KpiCard
+            label="Enti RUNTS"
+            value={valueOrMissing(runts?.n_enti_totali, formatInteger)}
+            {...go("societa")}
+          />
+          <KpiCard
+            label="Civici ANNCSU"
+            value={valueOrMissing(civici?.n_civici, formatInteger)}
+            {...go("mappa")}
+          />
+          <KpiCard
+            label="Impianti carburanti"
+            value={valueOrMissing(carburanti?.n_impianti, formatInteger)}
+            {...go("infra")}
+          />
+          <KpiCard
+            label="Pendolarismo netto"
+            value={valueOrMissing(pendol?.saldo_netto, formatInteger)}
+            {...go("infra")}
+          />
+          <KpiCard
+            label="Elevazione media"
+            value={valueOrMissing(morfo?.elev_mean, (v) => `${formatInteger(v)} m`)}
+            {...go("territorio")}
+          />
         </div>
       </details>
+    </section>
+  );
+}
 
-      {loading ? <LoadingBlock label="Caricamento approfondimenti demografici…" /> : null}
+
+function Istruzione({ kpi }: { kpi: Kpi }) {
+  const { detail, loading } = useDettaglio("profilo");
+  const istruzioneKpi = asRecord(kpi.istruzione_profilo);
+  const istruzione = asRecord(asRecord(detail?.profilo)?.istruzione) ?? istruzioneKpi;
+  const dettaglioIstr = asRecord(istruzione?.dettaglio);
+
+  return (
+    <section>
+      <SectionIntro
+        title="Istruzione"
+        description="Titoli di studio ISTAT e plessi scolastici MIUR nel comune."
+      />
+      <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
+        <KpiCard
+          label="Diploma o oltre"
+          value={valueOrMissing(istruzione?.pct_diploma_oltre ?? istruzioneKpi?.pct_diploma_oltre, formatPercent)}
+          icon={GraduationCap}
+          variant="info"
+        />
+        <KpiCard
+          label="Terziario"
+          value={valueOrMissing(istruzione?.pct_terziario ?? istruzioneKpi?.pct_terziario, formatPercent)}
+          icon={GraduationCap}
+          variant="success"
+        />
+      </div>
+
+      {loading ? <LoadingBlock /> : null}
+
+      {dettaglioIstr ? (
+        <div className="mb-4 panel">
+          <h3>Titolo di studio (pop. 25–64)</h3>
+          <BarChart
+            labels={["Nessun titolo", "Elementare", "Media", "Diploma", "Laurea triennale", "Laurea mag./dott."]}
+            datasets={[
+              {
+                label: "Persone",
+                data: [
+                  num(dettaglioIstr.nessun_titolo) ?? 0,
+                  num(dettaglioIstr.elementare) ?? 0,
+                  num(dettaglioIstr.media) ?? 0,
+                  num(dettaglioIstr.diploma) ?? 0,
+                  num(dettaglioIstr.laurea_triennale) ?? 0,
+                  num(dettaglioIstr.laurea_magistrale_dottorato) ?? 0,
+                ],
+              },
+            ]}
+          />
+        </div>
+      ) : null}
+
+      <ScuoleMiurPanel />
+    </section>
+  );
+}
+
+function Societa({ kpi }: { kpi: Kpi }) {
+  const { detail, loading } = useDettaglio("demografia,profilo,censimento,runts");
+  const demo = asRecord(kpi.demografia);
+  const runtsKpi = asRecord(kpi.terzo_settore_runts);
+
+  const demoExt = asRecord(detail?.demografia);
+  const fasce = asRecord(demoExt?.fasce_eta);
+  const profilo = asRecord(detail?.profilo);
+  const cens = asRecord(asRecord(detail?.censimento)?.kpi_comune);
+  const distEta = asRecord(asRecord(asRecord(detail?.censimento)?.distribuzioni_comune)?.eta_5anni);
+  const piramideFasce = Array.isArray(demoExt?.piramide_fasce)
+    ? (demoExt.piramide_fasce as Array<{ label: string; m: number; f: number; tot: number }>)
+    : [];
+
+  const runts = asRecord(detail?.runts);
+  const enti = Array.isArray(runts?.enti)
+    ? (runts.enti as Array<{ denom?: string; sez?: string; x1000?: boolean; data_iscr?: string; rapp?: string }>)
+    : [];
+  const mix = asRecord(asRecord(runts?.kpi)?.mix_sezione);
+  const iscrizioniAnno = asRecord(asRecord(runts?.kpi)?.iscrizioni_per_anno);
+
+  return (
+    <section>
+      <SectionIntro
+        title="Società"
+        description="Demografia, famiglie, censimento e terzo settore (RUNTS)."
+      />
+      <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
+        <KpiCard
+          label="Popolazione"
+          value={valueOrMissing(demo?.popolazione, formatInteger)}
+          hint={String(demo?.riferimento ?? "")}
+          icon={Users}
+          variant="info"
+        />
+        <KpiCard
+          label="Maschi / Femmine"
+          value={`${formatInteger(num(demo?.maschi))} / ${formatInteger(num(demo?.femmine))}`}
+          icon={Users}
+        />
+        <KpiCard
+          label="Età media"
+          value={valueOrMissing(demo?.eta_media, (v) => formatDecimal(v, 1))}
+          icon={Users}
+        />
+        <KpiCard
+          label="Indice di vecchiaia"
+          value={valueOrMissing(demo?.indice_vecchiaia, (v) => formatDecimal(v, 1))}
+          icon={TrendingUp}
+        />
+        <KpiCard
+          label="Indice di dipendenza"
+          value={valueOrMissing(demo?.indice_dipendenza, (v) => formatDecimal(v, 1))}
+        />
+        <KpiCard
+          label="Enti RUNTS"
+          value={valueOrMissing(runtsKpi?.n_enti_totali, formatInteger)}
+          hint={`${formatInteger(num(runtsKpi?.n_5x1000))} iscritti al 5x1000`}
+          icon={Handshake}
+          variant="success"
+        />
+      </div>
+
+      {loading ? <LoadingBlock label="Caricamento dati società…" /> : null}
 
       {fasce ? (
         <div className="mb-4 grid gap-3 sm:gap-4 lg:grid-cols-2">
@@ -568,14 +721,18 @@ function Panoramica({
         </div>
       ) : null}
 
-      <div className="grid gap-3 sm:gap-4 lg:grid-cols-3">
+      <div className="mb-4 grid gap-3 sm:gap-4 lg:grid-cols-3">
         {cens ? (
           <div className="panel">
             <h3>Censimento (sezioni)</h3>
             <ul className="space-y-1 text-xs sm:text-sm">
               <li>Sezioni: {formatInteger(num(cens.n_sezioni))}</li>
               <li>Famiglie: {formatInteger(num(cens.famiglie_totali))}</li>
-              <li>Abitazioni: {formatInteger(num(cens.abitazioni_totali))} ({formatInteger(num(cens.abitazioni_occupate))} occupate, {formatInteger(num(cens.abitazioni_vuote))} vuote)</li>
+              <li>
+                Abitazioni: {formatInteger(num(cens.abitazioni_totali))} (
+                {formatInteger(num(cens.abitazioni_occupate))} occupate,{" "}
+                {formatInteger(num(cens.abitazioni_vuote))} vuote)
+              </li>
               <li>Stranieri: {formatInteger(num(cens.stranieri_totali))}</li>
             </ul>
           </div>
@@ -584,37 +741,96 @@ function Panoramica({
           <div className="panel">
             <h3>Famiglie e cittadinanza</h3>
             <ul className="space-y-1 text-xs sm:text-sm">
-              <li>Famiglie: {formatInteger(num(asRecord(profilo?.famiglie)?.n_famiglie))} (dim. media {formatDecimal(num(asRecord(profilo?.famiglie)?.dim_media_famiglia), 1)})</li>
+              <li>
+                Famiglie: {formatInteger(num(asRecord(profilo?.famiglie)?.n_famiglie))} (dim. media{" "}
+                {formatDecimal(num(asRecord(profilo?.famiglie)?.dim_media_famiglia), 1)})
+              </li>
               <li>Italiani: {formatInteger(num(asRecord(profilo?.cittadinanza)?.italiani_n))}</li>
-              <li>Stranieri: {formatInteger(num(asRecord(profilo?.cittadinanza)?.stranieri_n))} ({formatPercent(num(asRecord(profilo?.cittadinanza)?.stranieri_pct))})</li>
+              <li>
+                Stranieri: {formatInteger(num(asRecord(profilo?.cittadinanza)?.stranieri_n))} (
+                {formatPercent(num(asRecord(profilo?.cittadinanza)?.stranieri_pct))})
+              </li>
             </ul>
           </div>
         ) : null}
       </div>
 
-      <div className="mt-4">
-        <ScuoleMiurPanel />
+      {distEta ? (
+        <div className="mb-4 panel">
+          <h3>Popolazione censimento per età (5 anni)</h3>
+          <BarChart
+            labels={Object.keys(distEta)}
+            datasets={[{ label: "Abitanti", data: Object.values(distEta).map((v) => Number(v) || 0) }]}
+          />
+        </div>
+      ) : null}
+
+      <div className="mb-4 grid gap-3 sm:gap-4 lg:grid-cols-2">
+        {mix ? (
+          <div className="panel">
+            <h3>Mix sezioni RUNTS</h3>
+            <DoughnutChart labels={Object.keys(mix)} values={Object.values(mix).map((v) => Number(v) || 0)} />
+          </div>
+        ) : null}
+        {iscrizioniAnno ? (
+          <div className="panel">
+            <h3>Iscrizioni RUNTS per anno</h3>
+            <BarChart
+              labels={Object.keys(iscrizioniAnno)}
+              datasets={[{ label: "Iscrizioni", data: Object.values(iscrizioniAnno).map((v) => Number(v) || 0) }]}
+            />
+          </div>
+        ) : null}
       </div>
+
+      {enti.length > 0 ? (
+        <div className="overflow-x-auto panel p-0">
+          <h3 className="px-3 pt-3 sm:px-4 sm:pt-4">Elenco enti RUNTS</h3>
+          <table className="min-w-full text-left text-xs sm:text-sm">
+            <thead className="bg-[#e8f2fc] text-[#17324d]">
+              <tr>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Denominazione</th>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Sezione</th>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Rappresentante</th>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">5x1000</th>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Iscrizione</th>
+              </tr>
+            </thead>
+            <tbody>
+              {enti.map((e) => (
+                <tr key={e.denom} className="border-t border-[#eef2f5]">
+                  <td className="px-2 py-1.5 sm:px-3 sm:py-2">{e.denom}</td>
+                  <td className="px-2 py-1.5 sm:px-3 sm:py-2">{e.sez}</td>
+                  <td className="px-2 py-1.5 sm:px-3 sm:py-2">{e.rapp ?? "—"}</td>
+                  <td className="px-2 py-1.5 sm:px-3 sm:py-2">{e.x1000 ? "Sì" : "No"}</td>
+                  <td className="px-2 py-1.5 sm:px-3 sm:py-2">{e.data_iscr ?? "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : null}
     </section>
   );
 }
 
-function Turismo({ kpi }: { kpi: Kpi }) {
+function Turismo({
+  onNavigate,
+}: {
+  onNavigate: (id: TabId) => void;
+}) {
   const { detail, error, loading } = useDettaglio("turismo");
-  const [porti, setPorti] = useState<Record<string, unknown> | null>(null);
   const [eventi, setEventi] = useState<Record<string, unknown> | null>(null);
   const [cultura, setCultura] = useState<Record<string, unknown> | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     Promise.all([
-      fetch("/api/toscana/porti").then((r) => (r.ok ? r.json() : null)),
       fetch("/api/toscana/eventi").then((r) => (r.ok ? r.json() : null)),
       fetch("/api/cultura/luoghi").then((r) => (r.ok ? r.json() : null)),
     ])
-      .then(([p, e, c]) => {
+      .then(([e, c]) => {
         if (!cancelled) {
-          setPorti(p);
           setEventi(e);
           setCultura(c);
         }
@@ -625,14 +841,12 @@ function Turismo({ kpi }: { kpi: Kpi }) {
     };
   }, []);
 
-  const turismoKpi = asRecord(kpi.turismo);
   const turismo = asRecord(detail?.turismo);
   const capacita = asRecord(turismo?.capacita_comune);
   const alberghi = asRecord(capacita?.alberghi);
   const extra = asRecord(capacita?.extra_alberghiero);
   const flussi = asRecord(turismo?.flussi_provincia);
-  
-  const portualita = asRecord(porti?.portualita);
+
   const luoghiCultura = Array.isArray(cultura?.luoghi)
     ? (cultura.luoghi as Array<Record<string, unknown>>)
     : [];
@@ -645,14 +859,26 @@ function Turismo({ kpi }: { kpi: Kpi }) {
     <section>
       <SectionIntro
         title="Turismo"
-        description="Capacità ricettiva comunale e flussi provinciali ISTAT."
+        description="Capacità ricettiva comunale, flussi provinciali ISTAT, cultura ed eventi. I dati del porto sono nella sezione dedicata."
       />
       <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
-        <KpiCard label="Strutture" value={valueOrMissing(capacita?.totale_strutture ?? turismoKpi?.totale_strutture, formatInteger)} />
-        <KpiCard label="Letti" value={valueOrMissing(capacita?.totale_letti ?? turismoKpi?.totale_letti, formatInteger)} />
+        <KpiCard label="Strutture" value={valueOrMissing(capacita?.totale_strutture, formatInteger)} />
+        <KpiCard label="Letti" value={valueOrMissing(capacita?.totale_letti, formatInteger)} />
         <KpiCard label="Camere" value={valueOrMissing(capacita?.totale_camere, formatInteger)} />
-        <KpiCard label="Indice turisticità" value={valueOrMissing(capacita?.indice_turisticita_per_100ab ?? turismoKpi?.indice_turisticita_per_100ab, (v) => `${formatDecimal(v, 1)} /100 ab.`)} />
+        <KpiCard label="Indice turisticità" value={valueOrMissing(capacita?.indice_turisticita_per_100ab, (v) => `${formatDecimal(v, 1)} /100 ab.`)} />
       </div>
+
+      <p className="mb-4 text-sm text-[var(--pa-muted)]">
+        Cerchi posti barca, webcam o traffico AIS? Vai a{" "}
+        <button
+          type="button"
+          className="font-semibold text-[var(--pa-primary)] underline"
+          onClick={() => onNavigate("porto")}
+        >
+          Porto
+        </button>
+        .
+      </p>
 
       {loading ? <LoadingBlock /> : null}
       {error ? <DataUnavailable message={error} /> : null}
@@ -723,50 +949,6 @@ function Turismo({ kpi }: { kpi: Kpi }) {
         </div>
       ) : null}
 
-      {portualita ? (
-        <div className="mt-4 panel bg-[#e8f4ff]">
-          <h3>Porto turistico</h3>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            <KpiCard
-              label="Posti barca"
-              value={valueOrMissing(portualita.posti_barca, formatInteger)}
-              icon={Ship}
-              variant="info"
-            />
-            <KpiCard
-              label="Tipo struttura"
-              value={String(portualita.tipo ?? "n.d.")}
-              icon={Ship}
-            />
-            <KpiCard
-              label="Classificazione"
-              value={String(porti?.classificazione ?? "n.d.")}
-              icon={Ship}
-            />
-          </div>
-          {Array.isArray(porti?.servizi) ? (
-            <div className="mt-3">
-              <p className="mb-2 text-xs font-semibold sm:text-sm">
-                Servizi disponibili:
-              </p>
-              <ul className="flex flex-wrap gap-2">
-                {(porti.servizi as string[]).map((s) => (
-                  <li
-                    key={s}
-                    className="rounded bg-white px-2 py-1 text-xs font-medium"
-                  >
-                    {s}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-          <p className="mb-0 mt-2.5 text-xs text-[#5b6f82] sm:mt-3 sm:text-sm">
-            Fonte: Regione Toscana - Masterplan portualità turistica
-          </p>
-        </div>
-      ) : null}
-
       {luoghiCultura.length > 0 ? (
         <div className="mt-4 panel">
           <h3>Luoghi di interesse culturale</h3>
@@ -829,26 +1011,16 @@ function Turismo({ kpi }: { kpi: Kpi }) {
   );
 }
 
-function Porto({ kpi }: { kpi: Kpi }) {
+function Porto() {
   const [porti, setPorti] = useState<Record<string, unknown> | null>(null);
-  const [balneazione, setBalneazione] = useState<Record<string, unknown> | null>(
-    null,
-  );
   const [loading, setLoading] = useState(true);
-  const carburanti = asRecord(kpi.carburanti_mimit);
-  const ev = asRecord(kpi.ricarica_ev_pun);
-  const meteo = asRecord(kpi.meteo_italiameteo);
 
   useEffect(() => {
     let cancelled = false;
-    Promise.all([
-      fetch("/api/toscana/porti").then((r) => (r.ok ? r.json() : null)),
-      fetch("/api/arpat/balneazione").then((r) => (r.ok ? r.json() : null)),
-    ])
-      .then(([p, b]) => {
-        if (cancelled) return;
-        setPorti(p);
-        setBalneazione(b);
+    fetch("/api/toscana/porti")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((p) => {
+        if (!cancelled) setPorti(p);
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -872,7 +1044,7 @@ function Porto({ kpi }: { kpi: Kpi }) {
     <section>
       <SectionIntro
         title="Porto"
-        description="Dati aggregati sul porto turistico: posti barca, servizi, webcam ufficiali del Comune e traffico AIS via VesselFinder."
+        description="Scheda del porto turistico: posti barca, servizi, webcam ufficiali del Comune e traffico AIS via VesselFinder."
       />
 
       <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
@@ -889,43 +1061,7 @@ function Porto({ kpi }: { kpi: Kpi }) {
         <KpiCard
           label="Classificazione"
           value={String(porti?.classificazione ?? "n.d.")}
-        />
-        <KpiCard
-          label="Punti ricarica EV (comune)"
-          value={valueOrMissing(ev?.n_totale, formatInteger)}
-          hint={`${formatInteger(num(ev?.n_attivi))} attivi`}
-          icon={Car}
-        />
-        <KpiCard
-          label="Impianti carburanti"
-          value={valueOrMissing(carburanti?.n_impianti, formatInteger)}
-          hint={
-            carburanti?.prezzo_medio_benzina_self != null
-              ? `Benzina self ${formatDecimal(num(carburanti.prezzo_medio_benzina_self), 3)} €/L`
-              : undefined
-          }
-        />
-        <KpiCard
-          label="Vento (live)"
-          value={valueOrMissing(meteo?.vento_kmh, (v) =>
-            `${formatDecimal(v, 1)} km/h`,
-          )}
-          hint={meteo?.ww_desc ? String(meteo.ww_desc) : undefined}
-          icon={Wind}
-        />
-        <KpiCard
-          label="Balneazione eccellente"
-          value={valueOrMissing(
-            balneazione?.classificazione_eccellente_pct,
-            formatPercent,
-          )}
-          hint={
-            balneazione?.aree_totali != null
-              ? `${formatInteger(num(balneazione.aree_totali))} aree ARPAT`
-              : undefined
-          }
-          icon={Waves}
-          variant="success"
+          icon={Ship}
         />
         <KpiCard
           label="Posti barca in Toscana"
@@ -1002,7 +1138,7 @@ function Porto({ kpi }: { kpi: Kpi }) {
 }
 
 function Economia({ kpi }: { kpi: Kpi }) {
-  const { detail, loading } = useDettaglio("asia,redditi,profilo,scuole");
+  const { detail, loading } = useDettaglio("asia,redditi,profilo");
   const lavoro = asRecord(kpi.lavoro_profilo);
   const redditiKpi = asRecord(kpi.redditi_mef);
   const imprese = asRecord(kpi.imprese_asia);
@@ -1022,8 +1158,6 @@ function Economia({ kpi }: { kpi: Kpi }) {
     ? (redditi.trend as Array<{ anno: number; reddito_medio: number; contribuenti: number; imposta_media: number }>)
     : [];
   const fasce = asRecord(asRecord(redditi?.latest)?.fasce);
-  const istruzione = asRecord(asRecord(detail?.profilo)?.istruzione);
-  const dettaglioIstr = asRecord(istruzione?.dettaglio);
   const lavoroExt = asRecord(asRecord(detail?.profilo)?.lavoro);
 
   const fasceEntries = fasce
@@ -1034,7 +1168,7 @@ function Economia({ kpi }: { kpi: Kpi }) {
 
   return (
     <section>
-      <SectionIntro title="Economia & Lavoro" description="Redditi MEF (serie e fasce), profilo occupazionale/istruzione ISTAT e imprese ASIA con ATECO." />
+      <SectionIntro title="Economia & Lavoro" description="Redditi MEF (serie e fasce), profilo occupazionale ISTAT e imprese ASIA con ATECO." />
       <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
         <KpiCard label="Tasso occupazione" value={valueOrMissing(lavoro?.tasso_occupazione, formatPercent)} hint={lavoroExt ? `${formatInteger(num(lavoroExt.occupati_n))} occupati` : undefined} />
         <KpiCard label="Tasso disoccupazione" value={valueOrMissing(lavoro?.tasso_disoccupazione, formatPercent)} hint={lavoroExt ? `${formatInteger(num(lavoroExt.in_cerca_n))} in cerca` : undefined} />
@@ -1114,27 +1248,6 @@ function Economia({ kpi }: { kpi: Kpi }) {
         </div>
       ) : null}
 
-      {dettaglioIstr ? (
-        <div className="panel">
-          <h3>Titolo di studio (pop. 25–64)</h3>
-          <BarChart
-            labels={["Nessun titolo", "Elementare", "Media", "Diploma", "Laurea triennale", "Laurea mag./dott."]}
-            datasets={[
-              {
-                label: "Persone",
-                data: [
-                  num(dettaglioIstr.nessun_titolo) ?? 0,
-                  num(dettaglioIstr.elementare) ?? 0,
-                  num(dettaglioIstr.media) ?? 0,
-                  num(dettaglioIstr.diploma) ?? 0,
-                  num(dettaglioIstr.laurea_triennale) ?? 0,
-                  num(dettaglioIstr.laurea_magistrale_dottorato) ?? 0,
-                ],
-              },
-            ]}
-          />
-        </div>
-      ) : null}
     </section>
   );
 }
@@ -1297,71 +1410,52 @@ function Finanza({ kpi }: { kpi: Kpi }) {
 }
 
 function Territorio({ kpi }: { kpi: Kpi }) {
-  const { detail, loading } = useDettaglio("territorio,morfologia,censimento");
+  const { detail, loading } = useDettaglio("territorio,morfologia");
   const ambiente = asRecord(kpi.ambiente);
-  const aria = asRecord(kpi.aria_ispra);
   const morfoKpi = asRecord(kpi.morfologia_cnr);
+  const anagrafica = asRecord(kpi.anagrafica);
 
   const territorio = asRecord(detail?.territorio);
-  const rifiuti = asRecord(territorio?.rifiuti);
-  const serieRifiuti = Array.isArray(rifiuti?.serie_storica)
-    ? (rifiuti.serie_storica as Array<{ anno?: number; rd_pct?: number; kg_ab?: number }>)
-    : [];
-  const suolo = asRecord(territorio?.suolo);
-  const serieSuolo = Array.isArray(suolo?.serie_storica)
-    ? (suolo.serie_storica as Array<{ intervallo?: string; netto_ha?: number }>)
-    : [];
   const alluvioni = asRecord(asRecord(territorio?.rischio_idrogeologico)?.alluvioni);
   const frane = asRecord(asRecord(territorio?.rischio_idrogeologico)?.frane);
   const morfo = asRecord(asRecord(detail?.morfologia)?.stats) ?? morfoKpi;
   const aspect = asRecord(morfo?.aspect_dist);
   const geomorph = asRecord(morfo?.geomorph);
   const sismica = asRecord(territorio?.classificazione_sismica);
-  const distEta = asRecord(asRecord(asRecord(detail?.censimento)?.distribuzioni_comune)?.eta_5anni);
 
   return (
     <section>
-      <SectionIntro title="Territorio & Ambiente" description="Suolo, rifiuti, rischio idrogeologico, sismica e morfologia CNR-IRPI." />
+      <SectionIntro
+        title="Territorio"
+        description="Morfologia CNR-IRPI, rischio idrogeologico e classificazione sismica. Suolo e rifiuti sono in Ambiente."
+      />
       <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
-        <KpiCard label="Superficie" value={valueOrMissing(ambiente?.superficie_kmq, (v) => `${formatDecimal(v, 2)} km²`)} />
-        <KpiCard label="Consumo di suolo" value={valueOrMissing(ambiente?.consumo_suolo_pct, formatPercent)} hint={suolo ? `${formatDecimal(num(asRecord(suolo.stock_2024)?.ha), 1)} ha` : undefined} />
-        <KpiCard label="Raccolta differenziata" value={valueOrMissing(ambiente?.raccolta_differenziata_pct, formatPercent)} />
-        <KpiCard label="Rifiuti pro capite" value={valueOrMissing(ambiente?.rifiuti_kg_per_abitante, (v) => `${formatInteger(v)} kg/ab`)} />
+        <KpiCard
+          label="Superficie"
+          value={valueOrMissing(ambiente?.superficie_kmq, (v) => `${formatDecimal(v, 2)} km²`)}
+          icon={LandPlot}
+        />
         <KpiCard label="Zona sismica" value={sismica?.zona_sismica ? `Zona ${sismica.zona_sismica}` : "n.d."} />
-        <KpiCard label="Elevazione media" value={valueOrMissing(morfo?.elev_mean, (v) => `${formatInteger(v)} m`)} hint={`min ${formatInteger(num(morfo?.elev_min))} · max ${formatInteger(num(morfo?.elev_max))}`} />
-        <KpiCard label="Pendenza media" value={valueOrMissing(morfo?.slope_mean, (v) => `${formatDecimal(v, 1)}°`)} hint={`>${15}°: ${formatPercent(num(morfo?.slope_gt15_pct))}`} />
+        <KpiCard
+          label="Elevazione media"
+          value={valueOrMissing(morfo?.elev_mean, (v) => `${formatInteger(v)} m`)}
+          hint={`min ${formatInteger(num(morfo?.elev_min))} · max ${formatInteger(num(morfo?.elev_max))}`}
+          icon={Mountain}
+        />
+        <KpiCard
+          label="Pendenza media"
+          value={valueOrMissing(morfo?.slope_mean, (v) => `${formatDecimal(v, 1)}°`)}
+          hint={`>${15}°: ${formatPercent(num(morfo?.slope_gt15_pct))}`}
+        />
         <KpiCard label="Esposizione dominante" value={morfo?.aspect_dom ? String(morfo.aspect_dom) : "n.d."} />
+        <KpiCard
+          label="CF / Catastale"
+          value={`${String(anagrafica?.codice_fiscale ?? "n.d.")}`}
+          hint={`Catastale ${String(anagrafica?.codice_catastale ?? "")}`}
+        />
       </div>
-
-      {aria?.ha_stazione === false ? (
-        <div className="mb-4"><DataUnavailable message="Qualità dell'aria ISPRA: nessuna stazione presente nel comune." /></div>
-      ) : null}
 
       {loading ? <LoadingBlock /> : null}
-
-      <div className="mb-4 grid gap-3 sm:gap-4 lg:grid-cols-2">
-        {serieRifiuti.length > 0 ? (
-          <div className="panel">
-            <h3>Serie raccolta differenziata</h3>
-            <LineChart
-              labels={serieRifiuti.map((r) => String(r.anno))}
-              datasets={[
-                { label: "% RD", data: serieRifiuti.map((r) => r.rd_pct ?? 0), color: "#008758" },
-                { label: "kg/ab", data: serieRifiuti.map((r) => r.kg_ab ?? 0), color: "#CC7A00" },
-              ]}
-            />
-          </div>
-        ) : null}
-        {serieSuolo.length > 0 ? (
-          <div className="panel">
-            <h3>Incremento netto consumo di suolo (ha)</h3>
-            <BarChart
-              labels={serieSuolo.map((s) => String(s.intervallo))}
-              datasets={[{ label: "ha netti", data: serieSuolo.map((s) => s.netto_ha ?? 0), color: "#D9364F" }]}
-            />
-          </div>
-        ) : null}
-      </div>
 
       <div className="mb-4 grid gap-3 sm:gap-4 lg:grid-cols-2">
         {alluvioni ? (
@@ -1402,16 +1496,6 @@ function Territorio({ kpi }: { kpi: Kpi }) {
           </div>
         ) : null}
       </div>
-
-      {distEta ? (
-        <div className="mb-4 panel">
-          <h3>Popolazione censimento per età (5 anni)</h3>
-          <BarChart
-            labels={Object.keys(distEta)}
-            datasets={[{ label: "Abitanti", data: Object.values(distEta).map((v) => Number(v) || 0) }]}
-          />
-        </div>
-      ) : null}
 
       {morfo ? (
         <div className="panel">
@@ -1509,7 +1593,7 @@ function Infra({ kpi }: { kpi: Kpi }) {
 
   return (
     <section>
-      <SectionIntro title="Infrastrutture & Mobilità" description="Banda larga, EV, veicoli, incidenti, pendolarismo e carburanti." />
+      <SectionIntro title="Mobilità" description="Banda larga, ricarica EV, veicoli, incidenti, pendolarismo e carburanti." />
       <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
         <KpiCard label="Copertura FTTH" value={valueOrMissing(banda?.copertura_ftth_pct ?? asRecord(agcom?.kpi)?.copertura_ftth_desi_pct, formatPercent)} hint={`FTTH 20m ${formatPercent(num(banda?.copertura_ftth_20m_pct ?? asRecord(agcom?.kpi)?.copertura_ftth_20m_pct))}`} />
         <KpiCard label="Punti ricarica EV" value={valueOrMissing(punKpi?.n_totale, formatInteger)} hint={`${formatInteger(num(punKpi?.n_attivi))} attivi · ${formatDecimal(num(punKpi?.potenza_tot_kw ?? punKpi?.potenza_totale_kw), 0)} kW`} />
@@ -1706,15 +1790,8 @@ function Infra({ kpi }: { kpi: Kpi }) {
 }
 
 function Sanita({ kpi }: { kpi: Kpi }) {
-  const { detail, loading } = useDettaglio("sanita,runts");
+  const { detail, loading } = useDettaglio("sanita");
   const sanita = asRecord(kpi.sanita_mds);
-  const runtsKpi = asRecord(kpi.terzo_settore_runts);
-  const runts = asRecord(detail?.runts);
-  const enti = Array.isArray(runts?.enti)
-    ? (runts.enti as Array<{ denom?: string; sez?: string; x1000?: boolean; data_iscr?: string; rapp?: string }>)
-    : [];
-  const mix = asRecord(asRecord(runts?.kpi)?.mix_sezione);
-  const iscrizioniAnno = asRecord(asRecord(runts?.kpi)?.iscrizioni_per_anno);
   const sanitaExt = asRecord(detail?.sanita_mds);
   const farmacie = Array.isArray(asRecord(sanitaExt?.farmacie)?.punti)
     ? (asRecord(sanitaExt?.farmacie)?.punti as Array<Record<string, unknown>>)
@@ -1726,12 +1803,19 @@ function Sanita({ kpi }: { kpi: Kpi }) {
 
   return (
     <section>
-      <SectionIntro title="Sanità & Terzo settore" description="Farmacie di turno (orari/date), anagrafe Ministero della Salute ed enti RUNTS." />
-      <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
-        <KpiCard label="Farmacie" value={valueOrMissing(sanita?.n_farmacie, formatInteger)} />
-        <KpiCard label="Parafarmacie" value={valueOrMissing(sanita?.n_parafarmacie, formatInteger)} />
-        <KpiCard label="Ospedali" value="dato non disponibile" unavailable={ospedali == null && sanita?.n_ospedali == null} />
-        <KpiCard label="Enti RUNTS" value={valueOrMissing(runtsKpi?.n_enti_totali, formatInteger)} hint={`${formatInteger(num(runtsKpi?.n_5x1000))} iscritti al 5x1000`} />
+      <SectionIntro
+        title="Sanità"
+        description="Farmacie di turno (orari/date) e anagrafe Ministero della Salute. Il terzo settore è in Società."
+      />
+      <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3">
+        <KpiCard label="Farmacie" value={valueOrMissing(sanita?.n_farmacie, formatInteger)} icon={Heart} variant="info" />
+        <KpiCard label="Parafarmacie" value={valueOrMissing(sanita?.n_parafarmacie, formatInteger)} icon={Pill} />
+        <KpiCard
+          label="Ospedali"
+          value="dato non disponibile"
+          unavailable={ospedali == null && sanita?.n_ospedali == null}
+          icon={Stethoscope}
+        />
       </div>
 
       <div className="mb-4">
@@ -1739,24 +1823,6 @@ function Sanita({ kpi }: { kpi: Kpi }) {
       </div>
 
       {loading ? <LoadingBlock /> : null}
-
-      <div className="mb-4 grid gap-3 sm:gap-4 lg:grid-cols-2">
-        {mix ? (
-          <div className="panel">
-            <h3>Mix sezioni RUNTS</h3>
-            <DoughnutChart labels={Object.keys(mix)} values={Object.values(mix).map((v) => Number(v) || 0)} />
-          </div>
-        ) : null}
-        {iscrizioniAnno ? (
-          <div className="panel">
-            <h3>Iscrizioni RUNTS per anno</h3>
-            <BarChart
-              labels={Object.keys(iscrizioniAnno)}
-              datasets={[{ label: "Iscrizioni", data: Object.values(iscrizioniAnno).map((v) => Number(v) || 0) }]}
-            />
-          </div>
-        ) : null}
-      </div>
 
       {(farmacie.length > 0 || para.length > 0) ? (
         <div className="mb-4 panel">
@@ -1773,39 +1839,12 @@ function Sanita({ kpi }: { kpi: Kpi }) {
           </ul>
         </div>
       ) : null}
-
-      {enti.length > 0 ? (
-        <div className="overflow-x-auto panel p-0">
-          <h3 className="px-3 pt-3 sm:px-4 sm:pt-4">Elenco enti RUNTS</h3>
-          <table className="min-w-full text-left text-xs sm:text-sm">
-            <thead className="bg-[#e8f2fc] text-[#17324d]">
-              <tr>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Denominazione</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Sezione</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Rappresentante</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">5x1000</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Iscrizione</th>
-              </tr>
-            </thead>
-            <tbody>
-              {enti.map((e) => (
-                <tr key={e.denom} className="border-t border-[#eef2f5]">
-                  <td className="px-2 py-1.5 sm:px-3 sm:py-2">{e.denom}</td>
-                  <td className="px-2 py-1.5 sm:px-3 sm:py-2">{e.sez}</td>
-                  <td className="px-2 py-1.5 sm:px-3 sm:py-2">{e.rapp ?? "—"}</td>
-                  <td className="px-2 py-1.5 sm:px-3 sm:py-2">{e.x1000 ? "Sì" : "No"}</td>
-                  <td className="px-2 py-1.5 sm:px-3 sm:py-2">{e.data_iscr ?? "—"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      ) : null}
     </section>
   );
 }
 
 function Ambiente({ kpi }: { kpi: Kpi }) {
+  const { detail, loading: loadingTerr } = useDettaglio("territorio");
   const [balneazione, setBalneazione] = useState<Record<string, unknown> | null>(null);
   const [aria, setAria] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(true);
@@ -1837,6 +1876,16 @@ function Ambiente({ kpi }: { kpi: Kpi }) {
   }, []);
 
   const ambiente = asRecord(kpi.ambiente);
+  const ariaKpi = asRecord(kpi.aria_ispra);
+  const territorio = asRecord(detail?.territorio);
+  const rifiuti = asRecord(territorio?.rifiuti);
+  const serieRifiuti = Array.isArray(rifiuti?.serie_storica)
+    ? (rifiuti.serie_storica as Array<{ anno?: number; rd_pct?: number; kg_ab?: number }>)
+    : [];
+  const suolo = asRecord(territorio?.suolo);
+  const serieSuolo = Array.isArray(suolo?.serie_storica)
+    ? (suolo.serie_storica as Array<{ intervallo?: string; netto_ha?: number }>)
+    : [];
   const aree = Array.isArray(balneazione?.aree)
     ? (balneazione.aree as Array<Record<string, unknown>>)
     : [];
@@ -1845,7 +1894,7 @@ function Ambiente({ kpi }: { kpi: Kpi }) {
     <section>
       <SectionIntro
         title="Ambiente"
-        description="Qualità acque di balneazione ARPAT, qualità aria e dati ambientali. San Vincenzo è un comune costiero con particolare attenzione alla qualità delle acque marine."
+        description="Balneazione ARPAT, aria, raccolta differenziata e consumo di suolo."
       />
 
       <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
@@ -1867,6 +1916,24 @@ function Ambiente({ kpi }: { kpi: Kpi }) {
           variant="success"
         />
         <KpiCard
+          label="Raccolta differenziata"
+          value={valueOrMissing(ambiente?.raccolta_differenziata_pct, formatPercent)}
+          icon={Recycle}
+          variant="success"
+        />
+        <KpiCard
+          label="Rifiuti pro capite"
+          value={valueOrMissing(ambiente?.rifiuti_kg_per_abitante, (v) => `${formatInteger(v)} kg/ab`)}
+          icon={Recycle}
+        />
+        <KpiCard
+          label="Consumo di suolo"
+          value={valueOrMissing(ambiente?.consumo_suolo_pct, formatPercent)}
+          hint={suolo ? `${formatDecimal(num(asRecord(suolo.stock_2024)?.ha), 1)} ha` : `${formatDecimal(num(ambiente?.superficie_kmq), 2)} km²`}
+          icon={LandPlot}
+          variant="warning"
+        />
+        <KpiCard
           label="Superamenti limiti 2024"
           value={valueOrMissing(balneazione?.superamenti_2024, formatInteger)}
           icon={Droplets}
@@ -1874,13 +1941,41 @@ function Ambiente({ kpi }: { kpi: Kpi }) {
         />
         <KpiCard
           label="Stazione qualità aria"
-          value={aria?.disponibile === false ? "Non presente" : "n.d."}
+          value={
+            aria?.disponibile === false || ariaKpi?.ha_stazione === false
+              ? "Non presente"
+              : "n.d."
+          }
           unavailable={true}
           icon={Wind}
         />
       </div>
 
-      {loading ? <LoadingBlock label="Caricamento dati ARPAT…" /> : null}
+      {loading || loadingTerr ? <LoadingBlock label="Caricamento dati ambientali…" /> : null}
+
+      <div className="mb-4 grid gap-3 sm:gap-4 lg:grid-cols-2">
+        {serieRifiuti.length > 0 ? (
+          <div className="panel">
+            <h3>Serie raccolta differenziata</h3>
+            <LineChart
+              labels={serieRifiuti.map((r) => String(r.anno))}
+              datasets={[
+                { label: "% RD", data: serieRifiuti.map((r) => r.rd_pct ?? 0), color: "#008758" },
+                { label: "kg/ab", data: serieRifiuti.map((r) => r.kg_ab ?? 0), color: "#CC7A00" },
+              ]}
+            />
+          </div>
+        ) : null}
+        {serieSuolo.length > 0 ? (
+          <div className="panel">
+            <h3>Incremento netto consumo di suolo (ha)</h3>
+            <BarChart
+              labels={serieSuolo.map((s) => String(s.intervallo))}
+              datasets={[{ label: "ha netti", data: serieSuolo.map((s) => s.netto_ha ?? 0), color: "#D9364F" }]}
+            />
+          </div>
+        ) : null}
+      </div>
 
       {aree.length > 0 ? (
         <div className="mb-4 panel">
@@ -1905,19 +2000,19 @@ function Ambiente({ kpi }: { kpi: Kpi }) {
                     <td className="px-2 py-1.5 sm:px-3 sm:py-2">
                       <span
                         className={`inline-block rounded px-2 py-0.5 text-xs font-semibold ${
-                          area.classificazione === "Eccellente"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-yellow-100 text-yellow-800"
+                          String(area.classificazione).toLowerCase().includes("eccellente")
+                            ? "bg-[#e6f7ef] text-[#008758]"
+                            : "bg-[#fff4e6] text-[#b36b00]"
                         }`}
                       >
-                        {String(area.classificazione)}
+                        {String(area.classificazione ?? "n.d.")}
                       </span>
                     </td>
                     <td className="px-2 py-1.5 sm:px-3 sm:py-2">
-                      {formatDecimal(num(area.km), 1)} km
+                      {formatDecimal(num(area.km_costa), 2)}
                     </td>
                     <td className="px-2 py-1.5 sm:px-3 sm:py-2">
-                      {formatInteger(num(area.campionamenti_2024))}
+                      {formatInteger(num(area.campionamenti))}
                     </td>
                     <td className="px-2 py-1.5 sm:px-3 sm:py-2">
                       {formatInteger(num(area.superamenti))}
@@ -1942,11 +2037,13 @@ function Ambiente({ kpi }: { kpi: Kpi }) {
         </div>
       ) : null}
 
-      {aria?.disponibile === false ? (
+      {aria?.disponibile === false || ariaKpi?.ha_stazione === false ? (
         <div className="mb-4 panel bg-[#fff8e6]">
           <h3>Qualità dell&apos;aria</h3>
-          <p className="mb-2 text-xs sm:text-sm">{String(aria.messaggio)}</p>
-          {Array.isArray(aria.stazioni_piu_vicine) ? (
+          <p className="mb-2 text-xs sm:text-sm">
+            {String(aria?.messaggio ?? "Nessuna stazione ISPRA presente nel comune.")}
+          </p>
+          {Array.isArray(aria?.stazioni_piu_vicine) ? (
             <>
               <p className="mb-2 text-xs font-semibold sm:text-sm">
                 Stazioni più vicine:
@@ -1964,18 +2061,6 @@ function Ambiente({ kpi }: { kpi: Kpi }) {
           ) : null}
         </div>
       ) : null}
-
-      <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3">
-        <KpiCard
-          label="Raccolta differenziata"
-          value={valueOrMissing(ambiente?.raccolta_differenziata_pct, formatPercent)}
-        />
-        <KpiCard
-          label="Consumo di suolo"
-          value={valueOrMissing(ambiente?.consumo_suolo_pct, formatPercent)}
-          hint={`${formatDecimal(num(ambiente?.superficie_kmq), 2)} km²`}
-        />
-      </div>
 
       <p className="mt-3 text-xs text-[#5b6f82] sm:mt-4 sm:text-sm">
         <strong>Note:</strong> ARPAT effettua monitoraggi microbiologici settimanali
