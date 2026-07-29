@@ -100,30 +100,37 @@ export function AppShell({
     scrollToTopSmooth();
   }
 
+  const brandBlock = (
+    <Link
+      href="/"
+      className="flex h-[var(--shell-topbar-h)] items-center gap-3 px-4 no-underline"
+    >
+      <Image
+        src={STEMMA.src}
+        alt={STEMMA.alt}
+        width={36}
+        height={45}
+        className="h-9 w-auto shrink-0"
+        priority
+      />
+      <div className="min-w-0">
+        <p className="m-0 text-sm font-bold leading-tight text-[var(--pa-ink)]">
+          Cruscotto {COMUNE_NOME}
+        </p>
+        <p className="m-0 mt-0.5 text-xs leading-tight text-[var(--pa-muted)]">
+          {COMUNE_PROVINCIA} · dati aperti
+        </p>
+      </div>
+    </Link>
+  );
+
   const nav = (
     <nav aria-label="Sezioni del cruscotto" className="flex h-full flex-col">
-      <div className="hidden border-b border-[var(--pa-border)] px-4 py-4 lg:block">
-        <Link href="/" className="flex items-center gap-3 no-underline">
-          <Image
-            src={STEMMA.src}
-            alt={STEMMA.alt}
-            width={40}
-            height={50}
-            className="h-10 w-auto"
-            priority
-          />
-          <div className="min-w-0">
-            <p className="m-0 text-sm font-bold leading-tight text-[var(--pa-ink)]">
-              Cruscotto {COMUNE_NOME}
-            </p>
-            <p className="m-0 mt-0.5 text-xs text-[var(--pa-muted)]">
-              {COMUNE_PROVINCIA} · dati aperti
-            </p>
-          </div>
-        </Link>
+      <div className="hidden shrink-0 border-b border-[var(--pa-border)] lg:block">
+        {brandBlock}
       </div>
 
-      <div className="flex-1 space-y-4 overflow-y-auto p-2">
+      <div className="flex-1 space-y-3 overflow-y-auto p-2 pt-3">
         {groups.map((group) => (
           <div key={group.label}>
             <p className="m-0 px-3 pb-1 text-[11px] font-bold uppercase tracking-wide text-[var(--pa-muted)]">
@@ -156,8 +163,8 @@ export function AppShell({
         ))}
       </div>
 
-      <div className="border-t border-[var(--pa-border)] p-3 text-xs text-[var(--pa-muted)]">
-        <p className="m-0 mb-2">Progetto indipendente · non ufficiale</p>
+      <div className="shrink-0 border-t border-[var(--pa-border)] p-3 text-xs text-[var(--pa-muted)]">
+        <p className="m-0 mb-1 leading-snug">Progetto indipendente · non ufficiale</p>
         <Link
           href="/attribuzioni"
           className="inline-flex min-h-11 items-center font-semibold text-[var(--pa-primary)] underline underline-offset-2"
@@ -194,7 +201,7 @@ export function AppShell({
             aria-label="Menu sezioni"
             className="absolute inset-y-0 left-0 flex w-[min(18rem,88vw)] flex-col bg-[var(--pa-surface)] shadow-xl"
           >
-            <div className="flex items-center justify-between border-b border-[var(--pa-border)] px-3 py-2">
+            <div className="flex h-[var(--shell-topbar-h)] items-center justify-between border-b border-[var(--pa-border)] px-3">
               <span className="text-sm font-bold text-[var(--pa-ink)]">Menu</span>
               <button
                 ref={closeBtnRef}
@@ -216,7 +223,7 @@ export function AppShell({
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-20 border-b border-[var(--pa-border)] bg-white/95 backdrop-blur">
-          <div className="flex items-center gap-3 px-3 py-2 sm:px-4 sm:py-2.5">
+          <div className="flex h-[var(--shell-topbar-h)] items-center gap-3 px-3 sm:px-4">
             <button
               ref={menuBtnRef}
               type="button"
@@ -230,7 +237,7 @@ export function AppShell({
 
             <Link
               href="/"
-              className="inline-flex min-h-11 items-center shrink-0 lg:hidden"
+              className="inline-flex h-9 shrink-0 items-center lg:hidden"
               aria-label="Home Cruscotto San Vincenzo"
             >
               <Image
@@ -243,17 +250,17 @@ export function AppShell({
               />
             </Link>
 
-            <div className="min-w-0 flex-1">
+            <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5">
               <h1
                 id={titleId}
-                className="m-0 truncate text-sm font-bold text-[var(--pa-ink)] sm:text-base"
+                className="m-0 truncate text-base font-bold leading-tight text-[var(--pa-ink)]"
               >
                 <span className="lg:hidden">Cruscotto {COMUNE_NOME}</span>
                 <span className="hidden lg:inline">
                   {active?.label ?? `Cruscotto ${COMUNE_NOME}`}
                 </span>
               </h1>
-              <p className="m-0 truncate text-xs text-[var(--pa-muted)]">
+              <p className="m-0 truncate text-xs leading-tight text-[var(--pa-muted)]">
                 {generatedAt
                   ? `Aggiornato ${new Date(generatedAt).toLocaleString("it-IT", {
                       dateStyle: "short",
@@ -270,7 +277,7 @@ export function AppShell({
               </p>
             </div>
           </div>
-          <div className="bg-[var(--pa-primary)] px-3 py-1.5 text-xs font-semibold text-white sm:px-4">
+          <div className="flex h-8 items-center bg-[var(--pa-primary)] px-3 text-xs font-semibold text-white sm:px-4">
             Progetto indipendente · non ufficiale · dati aperti
           </div>
         </header>
