@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import type { LucideIcon } from "lucide-react";
+import { TrendingUp, TrendingDown, AlertCircle } from "lucide-react";
 import { isMissing } from "@/lib/format";
 
 type KpiCardProps = {
@@ -6,24 +8,84 @@ type KpiCardProps = {
   value: ReactNode;
   hint?: string;
   unavailable?: boolean;
+  icon?: LucideIcon;
+  trend?: "up" | "down" | "neutral";
+  trendValue?: string;
+  variant?: "default" | "success" | "warning" | "danger" | "info";
 };
 
-export function KpiCard({ label, value, hint, unavailable }: KpiCardProps) {
+export function KpiCard({ 
+  label, 
+  value, 
+  hint, 
+  unavailable, 
+  icon: Icon,
+  trend,
+  trendValue,
+  variant = "default",
+}: KpiCardProps) {
   const empty =
     unavailable ||
     value === null ||
     value === undefined ||
     (typeof value === "string" && (value === "n.d." || value === ""));
 
+  const variantStyles = {
+    default: "border-[#d9e6f2] bg-white",
+    success: "border-green-200 bg-green-50",
+    warning: "border-yellow-200 bg-yellow-50",
+    danger: "border-red-200 bg-red-50",
+    info: "border-blue-200 bg-blue-50",
+  };
+
+  const iconColor = {
+    default: "text-[#0066CC]",
+    success: "text-green-600",
+    warning: "text-yellow-600",
+    danger: "text-red-600",
+    info: "text-blue-600",
+  };
+
   return (
-    <article className="rounded-lg border border-[#d9e6f2] bg-white p-3 shadow-sm sm:p-4">
-      <p className="m-0 text-xs font-semibold uppercase tracking-wide text-[#5b6f82]">
-        {label}
-      </p>
-      <p className="m-0 mt-1.5 text-xl font-bold text-[#17324d] sm:mt-2 sm:text-2xl">
-        {empty ? "dato non disponibile" : value}
-      </p>
-      {hint ? <p className="m-0 mt-1.5 text-xs text-[#5b6f82] sm:mt-2">{hint}</p> : null}
+    <article className={`rounded-lg border p-3 shadow-sm sm:p-4 ${variantStyles[variant]}`}>
+      <div className="flex items-start justify-between">
+        <p className="m-0 text-xs font-semibold uppercase tracking-wide text-[#5b6f82]">
+          {label}
+        </p>
+        {Icon && (
+          <Icon 
+            size={20} 
+            className={`shrink-0 ${iconColor[variant]}`} 
+            strokeWidth={2}
+          />
+        )}
+      </div>
+      <div className="mt-1.5 flex items-end justify-between sm:mt-2">
+        <p className="m-0 text-xl font-bold text-[#17324d] sm:text-2xl">
+          {empty ? (
+            <span className="flex items-center gap-1 text-base text-[#5b6f82]">
+              <AlertCircle size={16} />
+              <span>dato non disponibile</span>
+            </span>
+          ) : (
+            value
+          )}
+        </p>
+        {trend && !empty && (
+          <div className={`flex items-center gap-0.5 text-xs font-semibold ${
+            trend === "up" ? "text-green-600" : 
+            trend === "down" ? "text-red-600" : 
+            "text-[#5b6f82]"
+          }`}>
+            {trend === "up" && <TrendingUp size={14} />}
+            {trend === "down" && <TrendingDown size={14} />}
+            {trendValue && <span>{trendValue}</span>}
+          </div>
+        )}
+      </div>
+      {hint ? (
+        <p className="m-0 mt-1.5 text-xs text-[#5b6f82] sm:mt-2">{hint}</p>
+      ) : null}
     </article>
   );
 }

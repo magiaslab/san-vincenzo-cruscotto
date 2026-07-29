@@ -13,6 +13,24 @@ import {
   Stethoscope,
   Train,
   Waves,
+  Users,
+  TrendingUp,
+  Home,
+  GraduationCap,
+  Euro,
+  Recycle,
+  Droplets,
+  Wind,
+  Thermometer,
+  Umbrella,
+  Sun,
+  CloudRain,
+  Car,
+  Building2,
+  Briefcase,
+  Heart,
+  Ship,
+  LandPlot,
 } from "lucide-react";
 import { BarChart, DoughnutChart, LineChart } from "@/components/Charts";
 import {
@@ -209,30 +227,112 @@ function Panoramica({ kpi }: { kpi: Kpi }) {
       />
 
       <div className="mb-4 grid gap-2.5 sm:mb-6 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3 xl:grid-cols-4">
-        <KpiCard label="Popolazione" value={valueOrMissing(demo?.popolazione, formatInteger)} hint={String(demo?.riferimento ?? "")} />
-        <KpiCard label="Maschi / Femmine" value={`${formatInteger(num(demo?.maschi))} / ${formatInteger(num(demo?.femmine))}`} />
-        <KpiCard label="Età media" value={valueOrMissing(demo?.eta_media, (v) => formatDecimal(v, 1))} />
-        <KpiCard label="Indice di vecchiaia" value={valueOrMissing(demo?.indice_vecchiaia, (v) => formatDecimal(v, 1))} />
+        <KpiCard 
+          label="Popolazione" 
+          value={valueOrMissing(demo?.popolazione, formatInteger)} 
+          hint={String(demo?.riferimento ?? "")}
+          icon={Users}
+          variant="info"
+        />
+        <KpiCard 
+          label="Maschi / Femmine" 
+          value={`${formatInteger(num(demo?.maschi))} / ${formatInteger(num(demo?.femmine))}`}
+          icon={Users}
+        />
+        <KpiCard 
+          label="Età media" 
+          value={valueOrMissing(demo?.eta_media, (v) => formatDecimal(v, 1))}
+          icon={Users}
+        />
+        <KpiCard 
+          label="Indice di vecchiaia" 
+          value={valueOrMissing(demo?.indice_vecchiaia, (v) => formatDecimal(v, 1))}
+          icon={TrendingUp}
+        />
         <KpiCard label="Indice di dipendenza" value={valueOrMissing(demo?.indice_dipendenza, (v) => formatDecimal(v, 1))} />
-        <KpiCard label="Tasso occupazione" value={valueOrMissing(lavoro?.tasso_occupazione, formatPercent)} hint={lavoro?.anno ? `Anno ${lavoro.anno}` : undefined} />
-        <KpiCard label="Tasso disoccupazione" value={valueOrMissing(lavoro?.tasso_disoccupazione, formatPercent)} />
-        <KpiCard label="Diploma o oltre" value={valueOrMissing(istruzione?.pct_diploma_oltre, formatPercent)} />
-        <KpiCard label="Terziario" value={valueOrMissing(istruzione?.pct_terziario, formatPercent)} />
-        <KpiCard label="Reddito medio" value={valueOrMissing(redditi?.reddito_medio_eur, formatEuro)} hint={`${formatInteger(num(redditi?.n_contribuenti))} contribuenti`} />
-        <KpiCard label="Indice turisticità" value={valueOrMissing(turismo?.indice_turisticita_per_100ab, (v) => `${formatDecimal(v, 1)} /100 ab.`)} hint={`${formatInteger(num(turismo?.totale_strutture))} strutture · ${formatInteger(num(turismo?.totale_letti))} letti`} />
-        <KpiCard label="Raccolta differenziata" value={valueOrMissing(ambiente?.raccolta_differenziata_pct, formatPercent)} />
-        <KpiCard label="Consumo di suolo" value={valueOrMissing(ambiente?.consumo_suolo_pct, formatPercent)} hint={`${formatDecimal(num(ambiente?.superficie_kmq), 2)} km²`} />
+        <KpiCard 
+          label="Tasso occupazione" 
+          value={valueOrMissing(lavoro?.tasso_occupazione, formatPercent)} 
+          hint={lavoro?.anno ? `Anno ${lavoro.anno}` : undefined}
+          icon={Briefcase}
+          variant="success"
+        />
+        <KpiCard 
+          label="Tasso disoccupazione" 
+          value={valueOrMissing(lavoro?.tasso_disoccupazione, formatPercent)}
+          icon={Briefcase}
+        />
+        <KpiCard 
+          label="Diploma o oltre" 
+          value={valueOrMissing(istruzione?.pct_diploma_oltre, formatPercent)}
+          icon={GraduationCap}
+        />
+        <KpiCard 
+          label="Terziario" 
+          value={valueOrMissing(istruzione?.pct_terziario, formatPercent)}
+          icon={GraduationCap}
+        />
+        <KpiCard 
+          label="Reddito medio" 
+          value={valueOrMissing(redditi?.reddito_medio_eur, formatEuro)} 
+          hint={`${formatInteger(num(redditi?.n_contribuenti))} contribuenti`}
+          icon={Euro}
+          variant="success"
+        />
+        <KpiCard 
+          label="Indice turisticità" 
+          value={valueOrMissing(turismo?.indice_turisticita_per_100ab, (v) => `${formatDecimal(v, 1)} /100 ab.`)} 
+          hint={`${formatInteger(num(turismo?.totale_strutture))} strutture · ${formatInteger(num(turismo?.totale_letti))} letti`}
+          icon={Palmtree}
+          variant="success"
+        />
+        <KpiCard 
+          label="Raccolta differenziata" 
+          value={valueOrMissing(ambiente?.raccolta_differenziata_pct, formatPercent)}
+          icon={Recycle}
+          variant="success"
+        />
+        <KpiCard 
+          label="Consumo di suolo" 
+          value={valueOrMissing(ambiente?.consumo_suolo_pct, formatPercent)} 
+          hint={`${formatDecimal(num(ambiente?.superficie_kmq), 2)} km²`}
+          icon={LandPlot}
+          variant="warning"
+        />
         <KpiCard label="Copertura FTTH" value={valueOrMissing(banda?.copertura_ftth_pct, formatPercent)} />
         <KpiCard label="Punti ricarica EV" value={valueOrMissing(ev?.n_totale, formatInteger)} hint={`${formatPercent(num(ev?.pct_attivi))} attivi`} />
-        <KpiCard label="Veicoli" value={valueOrMissing(veicoli?.totale_veicoli, formatInteger)} hint={`${formatDecimal(num(veicoli?.tasso_motorizzazione_per_1000_ab), 0)} /1000 ab.`} />
-        <KpiCard label="Unità locali ASIA" value={valueOrMissing(imprese?.ul_totali, formatInteger)} hint={`${formatDecimal(num(imprese?.addetti_totali), 0)} addetti`} />
+        <KpiCard 
+          label="Veicoli" 
+          value={valueOrMissing(veicoli?.totale_veicoli, formatInteger)} 
+          hint={`${formatDecimal(num(veicoli?.tasso_motorizzazione_per_1000_ab), 0)} /1000 ab.`}
+          icon={Car}
+        />
+        <KpiCard 
+          label="Unità locali ASIA" 
+          value={valueOrMissing(imprese?.ul_totali, formatInteger)} 
+          hint={`${formatDecimal(num(imprese?.addetti_totali), 0)} addetti`}
+          icon={Building2}
+          trend={num(imprese?.ul_yoy_pct) != null && num(imprese?.ul_yoy_pct) > 0 ? "up" : num(imprese?.ul_yoy_pct) < 0 ? "down" : undefined}
+          trendValue={imprese?.ul_yoy_pct != null ? formatPercent(num(imprese.ul_yoy_pct)) : undefined}
+        />
         <KpiCard label="Saldo cassa SIOPE" value={valueOrMissing(siope?.saldo_cassa_eur, formatEuroCompact)} hint={`Anno ${String(siope?.anno ?? "")}`} />
         <KpiCard label="PNRR" value={valueOrMissing(pnrr?.importo_assegnato_eur, formatEuroCompact)} hint={`${formatInteger(num(pnrr?.n_progetti))} progetti · ${formatInteger(num(pnrr?.n_concluso))} conclusi`} />
         <KpiCard label="Opere BDAP" value={valueOrMissing(opere?.n_progetti, formatInteger)} hint={valueOrMissing(opere?.importo_totale_eur, formatEuroCompact)} />
         <KpiCard label="Contratti ANAC" value={valueOrMissing(anac?.n_aggiudicazioni, formatInteger)} hint={valueOrMissing(anac?.importo_totale_eur, formatEuroCompact)} />
-        <KpiCard label="Patrimonio PA" value={valueOrMissing(patrimonio?.n_immobili, formatInteger)} hint={`${formatInteger(num(patrimonio?.n_fabbricati))} fabbricati · ${formatInteger(num(patrimonio?.n_terreni))} terreni`} />
+        <KpiCard 
+          label="Patrimonio PA" 
+          value={valueOrMissing(patrimonio?.n_immobili, formatInteger)} 
+          hint={`${formatInteger(num(patrimonio?.n_fabbricati))} fabbricati · ${formatInteger(num(patrimonio?.n_terreni))} terreni`}
+          icon={Building2}
+        />
         <KpiCard label="Enti RUNTS" value={valueOrMissing(runts?.n_enti_totali, formatInteger)} />
-        <KpiCard label="Farmacie" value={valueOrMissing(sanita?.n_farmacie, formatInteger)} hint={`${formatInteger(num(sanita?.n_parafarmacie))} parafarmacie`} />
+        <KpiCard 
+          label="Farmacie" 
+          value={valueOrMissing(sanita?.n_farmacie, formatInteger)} 
+          hint={`${formatInteger(num(sanita?.n_parafarmacie))} parafarmacie`}
+          icon={Heart}
+          variant="info"
+        />
         <KpiCard label="Civici ANNCSU" value={valueOrMissing(civici?.n_civici, formatInteger)} hint={`${formatInteger(num(civici?.n_strade))} strade`} />
         <KpiCard label="Impianti carburanti" value={valueOrMissing(carburanti?.n_impianti, formatInteger)} hint={`Benzina self ${formatDecimal(num(carburanti?.prezzo_medio_benzina_self), 3)} €/L`} />
         <KpiCard label="Pendolarismo netto" value={valueOrMissing(pendol?.saldo_netto, formatInteger)} hint={`Uscenti ${formatInteger(num(pendol?.uscenti_totali))} · Entranti ${formatInteger(num(pendol?.entranti_totali))}`} />
@@ -451,14 +551,18 @@ function Turismo({ kpi }: { kpi: Kpi }) {
             <KpiCard
               label="Posti barca"
               value={valueOrMissing(portualita.posti_barca, formatInteger)}
+              icon={Ship}
+              variant="info"
             />
             <KpiCard
               label="Tipo struttura"
               value={String(portualita.tipo ?? "n.d.")}
+              icon={Ship}
             />
             <KpiCard
               label="Classificazione"
               value={String(porti?.classificazione ?? "n.d.")}
+              icon={Ship}
             />
           </div>
           {Array.isArray(porti?.servizi) ? (
@@ -1265,6 +1369,8 @@ function Ambiente({ kpi }: { kpi: Kpi }) {
           label="Aree balneazione"
           value={valueOrMissing(balneazione?.aree_totali, formatInteger)}
           hint={`${formatDecimal(num(balneazione?.km_costa_controllati), 1)} km costa`}
+          icon={Waves}
+          variant="info"
         />
         <KpiCard
           label="Classificazione eccellente"
@@ -1273,15 +1379,20 @@ function Ambiente({ kpi }: { kpi: Kpi }) {
             formatPercent,
           )}
           hint={`Anno ${String(balneazione?.anno ?? "2024")}`}
+          icon={Droplets}
+          variant="success"
         />
         <KpiCard
           label="Superamenti limiti 2024"
           value={valueOrMissing(balneazione?.superamenti_2024, formatInteger)}
+          icon={Droplets}
+          variant={num(balneazione?.superamenti_2024) === 0 ? "success" : "warning"}
         />
         <KpiCard
           label="Stazione qualità aria"
           value={aria?.disponibile === false ? "Non presente" : "n.d."}
           unavailable={true}
+          icon={Wind}
         />
       </div>
 
@@ -1490,16 +1601,20 @@ function Meteo({ kpi }: { kpi: Kpi }) {
               currentOm?.weather_desc ?? stats?.ww_desc ?? "",
             ) || undefined
           }
+          icon={Thermometer}
+          variant="info"
         />
         <KpiCard
           label="Percepita"
           value={valueOrMissing(currentOm?.apparent_temperature, (v) =>
             `${formatDecimal(v, 1)} °C`,
           )}
+          icon={Thermometer}
         />
         <KpiCard
           label="Min / Max 24h (KPI)"
           value={`${valueOrMissing(stats?.t2m_min24h_c, (v) => formatDecimal(v, 1))} / ${valueOrMissing(stats?.t2m_max24h_c, (v) => formatDecimal(v, 1))} °C`}
+          icon={Thermometer}
         />
         <KpiCard
           label="Umidità"
@@ -1507,6 +1622,8 @@ function Meteo({ kpi }: { kpi: Kpi }) {
             currentOm?.relative_humidity_2m ?? stats?.umidita_pct,
             formatPercent,
           )}
+          icon={Droplets}
+          variant="info"
         />
         <KpiCard
           label="Vento"
@@ -1521,6 +1638,7 @@ function Meteo({ kpi }: { kpi: Kpi }) {
                 ? `Raffiche max ${formatDecimal(num(stats.raffica_max24h_kmh), 1)} km/h`
                 : undefined
           }
+          icon={Wind}
         />
         <KpiCard
           label="Nuvolosità"
@@ -1528,6 +1646,7 @@ function Meteo({ kpi }: { kpi: Kpi }) {
             currentOm?.cloud_cover ?? stats?.nuvolosita_pct,
             formatPercent,
           )}
+          icon={CloudRain}
         />
         <KpiCard
           label="Precipitazioni"
@@ -1536,6 +1655,8 @@ function Meteo({ kpi }: { kpi: Kpi }) {
             (v) => `${formatDecimal(v, 1)} mm`,
           )}
           hint={stats?.prec_24h_mm != null ? "KPI: cumulate 24h se da ItaliaMeteo" : undefined}
+          icon={Umbrella}
+          variant={num(currentOm?.precipitation ?? stats?.prec_24h_mm) > 5 ? "info" : "default"}
         />
         <KpiCard
           label="Direzione vento"
@@ -1544,6 +1665,7 @@ function Meteo({ kpi }: { kpi: Kpi }) {
               ? `${formatInteger(num(currentOm?.wind_direction_10m ?? stats?.vento_dir_deg))}°`
               : "n.d."
           }
+          icon={Wind}
         />
       </div>
 
