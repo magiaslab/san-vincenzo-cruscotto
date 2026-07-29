@@ -33,6 +33,7 @@ import {
   Pill,
   Plane,
   Recycle,
+  School,
   ScrollText,
   Ship,
   Sun,
@@ -145,6 +146,10 @@ export const KPI_ICONS: Record<string, LucideIcon> = {
   Nuvolosità: CloudSun,
   Precipitazioni: CloudRain,
   "Direzione vento": Compass,
+  Plessi: School,
+  "Alunni / bambini": Users,
+  Infanzia: GraduationCap,
+  "Cittadinanza non italiana": Globe2,
 };
 
 export const KPI_ICON_FALLBACK: LucideIcon = BarChart3;

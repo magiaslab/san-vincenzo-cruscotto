@@ -35,6 +35,7 @@ import {
 import { AppShell, type NavGroup } from "@/components/AppShell";
 import { FarmacieTurno } from "@/components/FarmacieTurno";
 import { Footer } from "@/components/Footer";
+import { ScuoleMiurPanel } from "@/components/ScuoleMiurPanel";
 import {
   DataUnavailable,
   KpiCard,
@@ -295,7 +296,7 @@ function Panoramica({
     onDetail: () => onNavigate(id),
   });
   const { detail, loading } = useDettaglio(
-    "demografia,profilo,censimento,scuole,redditi,patrimonio",
+    "demografia,profilo,censimento,redditi,patrimonio",
   );
   const demo = asRecord(kpi.demografia);
   const turismo = asRecord(kpi.turismo);
@@ -324,7 +325,6 @@ function Panoramica({
   const fasce = asRecord(demoExt?.fasce_eta);
   const profilo = asRecord(detail?.profilo);
   const cens = asRecord(asRecord(detail?.censimento)?.kpi_comune);
-  const scuole = asRecord(detail?.scuole);
   const piramideFasce = Array.isArray(demoExt?.piramide_fasce)
     ? (demoExt.piramide_fasce as Array<{ label: string; m: number; f: number; tot: number }>)
     : [];
@@ -581,23 +581,10 @@ function Panoramica({
             </ul>
           </div>
         ) : null}
-        {scuole ? (
-          <div className="panel">
-            <h3>Scuole MIUR {String(scuole.anno_scolastico ?? "")}</h3>
-            <p className="text-xs text-[#5b6f82] sm:text-sm">
-              {formatInteger(num(asRecord(scuole.kpi)?.n_scuole))} plessi
-            </p>
-            <ul className="mt-2 space-y-1 text-xs sm:text-sm">
-              {(Array.isArray(scuole.scuole) ? (scuole.scuole as Array<Record<string, unknown>>) : []).map((s) => (
-                <li key={String(s.codice_scuola)}>
-                  <strong>{String(s.denominazione)}</strong> — {String(s.tipologia)}
-                  <br />
-                  <span className="text-[#5b6f82]">{String(s.indirizzo)}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : null}
+      </div>
+
+      <div className="mt-4">
+        <ScuoleMiurPanel />
       </div>
     </section>
   );
