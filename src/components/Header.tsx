@@ -30,16 +30,16 @@ export function Header({ generatedAt }: HeaderProps) {
         </div>
       </div>
 
-      {/* Center: stemma + titolo */}
+      {/* Center: stemma + titolo (senza attribuzione logo, spostata in footer) */}
       <div className="border-b border-[#d9e6f2] bg-white">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-start gap-4 px-4 py-5 sm:px-6">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-4 px-4 py-4 sm:px-6">
           <Image
             src={STEMMA.src}
             alt={STEMMA.alt}
-            width={48}
-            height={60}
+            width={44}
+            height={55}
             priority
-            className="mt-1 h-[60px] w-auto shrink-0"
+            className="h-[55px] w-auto shrink-0"
           />
           <div className="min-w-0 flex-1">
             <h1 className="m-0 text-2xl font-bold leading-tight text-[#17324d] md:text-3xl">
@@ -47,27 +47,10 @@ export function Header({ generatedAt }: HeaderProps) {
             </h1>
             <p className="m-0 mt-1 text-sm text-[#5b6f82]">
               Provincia di Livorno ({COMUNE_PROVINCIA}) · {COMUNE_REGIONE} ·
-              codice ISTAT {ISTAT_CODE}
-            </p>
-            {generatedAt ? (
-              <p className="m-0 mt-1 text-xs text-[#5b6f82]">
-                Dati aggiornati al{" "}
-                {new Date(generatedAt).toLocaleString("it-IT", {
-                  dateStyle: "medium",
-                  timeStyle: "short",
-                })}
-              </p>
-            ) : null}
-            <p className="m-0 mt-2 max-w-3xl text-[11px] leading-snug text-[#5b6f82]">
-              {STEMMA.attribution} —{" "}
-              <a
-                href={STEMMA.licenseUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline"
-              >
-                licenza
-              </a>
+              ISTAT {ISTAT_CODE}
+              {generatedAt
+                ? ` · agg. ${new Date(generatedAt).toLocaleString("it-IT", { dateStyle: "short", timeStyle: "short" })}`
+                : ""}
             </p>
           </div>
         </div>

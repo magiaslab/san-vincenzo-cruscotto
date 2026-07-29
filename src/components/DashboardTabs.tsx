@@ -2,6 +2,19 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
+import {
+  BarChart3,
+  Building2,
+  CloudSun,
+  Factory,
+  Globe2,
+  Landmark,
+  Map,
+  Mountain,
+  Palmtree,
+  Stethoscope,
+  Train,
+} from "lucide-react";
 import { BarChart, DoughnutChart, LineChart } from "@/components/Charts";
 import {
   DataUnavailable,
@@ -37,15 +50,15 @@ const MeteoRadarMap = dynamic(() => import("@/components/MeteoRadarMap"), {
 type Kpi = Record<string, unknown>;
 
 const TABS = [
-  { id: "panoramica", label: "Panoramica" },
-  { id: "turismo", label: "Turismo" },
-  { id: "economia", label: "Economia & Lavoro" },
-  { id: "finanza", label: "Finanza pubblica" },
-  { id: "territorio", label: "Territorio & Ambiente" },
-  { id: "infra", label: "Infrastrutture & Mobilità" },
-  { id: "sanita", label: "Sanità & Terzo settore" },
-  { id: "meteo", label: "Meteo" },
-  { id: "mappa", label: "Mappa" },
+  { id: "panoramica", label: "Panoramica", Icon: Globe2 },
+  { id: "turismo", label: "Turismo", Icon: Palmtree },
+  { id: "economia", label: "Economia", Icon: Factory },
+  { id: "finanza", label: "Finanza", Icon: Landmark },
+  { id: "territorio", label: "Territorio", Icon: Mountain },
+  { id: "infra", label: "Mobilità", Icon: Train },
+  { id: "sanita", label: "Sanità", Icon: Stethoscope },
+  { id: "meteo", label: "Meteo", Icon: CloudSun },
+  { id: "mappa", label: "Mappa", Icon: Map },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -104,24 +117,29 @@ export function DashboardTabs({ kpi }: { kpi: Kpi }) {
         className="sticky top-0 z-20 border-b border-[#d9e6f2] bg-white/95 backdrop-blur"
         aria-label="Sezioni del cruscotto"
       >
-        <div className="mx-auto max-w-7xl overflow-x-auto px-4 sm:px-6">
-          <ul className="m-0 flex list-none gap-1 p-0 py-2" role="tablist">
+        <div className="mx-auto max-w-7xl px-2 sm:px-4">
+          <ul
+            className="m-0 flex list-none justify-between gap-0 p-0 py-1.5 sm:justify-start sm:gap-1"
+            role="tablist"
+          >
             {TABS.map((t) => {
               const active = tab === t.id;
+              const Icon = t.Icon;
               return (
-                <li key={t.id} role="presentation">
+                <li key={t.id} role="presentation" className="flex-1 sm:flex-none">
                   <button
                     type="button"
                     role="tab"
                     aria-selected={active}
-                    className={`whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold transition ${
+                    className={`flex w-full flex-col items-center gap-0.5 rounded-lg px-1.5 py-1.5 text-[11px] font-semibold leading-tight transition sm:flex-row sm:gap-1.5 sm:px-3 sm:py-2 sm:text-sm ${
                       active
                         ? "bg-[#0066CC] text-white"
                         : "bg-transparent text-[#17324d] hover:bg-[#e8f2fc]"
                     }`}
                     onClick={() => setTab(t.id)}
                   >
-                    {t.label}
+                    <Icon size={16} strokeWidth={2} className="shrink-0" />
+                    <span className="truncate">{t.label}</span>
                   </button>
                 </li>
               );
