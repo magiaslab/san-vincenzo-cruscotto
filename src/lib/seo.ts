@@ -6,18 +6,44 @@ import {
   ISTAT_CODE,
 } from "@/lib/constants";
 
+/** Host pubblico preferito (apex reindirizza a www; i crawler OG spesso non seguono i 308). */
+const CANONICAL_HOST = "www.cruscottosanvincenzo.it";
+
+function normalizeSiteUrl(raw: string): string {
+  const trimmed = raw.trim().replace(/\/$/, "");
+  try {
+    const url = new URL(
+      trimmed.startsWith("http") ? trimmed : `https://${trimmed}`,
+    );
+    if (
+      url.hostname === "cruscottosanvincenzo.it" ||
+      url.hostname === CANONICAL_HOST
+    ) {
+      url.protocol = "https:";
+      url.hostname = CANONICAL_HOST;
+      url.pathname = "";
+      url.search = "";
+      url.hash = "";
+      return url.origin;
+    }
+    return `${url.protocol}//${url.host}`;
+  } catch {
+    return trimmed;
+  }
+}
+
 /** URL canonico del sito (senza slash finale). */
 export function getSiteUrl(): string {
   const fromEnv = process.env.NEXT_PUBLIC_SITE_URL?.trim();
-  if (fromEnv) return fromEnv.replace(/\/$/, "");
+  if (fromEnv) return normalizeSiteUrl(fromEnv);
 
   const prod = process.env.VERCEL_PROJECT_PRODUCTION_URL?.trim();
-  if (prod) return `https://${prod.replace(/^https?:\/\//, "")}`;
+  if (prod) return normalizeSiteUrl(prod);
 
   const preview = process.env.VERCEL_URL?.trim();
-  if (preview) return `https://${preview.replace(/^https?:\/\//, "")}`;
+  if (preview) return normalizeSiteUrl(preview);
 
-  return "https://san-vincenzo-cruscotto.vercel.app";
+  return `https://${CANONICAL_HOST}`;
 }
 
 export const SITE_NAME = `Cruscotto ${COMUNE_NOME}`;
@@ -43,10 +69,29 @@ export const SITE_KEYWORDS = [
   "balneazione ARPAT",
 ] as const;
 
+export const OG_IMAGE = {
+  path: "/og-image.jpg",
+  width: 1200,
+  height: 630,
+  type: "image/jpeg" as const,
+};
+
 export function absoluteUrl(path = "/"): string {
   const base = getSiteUrl();
   if (!path || path === "/") return base;
   return `${base}${path.startsWith("/") ? path : `/${path}`}`;
+}
+
+export function buildOgImages(alt: string) {
+  return [
+    {
+      url: absoluteUrl(OG_IMAGE.path),
+      width: OG_IMAGE.width,
+      height: OG_IMAGE.height,
+      type: OG_IMAGE.type,
+      alt,
+    },
+  ];
 }
 
 /** JSON-LD WebSite + WebApplication per la homepage. */
@@ -78,6 +123,7 @@ export function buildHomeJsonLd() {
         inLanguage: "it-IT",
         description: SITE_DESCRIPTION,
         isAccessibleForFree: true,
+        image: absoluteUrl(OG_IMAGE.path),
         creator: {
           "@type": "Person",
           name: AUTHOR.name,
