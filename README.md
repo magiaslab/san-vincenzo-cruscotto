@@ -33,6 +33,23 @@ Apri [http://localhost:3000](http://localhost:3000).
 | `GET /api/meteo/forecast` | Previsioni Open-Meteo (48h + 7 giorni) |
 | `GET /api/meteo/radar` | Metadati frame radar RainViewer |
 | `GET /api/farmacie/turno` | Farmacie di turno (FarmacieDiTurno.org) |
+| `POST /api/assistente` | Proxy RAG su Modal (HF self-host) |
+
+## Assistente RAG (Modal + Hugging Face)
+
+Piccolo RAG sui dati del cruscotto, **senza API LLM a pagamento**:
+
+- embedding [`paraphrase-multilingual-MiniLM-L12-v2`](https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2)
+- generazione [`SmolLM2-360M-Instruct`](https://huggingface.co/HuggingFaceTB/SmolLM2-360M-Instruct)
+- deploy su Modal (crediti starter, scale-to-zero)
+- app: [san-vincenzo-rag](https://modal.com/apps/magiaslab/main/deployed/san-vincenzo-rag)
+
+Vedi `modal_rag/README.md`. Su Vercel / `.env.local`:
+
+```bash
+# su Vercel / .env.local
+ASSISTENTE_MODAL_URL=https://magiaslab--san-vincenzo-rag-ragservice-web-ask.modal.run
+```
 
 ## Deploy su Vercel
 
