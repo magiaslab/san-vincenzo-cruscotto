@@ -649,7 +649,7 @@ function Turismo({ kpi }: { kpi: Kpi }) {
     <section>
       <SectionIntro
         title="Turismo"
-        description="Capacità ricettiva comunale e flussi provinciali ISTAT. La tassa di soggiorno non è inclusa nelle fonti Cruscotto Italia."
+        description="Capacità ricettiva comunale e flussi provinciali ISTAT."
       />
       <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
         <KpiCard label="Strutture" value={valueOrMissing(capacita?.totale_strutture ?? turismoKpi?.totale_strutture, formatInteger)} />
@@ -829,10 +829,6 @@ function Turismo({ kpi }: { kpi: Kpi }) {
           </p>
         </div>
       ) : null}
-
-      <p className="mt-3 text-xs text-[#5b6f82] sm:mt-4 sm:text-sm">
-        Nota: la tassa/imposta di soggiorno non è disponibile in queste fonti.
-      </p>
     </section>
   );
 }

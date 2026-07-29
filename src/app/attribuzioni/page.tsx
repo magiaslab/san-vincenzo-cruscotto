@@ -88,15 +88,6 @@ export default function AttribuzioniPage() {
             </p>
           </Section>
 
-          <Section title="Tassa di soggiorno">
-            <p>
-              La tassa/imposta di soggiorno non è inclusa: non fa parte delle
-              fonti federate da Cruscotto Italia, in quanto tariffa deliberata
-              autonomamente dal comune. Per informazioni ufficiali consultare
-              il sito istituzionale del Comune di San Vincenzo.
-            </p>
-          </Section>
-
           <Section title="Cruscotto Italia (AgID)">
             <p>
               Fonte principale dei KPI comunali:{" "}
