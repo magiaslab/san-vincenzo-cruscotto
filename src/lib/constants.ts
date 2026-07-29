@@ -32,6 +32,16 @@ export const AUTHOR = {
 export const MAP_CENTER: [number, number] = [43.085, 10.54];
 export const MAP_DEFAULT_ZOOM = 13;
 
+/** Coordinate meteo (centro comune) per Open-Meteo / overlay radar. */
+export const METEO_LAT = 43.085;
+export const METEO_LON = 10.54;
+
+export const OPEN_METEO_URL = "https://api.open-meteo.com/v1/forecast";
+export const OPEN_METEO_ATTRIBUTION_URL = "https://open-meteo.com/";
+export const RAINVIEWER_MAPS_URL =
+  "https://api.rainviewer.com/public/weather-maps.json";
+export const RAINVIEWER_ATTRIBUTION_URL = "https://www.rainviewer.com/";
+
 /** Limite punti civici inviati al client (paginazione server-side). */
 export const CIVICI_MAP_LIMIT = 1500;
 

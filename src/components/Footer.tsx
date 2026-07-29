@@ -64,6 +64,27 @@ export function Footer() {
                     CC BY-NC-ND 3.0 IT
                   </a>
                 </li>
+                <li>
+                  Previsioni:{" "}
+                  <a
+                    className="text-white text-decoration-underline"
+                    href="https://open-meteo.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Open-Meteo
+                  </a>
+                  {" · "}
+                  Radar:{" "}
+                  <a
+                    className="text-white text-decoration-underline"
+                    href="https://www.rainviewer.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    RainViewer
+                  </a>
+                </li>
                 <li>Licenza contenuti dati: CC-BY 4.0 (ove non diversamente indicato).</li>
               </ul>
             </div>

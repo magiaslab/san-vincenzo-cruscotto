@@ -29,6 +29,11 @@ const Terrain3D = dynamic(() => import("@/components/Terrain3D"), {
   loading: () => <LoadingBlock label="Caricamento rilievo 3D…" />,
 });
 
+const MeteoRadarMap = dynamic(() => import("@/components/MeteoRadarMap"), {
+  ssr: false,
+  loading: () => <LoadingBlock label="Caricamento radar…" />,
+});
+
 type Kpi = Record<string, unknown>;
 
 const TABS = [
@@ -1066,6 +1071,7 @@ function Sanita({ kpi }: { kpi: Kpi }) {
 
 function Meteo({ kpi }: { kpi: Kpi }) {
   const [live, setLive] = useState<Record<string, unknown> | null>(null);
+  const [forecast, setForecast] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const fallback = asRecord(kpi.meteo_italiameteo);
@@ -1074,12 +1080,23 @@ function Meteo({ kpi }: { kpi: Kpi }) {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/meteo?_=${Date.now()}`, { cache: "no-store" });
-      if (!res.ok) throw new Error("fetch failed");
-      const data = await res.json();
-      setLive(asRecord(data.meteo));
+      const [kpiRes, fcRes] = await Promise.all([
+        fetch(`/api/meteo?_=${Date.now()}`, { cache: "no-store" }),
+        fetch(`/api/meteo/forecast?_=${Date.now()}`, { cache: "no-store" }),
+      ]);
+      if (kpiRes.ok) {
+        const data = await kpiRes.json();
+        setLive(asRecord(data.meteo));
+      }
+      if (fcRes.ok) {
+        setForecast(await fcRes.json());
+      } else if (!kpiRes.ok) {
+        throw new Error("fetch failed");
+      }
     } catch {
-      setError("Aggiornamento live non riuscito: mostro l'ultimo dato KPI disponibile.");
+      setError(
+        "Aggiornamento live non riuscito: mostro gli ultimi dati disponibili.",
+      );
     } finally {
       setLoading(false);
     }
@@ -1095,33 +1112,251 @@ function Meteo({ kpi }: { kpi: Kpi }) {
     return asRecord(meteo.osservazione) ?? asRecord(meteo.corrente) ?? meteo;
   }, [meteo]);
 
+  const currentOm = asRecord(forecast?.current);
+  const hourly = asRecord(forecast?.hourly);
+  const daily = asRecord(forecast?.daily);
+  const hourlyLabels = Array.isArray(hourly?.time)
+    ? (hourly.time as string[]).map((t) =>
+        new Date(t).toLocaleTimeString("it-IT", {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      )
+    : [];
+  const dailyLabels = Array.isArray(daily?.time)
+    ? (daily.time as string[]).map((t) =>
+        new Date(t).toLocaleDateString("it-IT", {
+          weekday: "short",
+          day: "numeric",
+        }),
+      )
+    : [];
+  const dailyDesc = Array.isArray(daily?.weather_desc)
+    ? (daily.weather_desc as string[])
+    : [];
+
   return (
     <section>
-      <SectionIntro title="Meteo" description="Condizioni correnti ItaliaMeteo/Cineca. Aggiornamento live senza cache di lunga durata." />
+      <SectionIntro
+        title="Meteo"
+        description="Condizioni live (ItaliaMeteo/Cineca + Open-Meteo), previsioni orarie/giornaliere e radar precipitazioni RainViewer su mappa."
+      />
       <div className="mb-3 flex items-center gap-3">
-        <button type="button" onClick={() => void load()} className="rounded-full bg-[#0066CC] px-4 py-2 text-sm font-semibold text-white">
+        <button
+          type="button"
+          onClick={() => void load()}
+          className="rounded-full bg-[#0066CC] px-4 py-2 text-sm font-semibold text-white"
+        >
           Aggiorna ora
         </button>
-        {loading ? <span className="text-sm text-[#5b6f82]">Aggiornamento…</span> : null}
+        {loading ? (
+          <span className="text-sm text-[#5b6f82]">Aggiornamento…</span>
+        ) : null}
       </div>
       {error ? <DataUnavailable message={error} /> : null}
-      {!stats ? (
-        <DataUnavailable />
-      ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <KpiCard label="Temperatura" value={valueOrMissing(stats.t2m_c ?? stats.temp_c, (v) => `${formatDecimal(v, 1)} °C`)} hint={stats.ww_desc ? String(stats.ww_desc) : undefined} />
-          <KpiCard label="Min / Max 24h" value={`${valueOrMissing(stats.t2m_min24h_c, (v) => formatDecimal(v, 1))} / ${valueOrMissing(stats.t2m_max24h_c, (v) => formatDecimal(v, 1))} °C`} />
-          <KpiCard label="Umidità" value={valueOrMissing(stats.umidita_pct, formatPercent)} />
-          <KpiCard label="Vento" value={valueOrMissing(stats.vento_kmh, (v) => `${formatDecimal(v, 1)} km/h`)} hint={stats.raffica_max24h_kmh != null ? `Raffiche max ${formatDecimal(num(stats.raffica_max24h_kmh), 1)} km/h` : undefined} />
-          <KpiCard label="Direzione vento" value={stats.vento_dir_deg != null ? `${formatInteger(num(stats.vento_dir_deg))}°` : "n.d."} />
-          <KpiCard label="Precipitazioni 24h" value={valueOrMissing(stats.prec_24h_mm, (v) => `${formatDecimal(v, 1)} mm`)} />
-          <KpiCard label="Nuvolosità" value={valueOrMissing(stats.nuvolosita_pct, formatPercent)} />
-          <KpiCard label="Neve" value={valueOrMissing(stats.neve_cm, (v) => `${formatDecimal(v, 1)} cm`)} />
-          {stats.valid_time_utc ? (
-            <KpiCard label="Validità" value={new Date(String(stats.valid_time_utc)).toLocaleString("it-IT")} />
-          ) : null}
+
+      <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <KpiCard
+          label="Temperatura"
+          value={valueOrMissing(
+            currentOm?.temperature_2m ?? stats?.t2m_c ?? stats?.temp_c,
+            (v) => `${formatDecimal(v, 1)} °C`,
+          )}
+          hint={
+            String(
+              currentOm?.weather_desc ?? stats?.ww_desc ?? "",
+            ) || undefined
+          }
+        />
+        <KpiCard
+          label="Percepita"
+          value={valueOrMissing(currentOm?.apparent_temperature, (v) =>
+            `${formatDecimal(v, 1)} °C`,
+          )}
+        />
+        <KpiCard
+          label="Min / Max 24h (KPI)"
+          value={`${valueOrMissing(stats?.t2m_min24h_c, (v) => formatDecimal(v, 1))} / ${valueOrMissing(stats?.t2m_max24h_c, (v) => formatDecimal(v, 1))} °C`}
+        />
+        <KpiCard
+          label="Umidità"
+          value={valueOrMissing(
+            currentOm?.relative_humidity_2m ?? stats?.umidita_pct,
+            formatPercent,
+          )}
+        />
+        <KpiCard
+          label="Vento"
+          value={valueOrMissing(
+            currentOm?.wind_speed_10m ?? stats?.vento_kmh,
+            (v) => `${formatDecimal(v, 1)} km/h`,
+          )}
+          hint={
+            currentOm?.wind_gusts_10m != null
+              ? `Raffiche ${formatDecimal(num(currentOm.wind_gusts_10m), 1)} km/h`
+              : stats?.raffica_max24h_kmh != null
+                ? `Raffiche max ${formatDecimal(num(stats.raffica_max24h_kmh), 1)} km/h`
+                : undefined
+          }
+        />
+        <KpiCard
+          label="Nuvolosità"
+          value={valueOrMissing(
+            currentOm?.cloud_cover ?? stats?.nuvolosita_pct,
+            formatPercent,
+          )}
+        />
+        <KpiCard
+          label="Precipitazioni"
+          value={valueOrMissing(
+            currentOm?.precipitation ?? stats?.prec_24h_mm,
+            (v) => `${formatDecimal(v, 1)} mm`,
+          )}
+          hint={stats?.prec_24h_mm != null ? "KPI: cumulate 24h se da ItaliaMeteo" : undefined}
+        />
+        <KpiCard
+          label="Direzione vento"
+          value={
+            currentOm?.wind_direction_10m != null || stats?.vento_dir_deg != null
+              ? `${formatInteger(num(currentOm?.wind_direction_10m ?? stats?.vento_dir_deg))}°`
+              : "n.d."
+          }
+        />
+      </div>
+
+      <div className="mb-4">
+        <MeteoRadarMap />
+      </div>
+
+      {hourlyLabels.length > 0 ? (
+        <div className="mb-4 grid gap-4 lg:grid-cols-2">
+          <div className="panel">
+            <h3>Temperatura prossime 48 ore</h3>
+            <LineChart
+              labels={hourlyLabels}
+              datasets={[
+                {
+                  label: "°C",
+                  data: (hourly?.temperature_2m as number[]) ?? [],
+                  color: "#D9364F",
+                },
+              ]}
+            />
+          </div>
+          <div className="panel">
+            <h3>Precipitazioni e probabilità</h3>
+            <LineChart
+              labels={hourlyLabels}
+              datasets={[
+                {
+                  label: "mm",
+                  data: (hourly?.precipitation as number[]) ?? [],
+                  color: "#0066CC",
+                },
+                {
+                  label: "% probabilità",
+                  data: (hourly?.precipitation_probability as number[]) ?? [],
+                  color: "#008758",
+                },
+              ]}
+            />
+          </div>
         </div>
-      )}
+      ) : null}
+
+      {dailyLabels.length > 0 ? (
+        <div className="mb-4 panel">
+          <h3>Previsione 7 giorni</h3>
+          <div className="mb-4">
+            <LineChart
+              labels={dailyLabels}
+              datasets={[
+                {
+                  label: "Max °C",
+                  data: (daily?.temperature_2m_max as number[]) ?? [],
+                  color: "#D9364F",
+                },
+                {
+                  label: "Min °C",
+                  data: (daily?.temperature_2m_min as number[]) ?? [],
+                  color: "#0066CC",
+                },
+              ]}
+            />
+          </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-left text-sm">
+              <thead className="bg-[#e8f2fc] text-[#17324d]">
+                <tr>
+                  <th className="px-3 py-2">Giorno</th>
+                  <th className="px-3 py-2">Condizioni</th>
+                  <th className="px-3 py-2">Min/Max</th>
+                  <th className="px-3 py-2">Pioggia</th>
+                  <th className="px-3 py-2">Prob.</th>
+                  <th className="px-3 py-2">Vento max</th>
+                </tr>
+              </thead>
+              <tbody>
+                {dailyLabels.map((label, i) => (
+                  <tr key={label} className="border-t border-[#eef2f5]">
+                    <td className="px-3 py-2 font-semibold">{label}</td>
+                    <td className="px-3 py-2">{dailyDesc[i] ?? "—"}</td>
+                    <td className="px-3 py-2">
+                      {formatDecimal(
+                        num((daily?.temperature_2m_min as number[])?.[i]),
+                        1,
+                      )}
+                      {" / "}
+                      {formatDecimal(
+                        num((daily?.temperature_2m_max as number[])?.[i]),
+                        1,
+                      )}{" "}
+                      °C
+                    </td>
+                    <td className="px-3 py-2">
+                      {formatDecimal(
+                        num((daily?.precipitation_sum as number[])?.[i]),
+                        1,
+                      )}{" "}
+                      mm
+                    </td>
+                    <td className="px-3 py-2">
+                      {formatPercent(
+                        num(
+                          (daily?.precipitation_probability_max as number[])?.[
+                            i
+                          ],
+                        ),
+                      )}
+                    </td>
+                    <td className="px-3 py-2">
+                      {formatDecimal(
+                        num((daily?.wind_speed_10m_max as number[])?.[i]),
+                        0,
+                      )}{" "}
+                      km/h
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : loading ? (
+        <LoadingBlock label="Caricamento previsioni Open-Meteo…" />
+      ) : null}
+
+      <p className="mt-2 text-xs text-[#5b6f82]">
+        Fonti aggiuntive:{" "}
+        <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer" className="underline">
+          Open-Meteo
+        </a>{" "}
+        (previsioni) ·{" "}
+        <a href="https://www.rainviewer.com/" target="_blank" rel="noopener noreferrer" className="underline">
+          RainViewer
+        </a>{" "}
+        (radar). Condizioni puntuali anche da ItaliaMeteo/Cineca via Cruscotto Italia.
+      </p>
     </section>
   );
 }
