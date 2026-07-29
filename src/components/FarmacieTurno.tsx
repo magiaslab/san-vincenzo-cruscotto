@@ -1,8 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Phone, MapPin, ExternalLink, Clock } from "lucide-react";
-import { DataUnavailable, LoadingBlock } from "@/components/ui";
+import { Phone, MapPin, ExternalLink, Clock, Pill } from "lucide-react";
+import {
+  DataUnavailable,
+  LoadingBlock,
+  PanelHeading,
+  SolidButton,
+} from "@/components/ui";
 import { FARMACIE_DI_TURNO_URL } from "@/lib/constants";
 
 type FarmaciaTurno = {
@@ -85,26 +90,23 @@ export function FarmacieTurno() {
 
   return (
     <div className="panel">
-      <div className="mb-3 flex flex-wrap items-start justify-between gap-2">
-        <div>
-          <h3 className="m-0">Farmacie di turno</h3>
-          <p className="m-0 mt-1 text-sm text-[#5b6f82]">
-            {data?.giorno
-              ? `Giorno: ${data.giorno}`
-              : "Turni più vicini a San Vincenzo"}
-            {data?.orario_riferimento
-              ? ` · riferimento ore ${data.orario_riferimento}`
-              : null}
-          </p>
-        </div>
-        <button
-          type="button"
-          className="inline-flex min-h-11 items-center rounded-lg bg-[var(--pa-primary)] px-3 py-2 text-sm font-semibold text-white"
-          onClick={() => setTick((t) => t + 1)}
-        >
-          Aggiorna
-        </button>
-      </div>
+      <PanelHeading
+        title="Farmacie di turno"
+        description={
+          [
+            data?.giorno ? `Giorno: ${data.giorno}` : "Turni più vicini a San Vincenzo",
+            data?.orario_riferimento
+              ? `riferimento ore ${data.orario_riferimento}`
+              : null,
+          ]
+            .filter(Boolean)
+            .join(" · ")
+        }
+        icon={Pill}
+        actions={
+          <SolidButton onClick={() => setTick((t) => t + 1)}>Aggiorna</SolidButton>
+        }
+      />
 
       {loading ? <LoadingBlock label="Caricamento farmacie di turno…" /> : null}
 

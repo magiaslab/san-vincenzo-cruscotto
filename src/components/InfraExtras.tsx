@@ -15,8 +15,15 @@ import {
   MAP_DEFAULT_ZOOM,
   OSM_COPYRIGHT_URL,
 } from "@/lib/constants";
-import { DataUnavailable, LoadingBlock } from "@/components/ui";
+import {
+  DataUnavailable,
+  LoadingBlock,
+  OutlineLink,
+  PanelHeading,
+  SolidLink,
+} from "@/components/ui";
 import { formatDecimal } from "@/lib/format";
+import { Fuel, Wifi, Zap } from "lucide-react";
 
 type GeoFeature = {
   type: "Feature";
@@ -60,30 +67,34 @@ function MapShell({
   footer?: ReactNode;
   heightClass?: string;
 }) {
+  const icon =
+    title.toLowerCase().includes("ricarica") || title.toLowerCase().includes("ev")
+      ? Zap
+      : title.toLowerCase().includes("carburant")
+        ? Fuel
+        : Wifi;
+
   return (
     <div className="panel overflow-hidden p-0">
-      <div className="flex flex-wrap items-start justify-between gap-2 border-b border-[#d9e6f2] px-4 py-3">
-        <div>
-          <h3 className="m-0 text-base font-bold text-[#17324d]">{title}</h3>
-          <p className="m-0 mt-1 text-sm text-[#5b6f82]">{description}</p>
-        </div>
-        <a
-          href={sourceUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="shrink-0 rounded-full bg-[#0066CC] px-3 py-1.5 text-sm font-semibold text-white no-underline"
-        >
-          Fonte ufficiale
-        </a>
+      <div className="border-b border-[var(--pa-border)] px-4 py-3">
+        <PanelHeading
+          title={title}
+          description={description}
+          icon={icon}
+          actions={<SolidLink href={sourceUrl}>Fonte ufficiale</SolidLink>}
+          className="mb-0"
+        />
       </div>
-      <div className={`relative w-full ${heightClass}`}>{children}</div>
-      <p className="m-0 border-t border-[#d9e6f2] bg-[#f5f8fc] px-4 py-2 text-xs text-[#5b6f82]">
+      <div className={`relative z-0 w-full overflow-hidden ${heightClass}`}>
+        {children}
+      </div>
+      <p className="m-0 border-t border-[var(--pa-border)] bg-[var(--pa-surface-soft)] px-4 py-2 text-xs text-[var(--pa-muted)]">
         Fonte:{" "}
         <a
           href={sourceUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="underline"
+          className="font-semibold underline"
         >
           {sourceLabel}
         </a>
@@ -93,7 +104,7 @@ function MapShell({
           href={OSM_COPYRIGHT_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="underline"
+          className="font-semibold underline"
         >
           OpenStreetMap
         </a>
@@ -333,36 +344,19 @@ export function BandaUltralargaPanel({
 
   return (
     <div className="panel">
-      <div className="mb-3 flex flex-wrap items-start justify-between gap-2">
-        <div>
-          <h3 className="m-0 text-base font-bold text-[#17324d]">
-            Copertura banda ultralarga / FTTH
-          </h3>
-          <p className="m-0 mt-1 text-sm text-[#5b6f82]">
-            Indicatori AGCOM Broadband Map per San Vincenzo. La mappa ufficiale
-            nazionale non espone layer incorporabili: apri il portale per i
-            dettagli civico per civico.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <a
-            href="https://geo.agcom.it/agcomapps/BB4/BB4_BBwired_na_app16_4/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="shrink-0 rounded-full bg-[#0066CC] px-3 py-1.5 text-sm font-semibold text-white no-underline"
-          >
-            Mappa AGCOM
-          </a>
-          <a
-            href="https://bandaultralarga.italia.it/mappa/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="shrink-0 rounded-full border border-[#0066CC] bg-white px-3 py-1.5 text-sm font-semibold text-[#0066CC] no-underline"
-          >
-            Banda Ultralarga
-          </a>
-        </div>
-      </div>
+      <PanelHeading
+        title="Copertura banda ultralarga / FTTH"
+        description="Indicatori AGCOM Broadband Map per San Vincenzo. La mappa ufficiale nazionale non espone layer incorporabili: apri il portale per i dettagli civico per civico."
+        icon={Wifi}
+        actions={
+          <>
+            <SolidLink href="https://maps.agcom.it/">Mappa AGCOM</SolidLink>
+            <OutlineLink href="https://bandaultralarga.italia.it/mappa/">
+              Banda Ultralarga
+            </OutlineLink>
+          </>
+        }
+      />
       <div className="grid gap-3 sm:grid-cols-2">
         <CoverageBar label="Copertura FTTH (DESI)" value={pct} color="#0066CC" />
         <CoverageBar label="FTTH entro 20 m" value={pct20} color="#008758" />
@@ -384,12 +378,12 @@ function CoverageBar({
   return (
     <div>
       <div className="mb-1 flex items-baseline justify-between gap-2 text-sm">
-        <span className="text-[#5b6f82]">{label}</span>
-        <strong className="text-[#17324d]">
+        <span className="text-[var(--pa-muted)]">{label}</span>
+        <strong className="text-[var(--pa-ink)]">
           {value == null ? "n.d." : `${formatDecimal(value, 0)}%`}
         </strong>
       </div>
-      <div className="h-2.5 overflow-hidden rounded bg-[#e8eef4]">
+      <div className="h-2.5 overflow-hidden rounded bg-[var(--pa-surface-soft)]">
         <div
           className="h-full rounded transition-[width] duration-500"
           style={{ width: `${width}%`, backgroundColor: color }}

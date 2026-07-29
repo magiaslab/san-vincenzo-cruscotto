@@ -29,6 +29,8 @@ import {
   Heart,
   Ship,
   LandPlot,
+  Fuel,
+  Pill,
 } from "lucide-react";
 import { AppShell, type NavGroup } from "@/components/AppShell";
 import { FarmacieTurno } from "@/components/FarmacieTurno";
@@ -38,6 +40,7 @@ import {
   KpiCard,
   LoadingBlock,
   SectionIntro,
+  SolidButton,
   valueOrMissing,
 } from "@/components/ui";
 import { COMUNI_LOOKUP } from "@/lib/constants";
@@ -334,43 +337,52 @@ function Panoramica({
       />
 
       <div className="mb-5 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
-        <button
-          type="button"
-          onClick={() => onNavigate("sanita")}
-          className="panel min-h-11 text-left transition hover:border-[var(--pa-primary)]"
-        >
-          <p className="m-0 text-sm font-bold text-[var(--pa-ink)]">Farmacie di turno</p>
-          <p className="m-0 mt-1 text-xs text-[var(--pa-muted)]">
-            Orari e punti più vicini
-          </p>
-        </button>
-        <button
-          type="button"
-          onClick={() => onNavigate("infra")}
-          className="panel min-h-11 text-left transition hover:border-[var(--pa-primary)]"
-        >
-          <p className="m-0 text-sm font-bold text-[var(--pa-ink)]">Prezzi carburanti</p>
-          <p className="m-0 mt-1 text-xs text-[var(--pa-muted)]">
-            Benzina self media{" "}
-            {formatDecimal(num(carburanti?.prezzo_medio_benzina_self), 3)} €/L
-          </p>
-        </button>
-        <button
-          type="button"
-          onClick={() => onNavigate("ambiente")}
-          className="panel min-h-11 text-left transition hover:border-[var(--pa-primary)]"
-        >
-          <p className="m-0 text-sm font-bold text-[var(--pa-ink)]">Mare e balneazione</p>
-          <p className="m-0 mt-1 text-xs text-[var(--pa-muted)]">Qualità acque ARPAT</p>
-        </button>
-        <button
-          type="button"
-          onClick={() => onNavigate("meteo")}
-          className="panel min-h-11 text-left transition hover:border-[var(--pa-primary)]"
-        >
-          <p className="m-0 text-sm font-bold text-[var(--pa-ink)]">Meteo e radar</p>
-          <p className="m-0 mt-1 text-xs text-[var(--pa-muted)]">Previsioni e precipitazioni</p>
-        </button>
+        {(
+          [
+            {
+              id: "sanita",
+              title: "Farmacie di turno",
+              hint: "Orari e punti più vicini",
+              Icon: Pill,
+            },
+            {
+              id: "infra",
+              title: "Prezzi carburanti",
+              hint: `Benzina self media ${formatDecimal(num(carburanti?.prezzo_medio_benzina_self), 3)} €/L`,
+              Icon: Fuel,
+            },
+            {
+              id: "ambiente",
+              title: "Mare e balneazione",
+              hint: "Qualità acque ARPAT",
+              Icon: Waves,
+            },
+            {
+              id: "meteo",
+              title: "Meteo e radar",
+              hint: "Previsioni e precipitazioni",
+              Icon: CloudSun,
+            },
+          ] as const
+        ).map(({ id, title, hint, Icon }) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => onNavigate(id)}
+            className="panel min-h-11 text-left transition hover:border-[var(--pa-primary)]"
+          >
+            <div className="flex items-start justify-between gap-2">
+              <p className="m-0 text-sm font-bold text-[var(--pa-ink)]">{title}</p>
+              <Icon
+                size={20}
+                className="shrink-0 text-[var(--pa-primary)]"
+                strokeWidth={2}
+                aria-hidden
+              />
+            </div>
+            <p className="m-0 mt-1 text-xs text-[var(--pa-muted)]">{hint}</p>
+          </button>
+        ))}
       </div>
 
       <h3 className="mb-2 mt-0 text-sm font-bold text-[var(--pa-ink)]">
@@ -1547,14 +1559,20 @@ function Infra({ kpi }: { kpi: Kpi }) {
 
       {impiantiOrdinati.length > 0 ? (
         <div className="mb-4 overflow-x-auto panel p-0">
-          <div className="flex flex-wrap items-end justify-between gap-2 px-3 pt-3 sm:px-4 sm:pt-4">
-            <div>
-              <h3 className="m-0">Impianti carburanti</h3>
-              <p className="mb-0 mt-1 text-xs text-[#5b6f82] sm:text-sm">
-                Ordinati per benzina self crescente. Badge verde = prezzo migliore
-                tra gli impianti del comune.
-              </p>
-            </div>
+          <div className="px-3 pt-3 sm:px-4 sm:pt-4">
+            <h3 className="m-0 flex items-center gap-2">
+              <Fuel
+                size={20}
+                className="shrink-0 text-[var(--pa-primary)]"
+                strokeWidth={2}
+                aria-hidden
+              />
+              Impianti carburanti
+            </h3>
+            <p className="mb-0 mt-1 text-xs text-[var(--pa-muted)] sm:text-sm">
+              Ordinati per benzina self crescente. Badge verde = prezzo migliore
+              tra gli impianti del comune.
+            </p>
           </div>
           <table className="mt-2 min-w-full text-left text-xs sm:text-sm">
             <thead className="bg-[#e8f2fc]">
@@ -2050,15 +2068,11 @@ function Meteo({ kpi }: { kpi: Kpi }) {
         description="Condizioni live (ItaliaMeteo/Cineca + Open-Meteo), previsioni orarie/giornaliere e radar precipitazioni RainViewer su mappa."
       />
       <div className="mb-3 flex flex-wrap items-center gap-2 sm:gap-3">
-        <button
-          type="button"
-          onClick={() => void load()}
-          className="rounded-full bg-[#0066CC] px-3 py-1.5 text-xs font-semibold text-white sm:px-4 sm:py-2 sm:text-sm"
-        >
-          Aggiorna ora
-        </button>
+        <SolidButton onClick={() => void load()}>Aggiorna ora</SolidButton>
         {loading ? (
-          <span className="text-xs text-[#5b6f82] sm:text-sm">Aggiornamento…</span>
+          <span className="text-xs text-[var(--pa-muted)] sm:text-sm">
+            Aggiornamento…
+          </span>
         ) : null}
       </div>
       {error ? <DataUnavailable message={error} /> : null}

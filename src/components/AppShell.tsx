@@ -163,11 +163,10 @@ export function AppShell({
         ))}
       </div>
 
-      <div className="shrink-0 border-t border-[var(--pa-border)] p-3 text-xs text-[var(--pa-muted)]">
-        <p className="m-0 mb-1 leading-snug">Progetto indipendente · non ufficiale</p>
+      <div className="shrink-0 border-t border-[var(--pa-border)] p-3">
         <Link
           href="/attribuzioni"
-          className="inline-flex min-h-11 items-center font-semibold text-[var(--pa-primary)] underline underline-offset-2"
+          className="inline-flex min-h-11 w-full items-center rounded-lg px-2 text-sm font-semibold text-[var(--pa-primary)] underline underline-offset-2 hover:bg-[var(--pa-surface-soft)]"
           onClick={() => setOpen(false)}
         >
           Attribuzioni e regole
@@ -177,121 +176,123 @@ export function AppShell({
   );
 
   return (
-    <div className="flex min-h-screen bg-[var(--background)]">
+    <div className="flex min-h-screen flex-col bg-[var(--background)]">
       <a href="#contenuto-principale" className="skip-link">
         Vai al contenuto
       </a>
 
-      <aside className="sticky top-0 z-30 hidden h-screen w-64 shrink-0 border-r border-[var(--pa-border)] bg-[var(--pa-surface)] lg:block">
-        {nav}
-      </aside>
+      <div className="flex min-h-0 flex-1">
+        <aside className="sticky top-0 z-30 hidden h-screen w-64 shrink-0 border-r border-[var(--pa-border)] bg-[var(--pa-surface)] lg:block">
+          {nav}
+        </aside>
 
-      {open ? (
-        <div className="fixed inset-0 z-50 lg:hidden" role="presentation">
-          <button
-            type="button"
-            aria-label="Chiudi menu"
-            className="absolute inset-0 bg-[color-mix(in_srgb,var(--pa-ink)_50%,transparent)]"
-            onClick={() => setOpen(false)}
-          />
-          <aside
-            ref={drawerRef}
-            role="dialog"
-            aria-modal="true"
-            aria-label="Menu sezioni"
-            className="absolute inset-y-0 left-0 flex w-[min(18rem,88vw)] flex-col bg-[var(--pa-surface)] shadow-xl"
-          >
-            <div className="flex h-[var(--shell-topbar-h)] items-center justify-between border-b border-[var(--pa-border)] px-3">
-              <span className="text-sm font-bold text-[var(--pa-ink)]">Menu</span>
-              <button
-                ref={closeBtnRef}
-                type="button"
-                aria-label="Chiudi"
-                className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg text-[var(--pa-ink)] hover:bg-[var(--pa-surface-soft)]"
-                onClick={() => {
-                  setOpen(false);
-                  menuBtnRef.current?.focus();
-                }}
-              >
-                <X size={22} />
-              </button>
-            </div>
-            {nav}
-          </aside>
-        </div>
-      ) : null}
-
-      <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-20 border-b border-[var(--pa-border)] bg-white/95 backdrop-blur">
-          <div className="flex h-[var(--shell-topbar-h)] items-center gap-3 px-3 sm:px-4">
+        {open ? (
+          <div className="fixed inset-0 z-50 lg:hidden" role="presentation">
             <button
-              ref={menuBtnRef}
               type="button"
-              className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg text-[var(--pa-ink)] hover:bg-[var(--pa-surface-soft)] lg:hidden"
-              aria-label="Apri menu sezioni"
-              aria-expanded={open}
-              onClick={() => setOpen(true)}
+              aria-label="Chiudi menu"
+              className="absolute inset-0 bg-[color-mix(in_srgb,var(--pa-ink)_50%,transparent)]"
+              onClick={() => setOpen(false)}
+            />
+            <aside
+              ref={drawerRef}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Menu sezioni"
+              className="absolute inset-y-0 left-0 flex w-[min(18rem,88vw)] flex-col bg-[var(--pa-surface)] shadow-xl"
             >
-              <Menu size={22} />
-            </button>
-
-            <Link
-              href="/"
-              className="inline-flex h-9 shrink-0 items-center lg:hidden"
-              aria-label="Home Cruscotto San Vincenzo"
-            >
-              <Image
-                src={STEMMA.src}
-                alt=""
-                width={32}
-                height={40}
-                className="h-8 w-auto"
-                priority
-              />
-            </Link>
-
-            <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5">
-              <h1
-                id={titleId}
-                className="m-0 truncate text-base font-bold leading-tight text-[var(--pa-ink)]"
-              >
-                <span className="lg:hidden">Cruscotto {COMUNE_NOME}</span>
-                <span className="hidden lg:inline">
-                  {active?.label ?? `Cruscotto ${COMUNE_NOME}`}
-                </span>
-              </h1>
-              <p className="m-0 truncate text-xs leading-tight text-[var(--pa-muted)]">
-                {generatedAt
-                  ? `Aggiornato ${new Date(generatedAt).toLocaleString("it-IT", {
-                      dateStyle: "short",
-                      timeStyle: "short",
-                    })}`
-                  : "Dati Cruscotto Italia (AgID)"}
-                {" · "}
-                <a
-                  href={`mailto:${AUTHOR.email}`}
-                  className="text-[var(--pa-primary)] underline-offset-2 hover:underline"
+              <div className="flex h-[var(--shell-topbar-h)] items-center justify-between border-b border-[var(--pa-border)] px-3">
+                <span className="text-sm font-bold text-[var(--pa-ink)]">Menu</span>
+                <button
+                  ref={closeBtnRef}
+                  type="button"
+                  aria-label="Chiudi"
+                  className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg text-[var(--pa-ink)] hover:bg-[var(--pa-surface-soft)]"
+                  onClick={() => {
+                    setOpen(false);
+                    menuBtnRef.current?.focus();
+                  }}
                 >
-                  Contatti
-                </a>
-              </p>
+                  <X size={22} />
+                </button>
+              </div>
+              {nav}
+            </aside>
+          </div>
+        ) : null}
+
+        <div className="flex min-w-0 flex-1 flex-col">
+          <header className="sticky top-0 z-20 border-b border-[var(--pa-border)] bg-white/95 backdrop-blur">
+            <div className="flex h-[var(--shell-topbar-h)] items-center gap-3 px-3 sm:px-4">
+              <button
+                ref={menuBtnRef}
+                type="button"
+                className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg text-[var(--pa-ink)] hover:bg-[var(--pa-surface-soft)] lg:hidden"
+                aria-label="Apri menu sezioni"
+                aria-expanded={open}
+                onClick={() => setOpen(true)}
+              >
+                <Menu size={22} />
+              </button>
+
+              <Link
+                href="/"
+                className="inline-flex h-9 shrink-0 items-center lg:hidden"
+                aria-label="Home Cruscotto San Vincenzo"
+              >
+                <Image
+                  src={STEMMA.src}
+                  alt=""
+                  width={32}
+                  height={40}
+                  className="h-8 w-auto"
+                  priority
+                />
+              </Link>
+
+              <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5">
+                <h1
+                  id={titleId}
+                  className="m-0 truncate text-base font-bold leading-tight text-[var(--pa-ink)]"
+                >
+                  <span className="lg:hidden">Cruscotto {COMUNE_NOME}</span>
+                  <span className="hidden lg:inline">
+                    {active?.label ?? `Cruscotto ${COMUNE_NOME}`}
+                  </span>
+                </h1>
+                <p className="m-0 truncate text-xs leading-tight text-[var(--pa-muted)]">
+                  {generatedAt
+                    ? `Aggiornato ${new Date(generatedAt).toLocaleString("it-IT", {
+                        dateStyle: "short",
+                        timeStyle: "short",
+                      })}`
+                    : "Dati Cruscotto Italia (AgID)"}
+                  {" · "}
+                  <a
+                    href={`mailto:${AUTHOR.email}`}
+                    className="text-[var(--pa-primary)] underline-offset-2 hover:underline"
+                  >
+                    Contatti
+                  </a>
+                </p>
+              </div>
             </div>
-          </div>
-          <div className="flex h-8 items-center bg-[var(--pa-primary)] px-3 text-xs font-semibold text-white sm:px-4">
-            Progetto indipendente · non ufficiale · dati aperti
-          </div>
-        </header>
+            <div className="flex h-8 items-center bg-[var(--pa-primary)] px-3 text-xs font-semibold text-white sm:px-4">
+              Progetto indipendente · non ufficiale · dati aperti
+            </div>
+          </header>
 
-        <main
-          id="contenuto-principale"
-          className="flex-1 px-3 py-4 sm:px-5 sm:py-5 lg:px-6 lg:py-6"
-          aria-labelledby={titleId}
-        >
-          {children}
-        </main>
-
-        {footer}
+          <main
+            id="contenuto-principale"
+            className="flex-1 px-3 py-4 sm:px-5 sm:py-5 lg:px-6 lg:py-6"
+            aria-labelledby={titleId}
+          >
+            {children}
+          </main>
+        </div>
       </div>
+
+      {footer}
     </div>
   );
 }
