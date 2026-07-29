@@ -8,7 +8,10 @@ import {
 
 export function Footer() {
   return (
-    <footer className="mt-auto border-t border-[#d9e6f2] bg-[#003366] text-white" role="contentinfo">
+    <footer
+      className="mt-auto border-t border-[var(--pa-border)] bg-[var(--pa-footer)] text-white"
+      role="contentinfo"
+    >
       <div className="px-3 py-4 sm:px-5 lg:px-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="max-w-2xl">
@@ -35,20 +38,20 @@ export function Footer() {
           <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs sm:text-sm">
             <Link
               href="/attribuzioni"
-              className="font-semibold text-white underline underline-offset-2"
+              className="inline-flex min-h-11 items-center font-semibold text-white underline underline-offset-2"
             >
               Attribuzioni e regole
             </Link>
             <a
               href={`mailto:${AUTHOR.email}`}
-              className="text-white underline underline-offset-2"
+              className="inline-flex min-h-11 items-center text-white underline underline-offset-2"
             >
               Contatti
             </a>
           </div>
         </div>
       </div>
-      <div className="border-t border-white/10 bg-[#00264d] px-3 py-2.5 text-xs opacity-90 sm:px-5 lg:px-6">
+      <div className="border-t border-white/10 bg-[var(--pa-footer-deep)] px-3 py-2.5 text-xs opacity-90 sm:px-5 lg:px-6">
         <strong>Progetto non ufficiale:</strong> non affiliato ad AgID, al
         Governo italiano o al Comune di San Vincenzo.
       </div>

@@ -45,15 +45,15 @@ function Section({
 export default function AttribuzioniPage() {
   return (
     <>
-      <Header />
+      <Header brandAsHeading={false} />
       <main className="flex-1">
         <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 sm:py-8">
           <p className="mb-2 text-sm">
-            <Link href="/" className="text-[#0066CC] underline underline-offset-2">
+            <Link href="/" className="text-[var(--pa-primary)] underline underline-offset-2">
               ← Torna al cruscotto
             </Link>
           </p>
-          <h1 className="mb-2 text-2xl font-bold text-[#17324d] sm:text-3xl">
+          <h1 className="mb-2 text-2xl font-bold text-[var(--pa-ink)] sm:text-3xl">
             Attribuzioni e regole
           </h1>
           <p className="mb-8 text-[#5b6f82]">

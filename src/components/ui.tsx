@@ -135,9 +135,14 @@ export function SectionIntro({
 }) {
   return (
     <div className="mb-4 sm:mb-5">
-      <h2 className="m-0 text-lg font-bold text-[#17324d] sm:text-xl">{title}</h2>
+      {/* h2 sotto l'h1 di pagina in AppShell */}
+      <h2 className="m-0 text-lg font-bold text-[var(--pa-ink)] sm:text-xl">
+        {title}
+      </h2>
       {description ? (
-        <p className="m-0 mt-1 text-xs text-[#5b6f82] sm:text-sm">{description}</p>
+        <p className="m-0 mt-1 max-w-prose text-xs text-[var(--pa-muted)] sm:text-sm">
+          {description}
+        </p>
       ) : null}
     </div>
   );
@@ -153,7 +158,11 @@ export function DataUnavailable({ message }: { message?: string }) {
 
 export function LoadingBlock({ label = "Caricamento…" }: { label?: string }) {
   return (
-    <div className="animate-pulse rounded-lg border border-[#d9e6f2] bg-white p-6 text-sm text-[#5b6f82]">
+    <div
+      className="motion-safe:animate-pulse rounded-lg border border-[var(--pa-border)] bg-[var(--pa-surface)] p-6 text-sm text-[var(--pa-muted)]"
+      role="status"
+      aria-live="polite"
+    >
       {label}
     </div>
   );

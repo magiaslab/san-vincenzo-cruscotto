@@ -4,11 +4,26 @@
   --background: #f2f7fb;
   --foreground: #17324d;
   --pa-primary: #0066cc;
+  --pa-primary-hover: #0052a3;
+  --pa-ink: #17324d;
+  --pa-muted: #5b6f82;
+  --pa-border: #d9e6f2;
+  --pa-surface: #ffffff;
+  --pa-surface-soft: #e8f2fc;
+  --pa-footer: #003366;
+  --pa-footer-deep: #00264d;
+  --pa-danger: #d9364f;
+  --pa-success: #008758;
+  --pa-warning: #cc7a00;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-pa-primary: var(--pa-primary);
+  --color-pa-ink: var(--pa-ink);
+  --color-pa-muted: var(--pa-muted);
+  --color-pa-border: var(--pa-border);
   --font-sans: var(--font-titillium);
 }
 
@@ -27,6 +42,29 @@ a {
   color: var(--pa-primary);
 }
 
+:focus-visible {
+  outline: 2px solid var(--pa-primary);
+  outline-offset: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  left: 0.75rem;
+  top: -3rem;
+  z-index: 100;
+  border-radius: 0.5rem;
+  background: var(--pa-primary);
+  color: #fff;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  top: 0.75rem;
+}
+
 .leaflet-container {
   font: inherit;
   z-index: 0;
@@ -34,10 +72,10 @@ a {
 }
 
 .leaflet-container .leaflet-control-zoom a {
-  width: 32px;
-  height: 32px;
-  line-height: 32px;
-  font-size: 18px;
+  width: 44px;
+  height: 44px;
+  line-height: 44px;
+  font-size: 20px;
 }
 
 .radar-tiles {
@@ -46,8 +84,8 @@ a {
 
 .panel {
   border-radius: 0.5rem;
-  border: 1px solid #d9e6f2;
-  background: #fff;
+  border: 1px solid var(--pa-border);
+  background: var(--pa-surface);
   padding: 0.75rem;
 }
 
@@ -61,7 +99,7 @@ a {
   margin: 0 0 0.75rem;
   font-size: 0.95rem;
   font-weight: 700;
-  color: #17324d;
+  color: var(--pa-ink);
 }
 
 @media (min-width: 640px) {
@@ -82,5 +120,16 @@ a {
 @media (max-width: 639px) {
   input[type="checkbox"] {
     flex-shrink: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

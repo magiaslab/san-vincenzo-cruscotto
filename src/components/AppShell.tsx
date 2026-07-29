@@ -2,7 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { Menu, X, type LucideIcon } from "lucide-react";
 import {
   AUTHOR,
@@ -10,6 +16,7 @@ import {
   COMUNE_PROVINCIA,
   STEMMA,
 } from "@/lib/constants";
+import { scrollToTopSmooth } from "@/lib/motion";
 
 export type NavItem = {
   id: string;
@@ -17,8 +24,13 @@ export type NavItem = {
   Icon: LucideIcon;
 };
 
-type AppShellProps = {
+export type NavGroup = {
+  label: string;
   items: readonly NavItem[];
+};
+
+type AppShellProps = {
+  groups: readonly NavGroup[];
   activeId: string;
   onNavigate: (id: string) => void;
   generatedAt?: string | null;
@@ -27,7 +39,7 @@ type AppShellProps = {
 };
 
 export function AppShell({
-  items,
+  groups,
   activeId,
   onNavigate,
   generatedAt,
@@ -35,15 +47,44 @@ export function AppShell({
   footer,
 }: AppShellProps) {
   const [open, setOpen] = useState(false);
-  const active = items.find((i) => i.id === activeId);
+  const closeBtnRef = useRef<HTMLButtonElement>(null);
+  const menuBtnRef = useRef<HTMLButtonElement>(null);
+  const drawerRef = useRef<HTMLElement>(null);
+  const titleId = useId();
+  const flat = groups.flatMap((g) => g.items);
+  const active = flat.find((i) => i.id === activeId);
 
   useEffect(() => {
     if (!open) return;
+    const prev = document.activeElement as HTMLElement | null;
+    closeBtnRef.current?.focus();
+
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape") {
+        setOpen(false);
+        return;
+      }
+      if (e.key !== "Tab" || !drawerRef.current) return;
+      const focusable = drawerRef.current.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      );
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     };
+
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      prev?.focus?.();
+    };
   }, [open]);
 
   useEffect(() => {
@@ -56,12 +97,12 @@ export function AppShell({
   function go(id: string) {
     onNavigate(id);
     setOpen(false);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    scrollToTopSmooth();
   }
 
   const nav = (
     <nav aria-label="Sezioni del cruscotto" className="flex h-full flex-col">
-      <div className="hidden border-b border-[#d9e6f2] px-4 py-4 lg:block">
+      <div className="hidden border-b border-[var(--pa-border)] px-4 py-4 lg:block">
         <Link href="/" className="flex items-center gap-3 no-underline">
           <Image
             src={STEMMA.src}
@@ -72,47 +113,54 @@ export function AppShell({
             priority
           />
           <div className="min-w-0">
-            <p className="m-0 text-sm font-bold leading-tight text-[#17324d]">
+            <p className="m-0 text-sm font-bold leading-tight text-[var(--pa-ink)]">
               Cruscotto {COMUNE_NOME}
             </p>
-            <p className="m-0 mt-0.5 text-xs text-[#5b6f82]">
+            <p className="m-0 mt-0.5 text-xs text-[var(--pa-muted)]">
               {COMUNE_PROVINCIA} · dati aperti
             </p>
           </div>
         </Link>
       </div>
 
-      <ul className="m-0 flex-1 list-none space-y-0.5 overflow-y-auto p-2">
-        {items.map((item) => {
-          const Icon = item.Icon;
-          const isActive = item.id === activeId;
-          return (
-            <li key={item.id}>
-              <button
-                type="button"
-                onClick={() => go(item.id)}
-                aria-current={isActive ? "page" : undefined}
-                className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-semibold transition ${
-                  isActive
-                    ? "bg-[#0066CC] text-white"
-                    : "text-[#17324d] hover:bg-[#e8f2fc]"
-                }`}
-              >
-                <Icon size={18} strokeWidth={2} className="shrink-0" />
-                <span>{item.label}</span>
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+      <div className="flex-1 space-y-4 overflow-y-auto p-2">
+        {groups.map((group) => (
+          <div key={group.label}>
+            <p className="m-0 px-3 pb-1 text-[11px] font-bold uppercase tracking-wide text-[var(--pa-muted)]">
+              {group.label}
+            </p>
+            <ul className="m-0 list-none space-y-0.5 p-0">
+              {group.items.map((item) => {
+                const Icon = item.Icon;
+                const isActive = item.id === activeId;
+                return (
+                  <li key={item.id}>
+                    <button
+                      type="button"
+                      onClick={() => go(item.id)}
+                      aria-current={isActive ? "page" : undefined}
+                      className={`flex min-h-11 w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-semibold transition ${
+                        isActive
+                          ? "bg-[var(--pa-primary)] text-white"
+                          : "text-[var(--pa-ink)] hover:bg-[var(--pa-surface-soft)]"
+                      }`}
+                    >
+                      <Icon size={18} strokeWidth={2} className="shrink-0" />
+                      <span>{item.label}</span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ))}
+      </div>
 
-      <div className="border-t border-[#d9e6f2] p-3 text-xs text-[#5b6f82]">
-        <p className="m-0 mb-2">
-          Progetto indipendente · non ufficiale
-        </p>
+      <div className="border-t border-[var(--pa-border)] p-3 text-xs text-[var(--pa-muted)]">
+        <p className="m-0 mb-2">Progetto indipendente · non ufficiale</p>
         <Link
           href="/attribuzioni"
-          className="font-semibold text-[#0066CC] underline underline-offset-2"
+          className="inline-flex min-h-11 items-center font-semibold text-[var(--pa-primary)] underline underline-offset-2"
           onClick={() => setOpen(false)}
         >
           Attribuzioni e regole
@@ -122,31 +170,43 @@ export function AppShell({
   );
 
   return (
-    <div className="flex min-h-screen bg-[#f2f7fb]">
-      {/* Desktop sidebar */}
-      <aside className="sticky top-0 z-30 hidden h-screen w-64 shrink-0 border-r border-[#d9e6f2] bg-white lg:block">
+    <div className="flex min-h-screen bg-[var(--background)]">
+      <a href="#contenuto-principale" className="skip-link">
+        Vai al contenuto
+      </a>
+
+      <aside className="sticky top-0 z-30 hidden h-screen w-64 shrink-0 border-r border-[var(--pa-border)] bg-[var(--pa-surface)] lg:block">
         {nav}
       </aside>
 
-      {/* Mobile drawer */}
       {open ? (
-        <div className="fixed inset-0 z-50 lg:hidden">
+        <div className="fixed inset-0 z-50 lg:hidden" role="presentation">
           <button
             type="button"
             aria-label="Chiudi menu"
-            className="absolute inset-0 bg-[#17324d]/50"
+            className="absolute inset-0 bg-[color-mix(in_srgb,var(--pa-ink)_50%,transparent)]"
             onClick={() => setOpen(false)}
           />
-          <aside className="absolute inset-y-0 left-0 flex w-[min(18rem,88vw)] flex-col bg-white shadow-xl">
-            <div className="flex items-center justify-between border-b border-[#d9e6f2] px-3 py-3">
-              <span className="text-sm font-bold text-[#17324d]">Menu</span>
+          <aside
+            ref={drawerRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menu sezioni"
+            className="absolute inset-y-0 left-0 flex w-[min(18rem,88vw)] flex-col bg-[var(--pa-surface)] shadow-xl"
+          >
+            <div className="flex items-center justify-between border-b border-[var(--pa-border)] px-3 py-2">
+              <span className="text-sm font-bold text-[var(--pa-ink)]">Menu</span>
               <button
+                ref={closeBtnRef}
                 type="button"
                 aria-label="Chiudi"
-                className="rounded-lg p-2 text-[#17324d] hover:bg-[#e8f2fc]"
-                onClick={() => setOpen(false)}
+                className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg text-[var(--pa-ink)] hover:bg-[var(--pa-surface-soft)]"
+                onClick={() => {
+                  setOpen(false);
+                  menuBtnRef.current?.focus();
+                }}
               >
-                <X size={20} />
+                <X size={22} />
               </button>
             </div>
             {nav}
@@ -155,11 +215,12 @@ export function AppShell({
       ) : null}
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-20 border-b border-[#d9e6f2] bg-white/95 backdrop-blur">
-          <div className="flex items-center gap-3 px-3 py-2.5 sm:px-4 sm:py-3">
+        <header className="sticky top-0 z-20 border-b border-[var(--pa-border)] bg-white/95 backdrop-blur">
+          <div className="flex items-center gap-3 px-3 py-2 sm:px-4 sm:py-2.5">
             <button
+              ref={menuBtnRef}
               type="button"
-              className="rounded-lg p-2 text-[#17324d] hover:bg-[#e8f2fc] lg:hidden"
+              className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg text-[var(--pa-ink)] hover:bg-[var(--pa-surface-soft)] lg:hidden"
               aria-label="Apri menu sezioni"
               aria-expanded={open}
               onClick={() => setOpen(true)}
@@ -167,7 +228,11 @@ export function AppShell({
               <Menu size={22} />
             </button>
 
-            <Link href="/" className="shrink-0 lg:hidden" aria-label="Home">
+            <Link
+              href="/"
+              className="inline-flex min-h-11 items-center shrink-0 lg:hidden"
+              aria-label="Home Cruscotto San Vincenzo"
+            >
               <Image
                 src={STEMMA.src}
                 alt=""
@@ -179,13 +244,16 @@ export function AppShell({
             </Link>
 
             <div className="min-w-0 flex-1">
-              <p className="m-0 truncate text-sm font-bold text-[#17324d] sm:text-base">
+              <h1
+                id={titleId}
+                className="m-0 truncate text-sm font-bold text-[var(--pa-ink)] sm:text-base"
+              >
                 <span className="lg:hidden">Cruscotto {COMUNE_NOME}</span>
                 <span className="hidden lg:inline">
-                  {active?.label ?? "Cruscotto"}
+                  {active?.label ?? `Cruscotto ${COMUNE_NOME}`}
                 </span>
-              </p>
-              <p className="m-0 truncate text-xs text-[#5b6f82]">
+              </h1>
+              <p className="m-0 truncate text-xs text-[var(--pa-muted)]">
                 {generatedAt
                   ? `Aggiornato ${new Date(generatedAt).toLocaleString("it-IT", {
                       dateStyle: "short",
@@ -195,19 +263,23 @@ export function AppShell({
                 {" · "}
                 <a
                   href={`mailto:${AUTHOR.email}`}
-                  className="text-[#0066CC] underline-offset-2 hover:underline"
+                  className="text-[var(--pa-primary)] underline-offset-2 hover:underline"
                 >
                   Contatti
                 </a>
               </p>
             </div>
           </div>
-          <div className="bg-[#0066CC] px-3 py-1.5 text-xs font-semibold text-white sm:px-4">
+          <div className="bg-[var(--pa-primary)] px-3 py-1.5 text-xs font-semibold text-white sm:px-4">
             Progetto indipendente · non ufficiale · dati aperti
           </div>
         </header>
 
-        <main className="flex-1 px-3 py-4 sm:px-5 sm:py-5 lg:px-6 lg:py-6">
+        <main
+          id="contenuto-principale"
+          className="flex-1 px-3 py-4 sm:px-5 sm:py-5 lg:px-6 lg:py-6"
+          aria-labelledby={titleId}
+        >
           {children}
         </main>
 

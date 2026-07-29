@@ -30,8 +30,7 @@ import {
   Ship,
   LandPlot,
 } from "lucide-react";
-import { AppShell } from "@/components/AppShell";
-import { BarChart, DoughnutChart, LineChart } from "@/components/Charts";
+import { AppShell, type NavGroup } from "@/components/AppShell";
 import { FarmacieTurno } from "@/components/FarmacieTurno";
 import { Footer } from "@/components/Footer";
 import {
@@ -49,6 +48,20 @@ import {
   formatInteger,
   formatPercent,
 } from "@/lib/format";
+import { scrollToTopSmooth } from "@/lib/motion";
+
+const BarChart = dynamic(
+  () => import("@/components/Charts").then((m) => m.BarChart),
+  { ssr: false, loading: () => <LoadingBlock label="Caricamento grafico…" /> },
+);
+const DoughnutChart = dynamic(
+  () => import("@/components/Charts").then((m) => m.DoughnutChart),
+  { ssr: false, loading: () => <LoadingBlock label="Caricamento grafico…" /> },
+);
+const LineChart = dynamic(
+  () => import("@/components/Charts").then((m) => m.LineChart),
+  { ssr: false, loading: () => <LoadingBlock label="Caricamento grafico…" /> },
+);
 
 const MapPanel = dynamic(() => import("@/components/MapPanel"), {
   ssr: false,
@@ -108,21 +121,55 @@ const BandaUltralargaPanel = dynamic(
 
 type Kpi = Record<string, unknown>;
 
-const TABS = [
-  { id: "panoramica", label: "Panoramica", Icon: Globe2 },
-  { id: "turismo", label: "Turismo", Icon: Palmtree },
-  { id: "porto", label: "Porto", Icon: Ship },
-  { id: "economia", label: "Economia", Icon: Factory },
-  { id: "finanza", label: "Finanza", Icon: Landmark },
-  { id: "territorio", label: "Territorio", Icon: Mountain },
-  { id: "ambiente", label: "Ambiente", Icon: Waves },
-  { id: "infra", label: "Mobilità", Icon: Train },
-  { id: "sanita", label: "Sanità", Icon: Stethoscope },
-  { id: "meteo", label: "Meteo", Icon: CloudSun },
-  { id: "mappa", label: "Mappa", Icon: Map },
-] as const;
+type TabId =
+  | "panoramica"
+  | "turismo"
+  | "porto"
+  | "economia"
+  | "finanza"
+  | "territorio"
+  | "ambiente"
+  | "infra"
+  | "sanita"
+  | "meteo"
+  | "mappa";
 
-type TabId = (typeof TABS)[number]["id"];
+const NAV_GROUPS: NavGroup[] = [
+  {
+    label: "In evidenza",
+    items: [
+      { id: "panoramica", label: "Panoramica", Icon: Globe2 },
+      { id: "sanita", label: "Sanità", Icon: Stethoscope },
+      { id: "infra", label: "Mobilità", Icon: Train },
+      { id: "meteo", label: "Meteo", Icon: CloudSun },
+    ],
+  },
+  {
+    label: "Territorio e mare",
+    items: [
+      { id: "turismo", label: "Turismo", Icon: Palmtree },
+      { id: "porto", label: "Porto", Icon: Ship },
+      { id: "ambiente", label: "Ambiente", Icon: Waves },
+      { id: "territorio", label: "Territorio", Icon: Mountain },
+      { id: "mappa", label: "Mappa", Icon: Map },
+    ],
+  },
+  {
+    label: "Economia e PA",
+    items: [
+      { id: "economia", label: "Economia", Icon: Factory },
+      { id: "finanza", label: "Finanza", Icon: Landmark },
+    ],
+  },
+];
+
+const TABS = NAV_GROUPS.flatMap((g) => [...g.items]);
+
+const TAB_IDS = new Set<string>(TABS.map((t) => t.id));
+
+function isTabId(v: string): v is TabId {
+  return TAB_IDS.has(v);
+}
 
 function asRecord(v: unknown): Record<string, unknown> | null {
   return v && typeof v === "object" && !Array.isArray(v)
@@ -178,23 +225,41 @@ export function DashboardTabs({
 }) {
   const [tab, setTab] = useState<TabId>("panoramica");
 
+  useEffect(() => {
+    const fromHash = window.location.hash.replace(/^#/, "");
+    if (fromHash && isTabId(fromHash)) setTab(fromHash);
+    const onHash = () => {
+      const id = window.location.hash.replace(/^#/, "");
+      if (id && isTabId(id)) setTab(id);
+    };
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+
+  function navigate(id: TabId) {
+    setTab(id);
+    if (typeof window !== "undefined") {
+      const next = `#${id}`;
+      if (window.location.hash !== next) {
+        window.history.replaceState(null, "", next);
+      }
+    }
+    scrollToTopSmooth();
+  }
+
   return (
     <AppShell
-      items={TABS}
+      groups={NAV_GROUPS}
       activeId={tab}
-      onNavigate={(id) => setTab(id as TabId)}
+      onNavigate={(id) => {
+        if (isTabId(id)) navigate(id);
+      }}
       generatedAt={generatedAt}
       footer={<Footer />}
     >
-      <div role="tabpanel" aria-label={tabLabel(tab)}>
+      <div aria-label={tabLabel(tab)}>
         {tab === "panoramica" && (
-          <Panoramica
-            kpi={kpi}
-            onNavigate={(id) => {
-              setTab(id);
-              window.scrollTo({ top: 0, behavior: "smooth" });
-            }}
-          />
+          <Panoramica kpi={kpi} onNavigate={navigate} />
         )}
         {tab === "turismo" && <Turismo kpi={kpi} />}
         {tab === "porto" && <Porto kpi={kpi} />}
@@ -264,143 +329,187 @@ function Panoramica({
   return (
     <section>
       <SectionIntro
-        title="Panoramica"
-        description={`Cruscotto completo di ${String(anagrafica?.nome ?? "San Vincenzo")} — KPI sintetici e approfondimenti demografici.`}
+        title="Cosa ti serve oggi?"
+        description={`Dati aperti di ${String(anagrafica?.nome ?? "San Vincenzo")}: parti dai servizi utili, poi esplora gli indicatori.`}
       />
 
-      <div className="mb-4 grid gap-2.5 sm:mb-6 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3 xl:grid-cols-4">
-        <KpiCard 
-          label="Popolazione" 
-          value={valueOrMissing(demo?.popolazione, formatInteger)} 
+      <div className="mb-5 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
+        <button
+          type="button"
+          onClick={() => onNavigate("sanita")}
+          className="panel min-h-11 text-left transition hover:border-[var(--pa-primary)]"
+        >
+          <p className="m-0 text-sm font-bold text-[var(--pa-ink)]">Farmacie di turno</p>
+          <p className="m-0 mt-1 text-xs text-[var(--pa-muted)]">
+            Orari e punti più vicini
+          </p>
+        </button>
+        <button
+          type="button"
+          onClick={() => onNavigate("infra")}
+          className="panel min-h-11 text-left transition hover:border-[var(--pa-primary)]"
+        >
+          <p className="m-0 text-sm font-bold text-[var(--pa-ink)]">Prezzi carburanti</p>
+          <p className="m-0 mt-1 text-xs text-[var(--pa-muted)]">
+            Benzina self media{" "}
+            {formatDecimal(num(carburanti?.prezzo_medio_benzina_self), 3)} €/L
+          </p>
+        </button>
+        <button
+          type="button"
+          onClick={() => onNavigate("ambiente")}
+          className="panel min-h-11 text-left transition hover:border-[var(--pa-primary)]"
+        >
+          <p className="m-0 text-sm font-bold text-[var(--pa-ink)]">Mare e balneazione</p>
+          <p className="m-0 mt-1 text-xs text-[var(--pa-muted)]">Qualità acque ARPAT</p>
+        </button>
+        <button
+          type="button"
+          onClick={() => onNavigate("meteo")}
+          className="panel min-h-11 text-left transition hover:border-[var(--pa-primary)]"
+        >
+          <p className="m-0 text-sm font-bold text-[var(--pa-ink)]">Meteo e radar</p>
+          <p className="m-0 mt-1 text-xs text-[var(--pa-muted)]">Previsioni e precipitazioni</p>
+        </button>
+      </div>
+
+      <h3 className="mb-2 mt-0 text-sm font-bold text-[var(--pa-ink)]">
+        Instantanea del comune
+      </h3>
+      <div className="mb-4 grid gap-2.5 sm:mb-5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3">
+        <KpiCard
+          label="Popolazione"
+          value={valueOrMissing(demo?.popolazione, formatInteger)}
           hint={String(demo?.riferimento ?? "")}
           icon={Users}
           variant="info"
         />
-        <KpiCard 
-          label="Maschi / Femmine" 
-          value={`${formatInteger(num(demo?.maschi))} / ${formatInteger(num(demo?.femmine))}`}
-          icon={Users}
-        />
-        <KpiCard 
-          label="Età media" 
-          value={valueOrMissing(demo?.eta_media, (v) => formatDecimal(v, 1))}
-          icon={Users}
-        />
-        <KpiCard 
-          label="Indice di vecchiaia" 
-          value={valueOrMissing(demo?.indice_vecchiaia, (v) => formatDecimal(v, 1))}
-          icon={TrendingUp}
-        />
-        <KpiCard label="Indice di dipendenza" value={valueOrMissing(demo?.indice_dipendenza, (v) => formatDecimal(v, 1))} />
-        <KpiCard 
-          label="Tasso occupazione" 
-          value={valueOrMissing(lavoro?.tasso_occupazione, formatPercent)} 
-          hint={lavoro?.anno ? `Anno ${lavoro.anno}` : undefined}
-          icon={Briefcase}
-          variant="success"
-          {...go("economia")}
-        />
-        <KpiCard 
-          label="Tasso disoccupazione" 
-          value={valueOrMissing(lavoro?.tasso_disoccupazione, formatPercent)}
-          icon={Briefcase}
-          {...go("economia")}
-        />
-        <KpiCard 
-          label="Diploma o oltre" 
-          value={valueOrMissing(istruzione?.pct_diploma_oltre, formatPercent)}
-          icon={GraduationCap}
-          {...go("economia")}
-        />
-        <KpiCard 
-          label="Terziario" 
-          value={valueOrMissing(istruzione?.pct_terziario, formatPercent)}
-          icon={GraduationCap}
-          {...go("economia")}
-        />
-        <KpiCard 
-          label="Reddito medio" 
-          value={valueOrMissing(redditi?.reddito_medio_eur, formatEuro)} 
+        <KpiCard
+          label="Reddito medio"
+          value={valueOrMissing(redditi?.reddito_medio_eur, formatEuro)}
           hint={`${formatInteger(num(redditi?.n_contribuenti))} contribuenti`}
           icon={Euro}
           variant="success"
           {...go("economia")}
         />
-        <KpiCard 
-          label="Indice turisticità" 
-          value={valueOrMissing(turismo?.indice_turisticita_per_100ab, (v) => `${formatDecimal(v, 1)} /100 ab.`)} 
-          hint={`${formatInteger(num(turismo?.totale_strutture))} strutture · ${formatInteger(num(turismo?.totale_letti))} letti`}
+        <KpiCard
+          label="Indice turisticità"
+          value={valueOrMissing(turismo?.indice_turisticita_per_100ab, (v) => `${formatDecimal(v, 1)} /100 ab.`)}
+          hint={`${formatInteger(num(turismo?.totale_strutture))} strutture`}
           icon={Palmtree}
           variant="success"
           {...go("turismo")}
         />
-        <KpiCard 
-          label="Raccolta differenziata" 
+        <KpiCard
+          label="Raccolta differenziata"
           value={valueOrMissing(ambiente?.raccolta_differenziata_pct, formatPercent)}
           icon={Recycle}
           variant="success"
           {...go("ambiente")}
         />
-        <KpiCard 
-          label="Consumo di suolo" 
-          value={valueOrMissing(ambiente?.consumo_suolo_pct, formatPercent)} 
-          hint={`${formatDecimal(num(ambiente?.superficie_kmq), 2)} km²`}
-          icon={LandPlot}
-          variant="warning"
-          {...go("territorio")}
-        />
-        <KpiCard label="Copertura FTTH" value={valueOrMissing(banda?.copertura_ftth_pct, formatPercent)} {...go("infra")} />
-        <KpiCard label="Punti ricarica EV" value={valueOrMissing(ev?.n_totale, formatInteger)} hint={`${formatPercent(num(ev?.pct_attivi))} attivi`} {...go("infra")} />
-        <KpiCard 
-          label="Veicoli" 
-          value={valueOrMissing(veicoli?.totale_veicoli, formatInteger)} 
-          hint={`${formatDecimal(num(veicoli?.tasso_motorizzazione_per_1000_ab), 0)} /1000 ab.`}
-          icon={Car}
+        <KpiCard
+          label="Copertura FTTH"
+          value={valueOrMissing(banda?.copertura_ftth_pct, formatPercent)}
           {...go("infra")}
         />
-        <KpiCard 
-          label="Unità locali ASIA" 
-          value={valueOrMissing(imprese?.ul_totali, formatInteger)} 
-          hint={`${formatDecimal(num(imprese?.addetti_totali), 0)} addetti`}
-          icon={Building2}
-          trend={
-            num(imprese?.ul_yoy_pct) != null 
-              ? (num(imprese?.ul_yoy_pct) ?? 0) > 0 
-                ? "up" 
-                : (num(imprese?.ul_yoy_pct) ?? 0) < 0 
-                  ? "down" 
-                  : undefined
-              : undefined
-          }
-          trendValue={imprese?.ul_yoy_pct != null ? formatPercent(num(imprese?.ul_yoy_pct)) : undefined}
-          {...go("economia")}
-        />
-        <KpiCard label="Saldo cassa SIOPE" value={valueOrMissing(siope?.saldo_cassa_eur, formatEuroCompact)} hint={`Anno ${String(siope?.anno ?? "")}`} {...go("finanza")} />
-        <KpiCard label="PNRR" value={valueOrMissing(pnrr?.importo_assegnato_eur, formatEuroCompact)} hint={`${formatInteger(num(pnrr?.n_progetti))} progetti · ${formatInteger(num(pnrr?.n_concluso))} conclusi`} {...go("finanza")} />
-        <KpiCard label="Opere BDAP" value={valueOrMissing(opere?.n_progetti, formatInteger)} hint={valueOrMissing(opere?.importo_totale_eur, formatEuroCompact)} {...go("finanza")} />
-        <KpiCard label="Contratti ANAC" value={valueOrMissing(anac?.n_aggiudicazioni, formatInteger)} hint={valueOrMissing(anac?.importo_totale_eur, formatEuroCompact)} {...go("finanza")} />
-        <KpiCard 
-          label="Patrimonio PA" 
-          value={valueOrMissing(patrimonio?.n_immobili, formatInteger)} 
-          hint={`${formatInteger(num(patrimonio?.n_fabbricati))} fabbricati · ${formatInteger(num(patrimonio?.n_terreni))} terreni`}
-          icon={Building2}
-          {...go("finanza")}
-        />
-        <KpiCard label="Enti RUNTS" value={valueOrMissing(runts?.n_enti_totali, formatInteger)} {...go("sanita")} />
-        <KpiCard 
-          label="Farmacie" 
-          value={valueOrMissing(sanita?.n_farmacie, formatInteger)} 
+        <KpiCard
+          label="Farmacie"
+          value={valueOrMissing(sanita?.n_farmacie, formatInteger)}
           hint={`${formatInteger(num(sanita?.n_parafarmacie))} parafarmacie`}
           icon={Heart}
           variant="info"
           {...go("sanita")}
         />
-        <KpiCard label="Civici ANNCSU" value={valueOrMissing(civici?.n_civici, formatInteger)} hint={`${formatInteger(num(civici?.n_strade))} strade`} {...go("mappa")} />
-        <KpiCard label="Impianti carburanti" value={valueOrMissing(carburanti?.n_impianti, formatInteger)} hint={`Benzina self ${formatDecimal(num(carburanti?.prezzo_medio_benzina_self), 3)} €/L`} {...go("infra")} />
-        <KpiCard label="Pendolarismo netto" value={valueOrMissing(pendol?.saldo_netto, formatInteger)} hint={`Uscenti ${formatInteger(num(pendol?.uscenti_totali))} · Entranti ${formatInteger(num(pendol?.entranti_totali))}`} {...go("infra")} />
-        <KpiCard label="Elevazione media" value={valueOrMissing(morfo?.elev_mean, (v) => `${formatInteger(v)} m`)} hint={`min ${formatInteger(num(morfo?.elev_min))} · max ${formatInteger(num(morfo?.elev_max))}`} {...go("territorio")} />
-        <KpiCard label="CF / Catastale" value={`${String(anagrafica?.codice_fiscale ?? "n.d.")}`} hint={`Catastale ${String(anagrafica?.codice_catastale ?? "")}`} {...go("territorio")} />
       </div>
+
+      <details className="mb-5 panel">
+        <summary className="cursor-pointer text-sm font-bold text-[var(--pa-ink)]">
+          Altri indicatori (demografia, lavoro, PA…)
+        </summary>
+        <div className="mt-3 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3 xl:grid-cols-4">
+          <KpiCard
+            label="Maschi / Femmine"
+            value={`${formatInteger(num(demo?.maschi))} / ${formatInteger(num(demo?.femmine))}`}
+            icon={Users}
+          />
+          <KpiCard
+            label="Età media"
+            value={valueOrMissing(demo?.eta_media, (v) => formatDecimal(v, 1))}
+            icon={Users}
+          />
+          <KpiCard
+            label="Indice di vecchiaia"
+            value={valueOrMissing(demo?.indice_vecchiaia, (v) => formatDecimal(v, 1))}
+            icon={TrendingUp}
+          />
+          <KpiCard label="Indice di dipendenza" value={valueOrMissing(demo?.indice_dipendenza, (v) => formatDecimal(v, 1))} />
+          <KpiCard
+            label="Tasso occupazione"
+            value={valueOrMissing(lavoro?.tasso_occupazione, formatPercent)}
+            hint={lavoro?.anno ? `Anno ${lavoro.anno}` : undefined}
+            icon={Briefcase}
+            variant="success"
+            {...go("economia")}
+          />
+          <KpiCard
+            label="Tasso disoccupazione"
+            value={valueOrMissing(lavoro?.tasso_disoccupazione, formatPercent)}
+            icon={Briefcase}
+            {...go("economia")}
+          />
+          <KpiCard
+            label="Diploma o oltre"
+            value={valueOrMissing(istruzione?.pct_diploma_oltre, formatPercent)}
+            icon={GraduationCap}
+            {...go("economia")}
+          />
+          <KpiCard
+            label="Terziario"
+            value={valueOrMissing(istruzione?.pct_terziario, formatPercent)}
+            icon={GraduationCap}
+            {...go("economia")}
+          />
+          <KpiCard
+            label="Consumo di suolo"
+            value={valueOrMissing(ambiente?.consumo_suolo_pct, formatPercent)}
+            hint={`${formatDecimal(num(ambiente?.superficie_kmq), 2)} km²`}
+            icon={LandPlot}
+            variant="warning"
+            {...go("territorio")}
+          />
+          <KpiCard label="Punti ricarica EV" value={valueOrMissing(ev?.n_totale, formatInteger)} hint={`${formatPercent(num(ev?.pct_attivi))} attivi`} {...go("infra")} />
+          <KpiCard
+            label="Veicoli"
+            value={valueOrMissing(veicoli?.totale_veicoli, formatInteger)}
+            hint={`${formatDecimal(num(veicoli?.tasso_motorizzazione_per_1000_ab), 0)} /1000 ab.`}
+            icon={Car}
+            {...go("infra")}
+          />
+          <KpiCard
+            label="Unità locali ASIA"
+            value={valueOrMissing(imprese?.ul_totali, formatInteger)}
+            hint={`${formatDecimal(num(imprese?.addetti_totali), 0)} addetti`}
+            icon={Building2}
+            {...go("economia")}
+          />
+          <KpiCard label="Saldo cassa SIOPE" value={valueOrMissing(siope?.saldo_cassa_eur, formatEuroCompact)} hint={`Anno ${String(siope?.anno ?? "")}`} {...go("finanza")} />
+          <KpiCard label="PNRR" value={valueOrMissing(pnrr?.importo_assegnato_eur, formatEuroCompact)} hint={`${formatInteger(num(pnrr?.n_progetti))} progetti`} {...go("finanza")} />
+          <KpiCard label="Opere BDAP" value={valueOrMissing(opere?.n_progetti, formatInteger)} hint={valueOrMissing(opere?.importo_totale_eur, formatEuroCompact)} {...go("finanza")} />
+          <KpiCard label="Contratti ANAC" value={valueOrMissing(anac?.n_aggiudicazioni, formatInteger)} hint={valueOrMissing(anac?.importo_totale_eur, formatEuroCompact)} {...go("finanza")} />
+          <KpiCard
+            label="Patrimonio PA"
+            value={valueOrMissing(patrimonio?.n_immobili, formatInteger)}
+            icon={Building2}
+            {...go("finanza")}
+          />
+          <KpiCard label="Enti RUNTS" value={valueOrMissing(runts?.n_enti_totali, formatInteger)} {...go("sanita")} />
+          <KpiCard label="Civici ANNCSU" value={valueOrMissing(civici?.n_civici, formatInteger)} hint={`${formatInteger(num(civici?.n_strade))} strade`} {...go("mappa")} />
+          <KpiCard label="Impianti carburanti" value={valueOrMissing(carburanti?.n_impianti, formatInteger)} hint={`Benzina self ${formatDecimal(num(carburanti?.prezzo_medio_benzina_self), 3)} €/L`} {...go("infra")} />
+          <KpiCard label="Pendolarismo netto" value={valueOrMissing(pendol?.saldo_netto, formatInteger)} {...go("infra")} />
+          <KpiCard label="Elevazione media" value={valueOrMissing(morfo?.elev_mean, (v) => `${formatInteger(v)} m`)} {...go("territorio")} />
+          <KpiCard label="CF / Catastale" value={`${String(anagrafica?.codice_fiscale ?? "n.d.")}`} hint={`Catastale ${String(anagrafica?.codice_catastale ?? "")}`} {...go("territorio")} />
+        </div>
+      </details>
 
       {loading ? <LoadingBlock label="Caricamento approfondimenti demografici…" /> : null}
 

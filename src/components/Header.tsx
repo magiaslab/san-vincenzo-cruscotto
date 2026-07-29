@@ -11,19 +11,22 @@ import {
 
 type HeaderProps = {
   generatedAt?: string | null;
+  /** Se false, il titolo brand non usa h1 (pagine con h1 proprio). */
+  brandAsHeading?: boolean;
 };
 
-export function Header({ generatedAt }: HeaderProps) {
+export function Header({ generatedAt, brandAsHeading = true }: HeaderProps) {
+  const BrandTag = brandAsHeading ? "h1" : "p";
   return (
     <header className="site-header relative z-40 bg-white shadow-sm">
       {/* Slim bar */}
-      <div className="bg-[#0066CC] text-white">
+      <div className="bg-[var(--pa-primary)] text-white">
         <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-1.5 px-4 py-2 text-xs sm:flex-row sm:items-center sm:gap-2 sm:text-sm sm:px-6">
           <span className="font-semibold tracking-wide">
             Progetto indipendente · dati Cruscotto Italia (AgID)
           </span>
           <a
-            className="text-white underline-offset-2 hover:underline"
+            className="inline-flex min-h-11 items-center text-white underline-offset-2 hover:underline"
             href={`mailto:${AUTHOR.email}`}
           >
             Contatti
@@ -32,7 +35,7 @@ export function Header({ generatedAt }: HeaderProps) {
       </div>
 
       {/* Center: stemma + titolo (senza attribuzione logo, spostata in footer) */}
-      <div className="border-b border-[#d9e6f2] bg-white">
+      <div className="border-b border-[var(--pa-border)] bg-white">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-4 py-3 sm:gap-4 sm:py-4 sm:px-6">
           <Link href="/" className="shrink-0" aria-label="Torna alla home">
             <Image
@@ -45,12 +48,12 @@ export function Header({ generatedAt }: HeaderProps) {
             />
           </Link>
           <div className="min-w-0 flex-1">
-            <h1 className="m-0 text-xl font-bold leading-tight text-[#17324d] sm:text-2xl md:text-3xl">
+            <BrandTag className="m-0 text-xl font-bold leading-tight text-[var(--pa-ink)] sm:text-2xl md:text-3xl">
               <Link href="/" className="text-inherit no-underline hover:underline">
                 Cruscotto {COMUNE_NOME}
               </Link>
-            </h1>
-            <p className="m-0 mt-1 text-xs text-[#5b6f82] sm:text-sm">
+            </BrandTag>
+            <p className="m-0 mt-1 text-xs text-[var(--pa-muted)] sm:text-sm">
               Provincia di Livorno ({COMUNE_PROVINCIA}) · {COMUNE_REGIONE} ·
               ISTAT {ISTAT_CODE}
               {generatedAt
