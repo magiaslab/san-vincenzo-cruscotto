@@ -99,7 +99,7 @@ export function FarmacieTurno() {
         </div>
         <button
           type="button"
-          className="rounded-full bg-[#0066CC] px-3 py-1 text-sm font-semibold text-white"
+          className="inline-flex min-h-11 items-center rounded-lg bg-[var(--pa-primary)] px-3 py-2 text-sm font-semibold text-white"
           onClick={() => setTick((t) => t + 1)}
         >
           Aggiorna
