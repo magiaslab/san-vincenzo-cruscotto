@@ -15,7 +15,6 @@ import {
   Waves,
   Users,
   TrendingUp,
-  Home,
   GraduationCap,
   Euro,
   Recycle,
@@ -23,7 +22,6 @@ import {
   Wind,
   Thermometer,
   Umbrella,
-  Sun,
   CloudRain,
   Car,
   Building2,
@@ -312,8 +310,16 @@ function Panoramica({ kpi }: { kpi: Kpi }) {
           value={valueOrMissing(imprese?.ul_totali, formatInteger)} 
           hint={`${formatDecimal(num(imprese?.addetti_totali), 0)} addetti`}
           icon={Building2}
-          trend={num(imprese?.ul_yoy_pct) != null && num(imprese?.ul_yoy_pct) > 0 ? "up" : num(imprese?.ul_yoy_pct) < 0 ? "down" : undefined}
-          trendValue={imprese?.ul_yoy_pct != null ? formatPercent(num(imprese.ul_yoy_pct)) : undefined}
+          trend={
+            num(imprese?.ul_yoy_pct) != null 
+              ? (num(imprese?.ul_yoy_pct) ?? 0) > 0 
+                ? "up" 
+                : (num(imprese?.ul_yoy_pct) ?? 0) < 0 
+                  ? "down" 
+                  : undefined
+              : undefined
+          }
+          trendValue={imprese?.ul_yoy_pct != null ? formatPercent(num(imprese?.ul_yoy_pct)) : undefined}
         />
         <KpiCard label="Saldo cassa SIOPE" value={valueOrMissing(siope?.saldo_cassa_eur, formatEuroCompact)} hint={`Anno ${String(siope?.anno ?? "")}`} />
         <KpiCard label="PNRR" value={valueOrMissing(pnrr?.importo_assegnato_eur, formatEuroCompact)} hint={`${formatInteger(num(pnrr?.n_progetti))} progetti · ${formatInteger(num(pnrr?.n_concluso))} conclusi`} />
@@ -1656,7 +1662,7 @@ function Meteo({ kpi }: { kpi: Kpi }) {
           )}
           hint={stats?.prec_24h_mm != null ? "KPI: cumulate 24h se da ItaliaMeteo" : undefined}
           icon={Umbrella}
-          variant={num(currentOm?.precipitation ?? stats?.prec_24h_mm) > 5 ? "info" : "default"}
+          variant={(num(currentOm?.precipitation ?? stats?.prec_24h_mm) ?? 0) > 5 ? "info" : "default"}
         />
         <KpiCard
           label="Direzione vento"
