@@ -258,16 +258,25 @@ export function Footer() {
             >
               PUN / IDR
             </a>{" "}
-            — mappa colonnine;{" "}
+            — punti ricarica EV;{" "}
             <a
               className="text-white text-decoration-underline"
-              href="https://bandaultralarga.italia.it/mappa/"
+              href="https://www.mimit.gov.it/it/open-data/elenco-dataset/osservatorio-prezzi-carburanti"
               target="_blank"
               rel="noopener noreferrer"
             >
-              Banda Ultralarga
+              MIMIT
             </a>{" "}
-            — copertura fibra; OpenStreetMap/CARTO — cartografia di base.
+            — impianti carburanti;{" "}
+            <a
+              className="text-white text-decoration-underline"
+              href="https://geo.agcom.it/agcomapps/BB4/BB4_BBwired_na_app16_4/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              AGCOM Broadband Map
+            </a>{" "}
+            — copertura FTTH; OpenStreetMap — cartografia di base.
           </p>
           <p className="mb-0">
             <strong>Cruscotto Italia:</strong> Progettato e sviluppato da{" "}

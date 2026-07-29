@@ -87,11 +87,19 @@ const PunIdrMap = dynamic(
   },
 );
 
-const BandaUltralargaMap = dynamic(
-  () => import("@/components/InfraExtras").then((m) => m.BandaUltralargaMap),
+const CarburantiMap = dynamic(
+  () => import("@/components/InfraExtras").then((m) => m.CarburantiMap),
   {
     ssr: false,
-    loading: () => <LoadingBlock label="Caricamento mappa fibra…" />,
+    loading: () => <LoadingBlock label="Caricamento mappa carburanti…" />,
+  },
+);
+
+const BandaUltralargaPanel = dynamic(
+  () => import("@/components/InfraExtras").then((m) => m.BandaUltralargaPanel),
+  {
+    ssr: false,
+    loading: () => <LoadingBlock label="Caricamento copertura FTTH…" />,
   },
 );
 
@@ -1492,7 +1500,18 @@ function Infra({ kpi }: { kpi: Kpi }) {
       </div>
 
       <div className="mb-4">
-        <BandaUltralargaMap />
+        <CarburantiMap />
+      </div>
+
+      <div className="mb-4">
+        <BandaUltralargaPanel
+          ftthPct={num(
+            banda?.copertura_ftth_pct ?? asRecord(agcom?.kpi)?.copertura_ftth_desi_pct,
+          )}
+          ftth20mPct={num(
+            banda?.copertura_ftth_20m_pct ?? asRecord(agcom?.kpi)?.copertura_ftth_20m_pct,
+          )}
+        />
       </div>
 
       <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
