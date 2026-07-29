@@ -31,7 +31,7 @@ export default function AssistenteChat({
   const [messages, setMessages] = useState<Msg[]>([
     {
       role: "assistant",
-      text: "Ciao: sono l’assistente RAG del cruscotto. Uso un modello open Hugging Face su Modal e rispondo solo con i dati indicizzati del sito (niente API a pagamento).",
+      text: "Ciao: sono l’assistente RAG del cruscotto. Uso un modello open Hugging Face su Modal e rispondo solo con i dati indicizzati del sito.",
     },
   ]);
   const [input, setInput] = useState("");
