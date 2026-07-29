@@ -74,3 +74,13 @@ export const COMUNI_LOOKUP: Record<string, string> = {
   "050026": "Pisa",
   "053009": "Grosseto",
 };
+
+/** URL fonti open data aggiuntive */
+export const SAN_VINCENZO_OPENDATA_URL = "https://cloud.ldpgis.it/sanvincenzoopen/";
+export const ARPAT_BASE_URL = "https://www.arpat.toscana.it";
+export const ARPAT_OPENDATA_URL = "https://www.arpat.toscana.it/opendata";
+export const REGIONE_TOSCANA_CKAN_API = "https://dati.toscana.it/api/3/action";
+export const MINISTERO_CULTURA_API = "https://opendata.beniculturali.it";
+
+/** Codice comune per API Ministero Cultura */
+export const COMUNE_ISTAT_CULTURA = "049018";

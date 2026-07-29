@@ -12,6 +12,7 @@ import {
   Palmtree,
   Stethoscope,
   Train,
+  Waves,
 } from "lucide-react";
 import { BarChart, DoughnutChart, LineChart } from "@/components/Charts";
 import {
@@ -53,6 +54,7 @@ const TABS = [
   { id: "economia", label: "Economia", Icon: Factory },
   { id: "finanza", label: "Finanza", Icon: Landmark },
   { id: "territorio", label: "Territorio", Icon: Mountain },
+  { id: "ambiente", label: "Ambiente", Icon: Waves },
   { id: "infra", label: "Mobilità", Icon: Train },
   { id: "sanita", label: "Sanità", Icon: Stethoscope },
   { id: "meteo", label: "Meteo", Icon: CloudSun },
@@ -153,6 +155,7 @@ export function DashboardTabs({ kpi }: { kpi: Kpi }) {
         {tab === "economia" && <Economia kpi={kpi} />}
         {tab === "finanza" && <Finanza kpi={kpi} />}
         {tab === "territorio" && <Territorio kpi={kpi} />}
+        {tab === "ambiente" && <Ambiente kpi={kpi} />}
         {tab === "infra" && <Infra kpi={kpi} />}
         {tab === "sanita" && <Sanita kpi={kpi} />}
         {tab === "meteo" && <Meteo kpi={kpi} />}
@@ -319,12 +322,41 @@ function Panoramica({ kpi }: { kpi: Kpi }) {
 
 function Turismo({ kpi }: { kpi: Kpi }) {
   const { detail, error, loading } = useDettaglio("turismo");
+  const [porti, setPorti] = useState<Record<string, unknown> | null>(null);
+  const [eventi, setEventi] = useState<Record<string, unknown> | null>(null);
+  const [cultura, setCultura] = useState<Record<string, unknown> | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    Promise.all([
+      fetch("/api/toscana/porti").then((r) => (r.ok ? r.json() : null)),
+      fetch("/api/toscana/eventi").then((r) => (r.ok ? r.json() : null)),
+      fetch("/api/cultura/luoghi").then((r) => (r.ok ? r.json() : null)),
+    ])
+      .then(([p, e, c]) => {
+        if (!cancelled) {
+          setPorti(p);
+          setEventi(e);
+          setCultura(c);
+        }
+      })
+      .catch((err) => console.error("Errore caricamento dati turismo extra:", err));
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const turismoKpi = asRecord(kpi.turismo);
   const turismo = asRecord(detail?.turismo);
   const capacita = asRecord(turismo?.capacita_comune);
   const alberghi = asRecord(capacita?.alberghi);
   const extra = asRecord(capacita?.extra_alberghiero);
   const flussi = asRecord(turismo?.flussi_provincia);
+  
+  const portualita = asRecord(porti?.portualita);
+  const luoghiCultura = Array.isArray(cultura?.luoghi)
+    ? (cultura.luoghi as Array<Record<string, unknown>>)
+    : [];
 
   const stelleLabels = ["5", "4", "3", "2", "1"];
   const stelleData = stelleLabels.map((s) => num(asRecord(alberghi?.[`stelle_${s}`])?.strutture) ?? 0);
@@ -409,6 +441,105 @@ function Turismo({ kpi }: { kpi: Kpi }) {
               Arrivi IT {formatInteger(num(flussi.arrivi_italiani))} / EST {formatInteger(num(flussi.arrivi_stranieri))} ·
               Presenze IT {formatInteger(num(flussi.presenze_italiane))} / EST {formatInteger(num(flussi.presenze_straniere))}
             </p>
+        </div>
+      ) : null}
+
+      {portualita ? (
+        <div className="mt-4 panel bg-[#e8f4ff]">
+          <h3>Porto turistico</h3>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <KpiCard
+              label="Posti barca"
+              value={valueOrMissing(portualita.posti_barca, formatInteger)}
+            />
+            <KpiCard
+              label="Tipo struttura"
+              value={String(portualita.tipo ?? "n.d.")}
+            />
+            <KpiCard
+              label="Classificazione"
+              value={String(porti?.classificazione ?? "n.d.")}
+            />
+          </div>
+          {Array.isArray(porti?.servizi) ? (
+            <div className="mt-3">
+              <p className="mb-2 text-xs font-semibold sm:text-sm">
+                Servizi disponibili:
+              </p>
+              <ul className="flex flex-wrap gap-2">
+                {(porti.servizi as string[]).map((s) => (
+                  <li
+                    key={s}
+                    className="rounded bg-white px-2 py-1 text-xs font-medium"
+                  >
+                    {s}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+          <p className="mb-0 mt-2.5 text-xs text-[#5b6f82] sm:mt-3 sm:text-sm">
+            Fonte: Regione Toscana - Masterplan portualità turistica
+          </p>
+        </div>
+      ) : null}
+
+      {luoghiCultura.length > 0 ? (
+        <div className="mt-4 panel">
+          <h3>Luoghi di interesse culturale</h3>
+          <ul className="space-y-2 text-xs sm:text-sm">
+            {luoghiCultura.map((luogo) => (
+              <li key={String(luogo.nome)} className="border-b border-[#eef2f5] pb-2 last:border-0">
+                <strong className="text-sm sm:text-base">{String(luogo.nome)}</strong>
+                <br />
+                <span className="text-[#5b6f82]">
+                  {String(luogo.tipologia)} • {String(luogo.tipo)}
+                  {luogo.visitabile === true ? " • Visitabile" : ""}
+                </span>
+                {luogo.note ? (
+                  <>
+                    <br />
+                    <span className="text-xs text-[#5b6f82]">{String(luogo.note)}</span>
+                  </>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+          <p className="mb-0 mt-2.5 text-xs text-[#5b6f82] sm:mt-3 sm:text-sm">
+            Fonte: Ministero della Cultura - Catalogo generale beni culturali
+          </p>
+        </div>
+      ) : null}
+
+      {eventi?.disponibile === true ? (
+        <div className="mt-4 panel bg-[#fff4e6]">
+          <h3>Eventi culturali Regione Toscana</h3>
+          <p className="mb-2 text-xs sm:text-sm">
+            {String(eventi.note ?? "Eventi promossi dalla Regione Toscana")}
+          </p>
+          {Array.isArray(eventi.categorie) ? (
+            <ul className="flex flex-wrap gap-2">
+              {(eventi.categorie as string[]).map((cat) => (
+                <li
+                  key={cat}
+                  className="rounded bg-[#0066CC] px-2 py-1 text-xs font-semibold text-white"
+                >
+                  {cat}
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          <p className="mb-0 mt-2.5 text-xs text-[#5b6f82] sm:mt-3 sm:text-sm">
+            Fonte:{" "}
+            <a
+              href="https://dati.toscana.it/dataset/rt-eventi-sistcult"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline"
+            >
+              Regione Toscana Open Data
+            </a>
+          </p>
         </div>
       ) : null}
 
@@ -1082,6 +1213,181 @@ function Sanita({ kpi }: { kpi: Kpi }) {
           </table>
         </div>
       ) : null}
+    </section>
+  );
+}
+
+function Ambiente({ kpi }: { kpi: Kpi }) {
+  const [balneazione, setBalneazione] = useState<Record<string, unknown> | null>(null);
+  const [aria, setAria] = useState<Record<string, unknown> | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+
+    Promise.all([
+      fetch("/api/arpat/balneazione").then((r) => (r.ok ? r.json() : null)),
+      fetch("/api/arpat/aria").then((r) => (r.ok ? r.json() : null)),
+    ])
+      .then(([baln, ar]) => {
+        if (!cancelled) {
+          setBalneazione(baln);
+          setAria(ar);
+        }
+      })
+      .catch((err) => {
+        console.error("Errore caricamento dati ambiente:", err);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const ambiente = asRecord(kpi.ambiente);
+  const aree = Array.isArray(balneazione?.aree)
+    ? (balneazione.aree as Array<Record<string, unknown>>)
+    : [];
+
+  return (
+    <section>
+      <SectionIntro
+        title="Ambiente"
+        description="Qualità acque di balneazione ARPAT, qualità aria e dati ambientali. San Vincenzo è un comune costiero con particolare attenzione alla qualità delle acque marine."
+      />
+
+      <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
+        <KpiCard
+          label="Aree balneazione"
+          value={valueOrMissing(balneazione?.aree_totali, formatInteger)}
+          hint={`${formatDecimal(num(balneazione?.km_costa_controllati), 1)} km costa`}
+        />
+        <KpiCard
+          label="Classificazione eccellente"
+          value={valueOrMissing(
+            balneazione?.classificazione_eccellente_pct,
+            formatPercent,
+          )}
+          hint={`Anno ${String(balneazione?.anno ?? "2024")}`}
+        />
+        <KpiCard
+          label="Superamenti limiti 2024"
+          value={valueOrMissing(balneazione?.superamenti_2024, formatInteger)}
+        />
+        <KpiCard
+          label="Stazione qualità aria"
+          value={aria?.disponibile === false ? "Non presente" : "n.d."}
+          unavailable={true}
+        />
+      </div>
+
+      {loading ? <LoadingBlock label="Caricamento dati ARPAT…" /> : null}
+
+      {aree.length > 0 ? (
+        <div className="mb-4 panel">
+          <h3>Aree di balneazione controllate ARPAT</h3>
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-left text-xs sm:text-sm">
+              <thead className="bg-[#e8f2fc] text-[#17324d]">
+                <tr>
+                  <th className="px-2 py-1.5 sm:px-3 sm:py-2">Area</th>
+                  <th className="px-2 py-1.5 sm:px-3 sm:py-2">Classificazione</th>
+                  <th className="px-2 py-1.5 sm:px-3 sm:py-2">Km costa</th>
+                  <th className="px-2 py-1.5 sm:px-3 sm:py-2">Campionamenti</th>
+                  <th className="px-2 py-1.5 sm:px-3 sm:py-2">Superamenti</th>
+                </tr>
+              </thead>
+              <tbody>
+                {aree.map((area) => (
+                  <tr key={String(area.nome)} className="border-t border-[#eef2f5]">
+                    <td className="px-2 py-1.5 font-semibold sm:px-3 sm:py-2">
+                      {String(area.nome)}
+                    </td>
+                    <td className="px-2 py-1.5 sm:px-3 sm:py-2">
+                      <span
+                        className={`inline-block rounded px-2 py-0.5 text-xs font-semibold ${
+                          area.classificazione === "Eccellente"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-yellow-100 text-yellow-800"
+                        }`}
+                      >
+                        {String(area.classificazione)}
+                      </span>
+                    </td>
+                    <td className="px-2 py-1.5 sm:px-3 sm:py-2">
+                      {formatDecimal(num(area.km), 1)} km
+                    </td>
+                    <td className="px-2 py-1.5 sm:px-3 sm:py-2">
+                      {formatInteger(num(area.campionamenti_2024))}
+                    </td>
+                    <td className="px-2 py-1.5 sm:px-3 sm:py-2">
+                      {formatInteger(num(area.superamenti))}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="mb-0 mt-2.5 text-xs text-[#5b6f82] sm:mt-3 sm:text-sm">
+            Fonte:{" "}
+            <a
+              href="https://www.arpat.toscana.it/tema-ambientale/balneazione/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline"
+            >
+              ARPAT - Acque di Balneazione
+            </a>
+            . Monitoraggio E. coli ed enterococchi intestinali stagione balneare 2024.
+          </p>
+        </div>
+      ) : null}
+
+      {aria?.disponibile === false ? (
+        <div className="mb-4 panel bg-[#fff8e6]">
+          <h3>Qualità dell&apos;aria</h3>
+          <p className="mb-2 text-xs sm:text-sm">{String(aria.messaggio)}</p>
+          {Array.isArray(aria.stazioni_piu_vicine) ? (
+            <>
+              <p className="mb-2 text-xs font-semibold sm:text-sm">
+                Stazioni più vicine:
+              </p>
+              <ul className="space-y-1 text-xs sm:text-sm">
+                {(
+                  aria.stazioni_piu_vicine as Array<Record<string, unknown>>
+                ).map((s) => (
+                  <li key={String(s.nome)}>
+                    <strong>{String(s.nome)}</strong> — {formatInteger(num(s.distanza_km))} km
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : null}
+        </div>
+      ) : null}
+
+      <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3">
+        <KpiCard
+          label="Raccolta differenziata"
+          value={valueOrMissing(ambiente?.raccolta_differenziata_pct, formatPercent)}
+        />
+        <KpiCard
+          label="Consumo di suolo"
+          value={valueOrMissing(ambiente?.consumo_suolo_pct, formatPercent)}
+          hint={`${formatDecimal(num(ambiente?.superficie_kmq), 2)} km²`}
+        />
+      </div>
+
+      <p className="mt-3 text-xs text-[#5b6f82] sm:mt-4 sm:text-sm">
+        <strong>Note:</strong> ARPAT effettua monitoraggi microbiologici settimanali
+        nelle aree di balneazione durante la stagione (1 aprile - 30 settembre).
+        La classificazione si basa sui dati degli ultimi 4 anni. San Vincenzo mantiene
+        acque di qualità eccellente su tutta la costa.
+      </p>
     </section>
   );
 }
