@@ -29,6 +29,7 @@ import {
   Heart,
   Ship,
   LandPlot,
+  Bot,
 } from "lucide-react";
 import { BarChart, DoughnutChart, LineChart } from "@/components/Charts";
 import {
@@ -103,6 +104,11 @@ const BandaUltralargaPanel = dynamic(
   },
 );
 
+const AssistenteChat = dynamic(() => import("@/components/AssistenteChat"), {
+  ssr: false,
+  loading: () => <LoadingBlock label="Caricamento assistente…" />,
+});
+
 type Kpi = Record<string, unknown>;
 
 const TABS = [
@@ -117,6 +123,7 @@ const TABS = [
   { id: "sanita", label: "Sanità", Icon: Stethoscope },
   { id: "meteo", label: "Meteo", Icon: CloudSun },
   { id: "mappa", label: "Mappa", Icon: Map },
+  { id: "assistente", label: "Assistente", Icon: Bot },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -227,6 +234,7 @@ export function DashboardTabs({ kpi }: { kpi: Kpi }) {
         {tab === "sanita" && <Sanita kpi={kpi} />}
         {tab === "meteo" && <Meteo kpi={kpi} />}
         {tab === "mappa" && <MapPanel kpi={kpi} />}
+        {tab === "assistente" && <AssistenteChat />}
       </div>
     </div>
   );

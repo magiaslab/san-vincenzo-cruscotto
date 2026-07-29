@@ -9,7 +9,9 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "rag:corpus": "node modal_rag/build_corpus.mjs",
+    "rag:deploy": "modal deploy modal_rag/app.py"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0",
