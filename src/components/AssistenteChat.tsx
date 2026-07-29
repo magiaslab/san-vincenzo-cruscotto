@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { LoadingBlock, SectionIntro } from "@/components/ui";
+import { LoadingBlock, SectionIntro, SolidButton } from "@/components/ui";
 
 type Source = {
   title?: string;
@@ -83,7 +83,7 @@ export default function AssistenteChat() {
     <section>
       <SectionIntro
         title="Assistente (RAG)"
-        description="Domande in italiano sui dati del cruscotto. Embedding MiniLM + SmolLM2-360M su Modal (Hugging Face, self-host)."
+        description="Domande in italiano sui dati del cruscotto. Embedding MiniLM multilingue + SmolLM2-360M su Modal (Hugging Face, self-host)."
       />
 
       <div className="mb-3 flex flex-wrap gap-2">
@@ -91,7 +91,7 @@ export default function AssistenteChat() {
           <button
             key={s}
             type="button"
-            className="rounded-full border border-[#c5d9ec] bg-white px-3 py-1.5 text-left text-xs text-[#17324d] hover:bg-[#e8f2fc] sm:text-sm"
+            className="inline-flex min-h-11 items-center rounded-lg border border-[var(--pa-border)] bg-white px-3 py-2 text-left text-xs font-semibold text-[var(--pa-ink)] hover:bg-[var(--pa-surface-soft)] sm:text-sm"
             onClick={() => void ask(s)}
             disabled={loading}
           >
@@ -100,20 +100,20 @@ export default function AssistenteChat() {
         ))}
       </div>
 
-      <div className="panel flex min-h-[360px] flex-col p-0">
+      <div className="panel flex min-h-[360px] flex-col overflow-hidden p-0">
         <div className="flex-1 space-y-3 overflow-y-auto px-3 py-3 sm:px-4 sm:py-4">
           {messages.map((m, i) => (
             <div
               key={`${m.role}-${i}`}
               className={`max-w-[920px] rounded-lg px-3 py-2 text-sm leading-relaxed ${
                 m.role === "user"
-                  ? "ml-auto bg-[#0066CC] text-white"
-                  : "bg-[#f5f8fc] text-[#17324d]"
+                  ? "ml-auto bg-[var(--pa-primary)] text-white"
+                  : "bg-[var(--pa-surface-soft)] text-[var(--pa-ink)]"
               }`}
             >
               <p className="m-0 whitespace-pre-wrap">{m.text}</p>
               {m.sources && m.sources.length > 0 ? (
-                <ul className="mb-0 mt-2 list-disc pl-4 text-xs text-[#5b6f82]">
+                <ul className="mb-0 mt-2 list-disc pl-4 text-xs text-[var(--pa-muted)]">
                   {m.sources.map((s, j) => (
                     <li key={j}>
                       <strong>{s.title || s.source}</strong>
@@ -125,43 +125,44 @@ export default function AssistenteChat() {
               ) : null}
             </div>
           ))}
-          {loading ? <LoadingBlock label="Generazione risposta su Modal…" /> : null}
+          {loading ? (
+            <LoadingBlock label="Generazione risposta su Modal…" />
+          ) : null}
         </div>
 
         <form
           onSubmit={onSubmit}
-          className="flex flex-col gap-2 border-t border-[#d9e6f2] bg-white p-3 sm:flex-row sm:items-end"
+          className="flex flex-col gap-2 border-t border-[var(--pa-border)] bg-white p-3 sm:flex-row sm:items-end"
         >
           <label className="m-0 flex-1 text-sm">
-            <span className="mb-1 block text-[#5b6f82]">La tua domanda</span>
+            <span className="mb-1 block text-[var(--pa-muted)]">La tua domanda</span>
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               rows={2}
-              className="w-full resize-y rounded border border-[#c5d9ec] px-3 py-2 text-[#17324d]"
+              className="w-full resize-y rounded-lg border border-[var(--pa-border)] px-3 py-2 text-[var(--pa-ink)]"
               placeholder="Es. Quanti impianti carburanti ci sono?"
               disabled={loading}
             />
           </label>
-          <button
-            type="submit"
+          <SolidButton
+            onClick={() => void ask(input)}
             disabled={loading || !input.trim()}
-            className="rounded bg-[#0066CC] px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
           >
             Chiedi
-          </button>
+          </SolidButton>
         </form>
       </div>
 
-      <p className="mt-3 text-xs text-[#5b6f82]">
+      <p className="mt-3 text-xs text-[var(--pa-muted)]">
         Modelli:{" "}
         <a
-          href="https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2"
+          href="https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
           target="_blank"
           rel="noopener noreferrer"
           className="underline"
         >
-          all-MiniLM-L6-v2
+          paraphrase-multilingual-MiniLM-L12-v2
         </a>{" "}
         +{" "}
         <a

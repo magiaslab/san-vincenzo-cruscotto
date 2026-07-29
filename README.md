@@ -47,10 +47,7 @@ Piccolo RAG sui dati del cruscotto, **senza API LLM a pagamento**:
 Vedi `modal_rag/README.md`. Su Vercel / `.env.local`:
 
 ```bash
-<<<<<<< HEAD
 # su Vercel / .env.local
-=======
->>>>>>> 9c7d88d (Migliora RAG Modal: embedding multilingue, retrieval ibrido e URL deploy.)
 ASSISTENTE_MODAL_URL=https://magiaslab--san-vincenzo-rag-ragservice-web-ask.modal.run
 ```
 
