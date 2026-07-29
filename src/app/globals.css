@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "bootstrap-italia/dist/css/bootstrap-italia.min.css";
 
 :root {
   --background: #f2f7fb;
@@ -26,18 +25,6 @@ body {
 
 a {
   color: var(--pa-primary);
-}
-
-/* Evita layout assoluti/fixed di Bootstrap Italia sull'header custom */
-.site-header,
-.site-header * {
-  position: relative;
-}
-
-.site-header {
-  position: relative;
-  z-index: 40;
-  overflow: visible;
 }
 
 .leaflet-container {
@@ -83,18 +70,15 @@ a {
   }
 }
 
-/* Scrollbar sottili su mobile */
 * {
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 102, 204, 0.3) transparent;
 }
 
-/* Miglioramenti per overflow orizzontale */
 .overflow-x-auto {
   -webkit-overflow-scrolling: touch;
 }
 
-/* Ottimizzazioni checkbox mobile */
 @media (max-width: 639px) {
   input[type="checkbox"] {
     flex-shrink: 0;

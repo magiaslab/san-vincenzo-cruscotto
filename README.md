@@ -7,7 +7,7 @@ Progetto **indipendente e non ufficiale**, realizzato da [Alessandro Cipriani](m
 ## Stack
 
 - Next.js 15 (App Router) + TypeScript
-- Tailwind CSS + bootstrap-italia
+- Tailwind CSS (layout dashboard a sidebar)
 - Chart.js / react-chartjs-2
 - Leaflet / react-leaflet (OpenStreetMap)
 - Three.js (rilievo 3D stilizzato morfologia)
@@ -32,6 +32,7 @@ Apri [http://localhost:3000](http://localhost:3000).
 | `GET /api/meteo` | Meteo live KPI (no-store) |
 | `GET /api/meteo/forecast` | Previsioni Open-Meteo (48h + 7 giorni) |
 | `GET /api/meteo/radar` | Metadati frame radar RainViewer |
+| `GET /api/farmacie/turno` | Farmacie di turno (FarmacieDiTurno.org) |
 
 ## Deploy su Vercel
 

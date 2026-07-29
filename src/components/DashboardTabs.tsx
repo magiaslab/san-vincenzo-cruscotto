@@ -30,7 +30,10 @@ import {
   Ship,
   LandPlot,
 } from "lucide-react";
+import { AppShell } from "@/components/AppShell";
 import { BarChart, DoughnutChart, LineChart } from "@/components/Charts";
+import { FarmacieTurno } from "@/components/FarmacieTurno";
+import { Footer } from "@/components/Footer";
 import {
   DataUnavailable,
   KpiCard,
@@ -158,48 +161,24 @@ function useDettaglio(sezioni: string) {
   return { detail, error, loading };
 }
 
-export function DashboardTabs({ kpi }: { kpi: Kpi }) {
+export function DashboardTabs({
+  kpi,
+  generatedAt,
+}: {
+  kpi: Kpi;
+  generatedAt?: string | null;
+}) {
   const [tab, setTab] = useState<TabId>("panoramica");
 
   return (
-    <div>
-      <nav
-        className="sticky top-0 z-20 border-b border-[#d9e6f2] bg-white/95 backdrop-blur"
-        aria-label="Sezioni del cruscotto"
-      >
-        <div className="mx-auto max-w-7xl px-2 sm:px-4">
-          <ul
-            className="m-0 flex list-none gap-1 overflow-x-auto p-0 py-2 sm:gap-1.5 sm:py-1.5"
-            role="tablist"
-            style={{ scrollbarWidth: 'thin' }}
-          >
-            {TABS.map((t) => {
-              const active = tab === t.id;
-              const Icon = t.Icon;
-              return (
-                <li key={t.id} role="presentation" className="flex-shrink-0">
-                  <button
-                    type="button"
-                    role="tab"
-                    aria-selected={active}
-                    className={`flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold transition sm:gap-2 sm:px-4 ${
-                      active
-                        ? "bg-[#0066CC] text-white"
-                        : "bg-transparent text-[#17324d] hover:bg-[#e8f2fc]"
-                    }`}
-                    onClick={() => setTab(t.id)}
-                  >
-                    <Icon size={18} strokeWidth={2} className="shrink-0" />
-                    <span>{t.label}</span>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      </nav>
-
-      <div className="mx-auto max-w-7xl px-3 py-4 sm:px-4 sm:py-5 lg:px-6 lg:py-6" role="tabpanel">
+    <AppShell
+      items={TABS}
+      activeId={tab}
+      onNavigate={(id) => setTab(id as TabId)}
+      generatedAt={generatedAt}
+      footer={<Footer />}
+    >
+      <div role="tabpanel" aria-label={tabLabel(tab)}>
         {tab === "panoramica" && (
           <Panoramica
             kpi={kpi}
@@ -220,7 +199,7 @@ export function DashboardTabs({ kpi }: { kpi: Kpi }) {
         {tab === "meteo" && <Meteo kpi={kpi} />}
         {tab === "mappa" && <MapPanel kpi={kpi} />}
       </div>
-    </div>
+    </AppShell>
   );
 }
 
@@ -1609,12 +1588,16 @@ function Sanita({ kpi }: { kpi: Kpi }) {
 
   return (
     <section>
-      <SectionIntro title="Sanità & Terzo settore" description="Farmacie/parafarmacie Ministero della Salute ed enti RUNTS." />
+      <SectionIntro title="Sanità & Terzo settore" description="Farmacie di turno (orari/date), anagrafe Ministero della Salute ed enti RUNTS." />
       <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
         <KpiCard label="Farmacie" value={valueOrMissing(sanita?.n_farmacie, formatInteger)} />
         <KpiCard label="Parafarmacie" value={valueOrMissing(sanita?.n_parafarmacie, formatInteger)} />
         <KpiCard label="Ospedali" value="dato non disponibile" unavailable={ospedali == null && sanita?.n_ospedali == null} />
         <KpiCard label="Enti RUNTS" value={valueOrMissing(runtsKpi?.n_enti_totali, formatInteger)} hint={`${formatInteger(num(runtsKpi?.n_5x1000))} iscritti al 5x1000`} />
+      </div>
+
+      <div className="mb-4">
+        <FarmacieTurno />
       </div>
 
       {loading ? <LoadingBlock /> : null}

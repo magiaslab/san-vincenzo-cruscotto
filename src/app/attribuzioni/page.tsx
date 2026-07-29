@@ -10,6 +10,7 @@ import {
   CARTO_ATTRIBUTION_URL,
   COMUNE_NOME,
   CRUSCOTTO_ITALIA_URL,
+  FARMACIE_DI_TURNO_URL,
   MINISTERO_CULTURA_URL,
   OPEN_METEO_ATTRIBUTION_URL,
   OSM_COPYRIGHT_URL,
@@ -246,6 +247,18 @@ export default function AttribuzioniPage() {
                 >
                   Comune di San Vincenzo
                 </a>
+              </li>
+              <li>
+                <a
+                  className="text-[#0066CC] underline"
+                  href={FARMACIE_DI_TURNO_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  FarmacieDiTurno.org
+                </a>{" "}
+                — farmacie di turno (orari e date) per San Vincenzo e comuni
+                vicini
               </li>
             </ul>
           </Section>
