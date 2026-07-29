@@ -43,6 +43,18 @@ a {
 .leaflet-container {
   font: inherit;
   z-index: 0;
+  background: #dce6ef;
+}
+
+.leaflet-container .leaflet-control-zoom a {
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
+  font-size: 18px;
+}
+
+.radar-tiles {
+  image-rendering: auto;
 }
 
 .panel {

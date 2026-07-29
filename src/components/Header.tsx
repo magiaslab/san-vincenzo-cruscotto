@@ -43,7 +43,7 @@ export function Header({ generatedAt }: HeaderProps) {
           />
           <div className="min-w-0 flex-1">
             <h1 className="m-0 text-2xl font-bold leading-tight text-[#17324d] md:text-3xl">
-              Comune di {COMUNE_NOME}
+              Cruscotto {COMUNE_NOME}
             </h1>
             <p className="m-0 mt-1 text-sm text-[#5b6f82]">
               Provincia di Livorno ({COMUNE_PROVINCIA}) · {COMUNE_REGIONE} ·

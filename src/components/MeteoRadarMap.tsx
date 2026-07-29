@@ -1,16 +1,17 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   CircleMarker,
   MapContainer,
   Popup,
   TileLayer,
+  useMap,
 } from "react-leaflet";
+import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import {
   MAP_CENTER,
-  MAP_DEFAULT_ZOOM,
   METEO_LAT,
   METEO_LON,
   OSM_COPYRIGHT_URL,
@@ -33,12 +34,76 @@ type RadarResponse = {
   error?: string;
 };
 
+/** Zoom iniziale locale Toscana / San Vincenzo (radar nativo max z7). */
+const INITIAL_ZOOM = 8;
+const RADAR_MAX_NATIVE_ZOOM = 7;
+
+/** Aggiorna URL del layer radar senza rimontare la mappa (preserva zoom/pan). */
+function RadarTileUpdater({
+  url,
+  opacity,
+}: {
+  url: string | null;
+  opacity: number;
+}) {
+  const map = useMap();
+  const layerRef = useRef<L.TileLayer | null>(null);
+
+  useEffect(() => {
+    if (!url) return;
+
+    if (!layerRef.current) {
+      const layer = L.tileLayer(url, {
+        opacity,
+        zIndex: 450,
+        maxZoom: 18,
+        maxNativeZoom: RADAR_MAX_NATIVE_ZOOM,
+        tileSize: 512,
+        zoomOffset: -1,
+        updateWhenIdle: true,
+        keepBuffer: 2,
+        className: "radar-tiles",
+        attribution: `Radar <a href="${RAINVIEWER_ATTRIBUTION_URL}" target="_blank" rel="noopener noreferrer">RainViewer</a>`,
+      });
+      layer.addTo(map);
+      layerRef.current = layer;
+    } else {
+      layerRef.current.setUrl(url);
+      layerRef.current.setOpacity(opacity);
+    }
+  }, [map, url, opacity]);
+
+  useEffect(() => {
+    return () => {
+      if (layerRef.current) {
+        map.removeLayer(layerRef.current);
+        layerRef.current = null;
+      }
+    };
+  }, [map]);
+
+  return null;
+}
+
+/** Garantisce dimensioni corrette dopo il mount (altrimenti tile “stirate”). */
+function MapReady() {
+  const map = useMap();
+  useEffect(() => {
+    const t = window.setTimeout(() => {
+      map.invalidateSize();
+      map.setView([METEO_LAT, METEO_LON], INITIAL_ZOOM, { animate: false });
+    }, 50);
+    return () => window.clearTimeout(t);
+  }, [map]);
+  return null;
+}
+
 export default function MeteoRadarMap() {
   const [data, setData] = useState<RadarResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [index, setIndex] = useState(0);
-  const [playing, setPlaying] = useState(true);
-  const [opacity, setOpacity] = useState(0.7);
+  const [playing, setPlaying] = useState(false);
+  const [opacity, setOpacity] = useState(0.65);
   const [layer, setLayer] = useState<"radar" | "infrared">("radar");
 
   useEffect(() => {
@@ -70,7 +135,7 @@ export default function MeteoRadarMap() {
     if (!playing || frames.length < 2) return;
     const id = window.setInterval(() => {
       setIndex((i) => (i + 1) % frames.length);
-    }, 700);
+    }, 900);
     return () => window.clearInterval(id);
   }, [playing, frames.length]);
 
@@ -93,7 +158,10 @@ export default function MeteoRadarMap() {
             className={`rounded-full px-3 py-1 font-semibold ${
               layer === "radar" ? "bg-[#0066CC] text-white" : "bg-[#e8f2fc] text-[#17324d]"
             }`}
-            onClick={() => setLayer("radar")}
+            onClick={() => {
+              setLayer("radar");
+              setPlaying(false);
+            }}
           >
             Radar
           </button>
@@ -104,7 +172,10 @@ export default function MeteoRadarMap() {
                 ? "bg-[#0066CC] text-white"
                 : "bg-[#e8f2fc] text-[#17324d]"
             }`}
-            onClick={() => setLayer("infrared")}
+            onClick={() => {
+              setLayer("infrared");
+              setPlaying(false);
+            }}
             disabled={!data?.infrared?.length}
           >
             Satellite IR
@@ -149,38 +220,43 @@ export default function MeteoRadarMap() {
 
       {data && frames.length > 0 ? (
         <>
-          <MapContainer
-            center={MAP_CENTER}
-            zoom={MAP_DEFAULT_ZOOM - 1}
-            scrollWheelZoom
-            className="h-[420px] w-full"
-          >
-            <TileLayer
-              attribution={`&copy; <a href="${OSM_COPYRIGHT_URL}">OpenStreetMap</a>`}
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            {current ? (
-              <TileLayer
-                key={current.tileUrl}
-                url={current.tileUrl}
-                opacity={opacity}
-                zIndex={400}
-                attribution={`Radar <a href="${RAINVIEWER_ATTRIBUTION_URL}" target="_blank" rel="noopener noreferrer">RainViewer</a>`}
-              />
-            ) : null}
-            <CircleMarker
-              center={[METEO_LAT, METEO_LON]}
-              radius={8}
-              pathOptions={{
-                color: "#0066CC",
-                fillColor: "#0066CC",
-                fillOpacity: 0.9,
-                weight: 2,
-              }}
+          <div className="relative isolate h-[480px] w-full [&_.leaflet-container]:h-full [&_.leaflet-container]:w-full [&_.leaflet-container]:z-0 [&_.radar-tiles]:!image-rendering-auto">
+            <MapContainer
+              center={MAP_CENTER}
+              zoom={INITIAL_ZOOM}
+              minZoom={5}
+              maxZoom={16}
+              scrollWheelZoom
+              doubleClickZoom
+              dragging
+              touchZoom
+              zoomControl
+              className="h-full w-full"
+              style={{ height: "100%", width: "100%" }}
             >
-              <Popup>San Vincenzo — punto meteo di riferimento</Popup>
-            </CircleMarker>
-          </MapContainer>
+              <MapReady />
+              <TileLayer
+                attribution={`&copy; <a href="${OSM_COPYRIGHT_URL}">OpenStreetMap</a> · <a href="https://carto.com/">CARTO</a>`}
+                url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+                subdomains="abcd"
+                maxZoom={20}
+                detectRetina
+              />
+              <RadarTileUpdater url={current?.tileUrl ?? null} opacity={opacity} />
+              <CircleMarker
+                center={[METEO_LAT, METEO_LON]}
+                radius={9}
+                pathOptions={{
+                  color: "#ffffff",
+                  fillColor: "#0066CC",
+                  fillOpacity: 1,
+                  weight: 2,
+                }}
+              >
+                <Popup>San Vincenzo — punto meteo di riferimento</Popup>
+              </CircleMarker>
+            </MapContainer>
+          </div>
 
           <div className="space-y-2 border-t border-[#d9e6f2] bg-[#f5f8fc] px-4 py-3">
             <input
@@ -200,7 +276,7 @@ export default function MeteoRadarMap() {
                 {current?.isNowcast ? " · nowcast" : ""} — {current?.label}
               </span>
               <span>
-                Fonte:{" "}
+                Zoom rotella/pinch · radar nativo fino a z{RADAR_MAX_NATIVE_ZOOM} ·{" "}
                 <a
                   href={RAINVIEWER_ATTRIBUTION_URL}
                   target="_blank"

@@ -8,7 +8,8 @@ type RadarFrame = { time: number; path: string };
 
 /**
  * Metadati frame radar RainViewer (past + nowcast).
- * I tile vengono caricati direttamente dal CDN lato client.
+ * Tile 512px + schema colore Universal Blue (2) per migliore leggibilità.
+ * Zoom nativo radar: 0–7 (oltre Leaflet scala il tile).
  */
 export async function GET() {
   try {
@@ -30,11 +31,12 @@ export async function GET() {
     const host = data.host ?? "https://tilecache.rainviewer.com";
     const past = data.radar?.past ?? [];
     const nowcast = data.radar?.nowcast ?? [];
+
+    // size 512, color 2 (Universal Blue), options 1_1 = smooth + snow
     const frames = [...past, ...nowcast].map((f) => ({
       time: f.time,
       path: f.path,
-      /** Tile template Leaflet: {z}/{x}/{y} */
-      tileUrl: `${host}${f.path}/256/{z}/{x}/{y}/2/1_1.png`,
+      tileUrl: `${host}${f.path}/512/{z}/{x}/{y}/2/1_1.png`,
       label: new Date(f.time * 1000).toLocaleString("it-IT", {
         timeZone: "Europe/Rome",
         dateStyle: "short",
@@ -43,10 +45,10 @@ export async function GET() {
       isNowcast: nowcast.some((n) => n.time === f.time),
     }));
 
-    const infrared = (data.satellite?.infrared ?? []).slice(-6).map((f) => ({
+    const infrared = (data.satellite?.infrared ?? []).slice(-8).map((f) => ({
       time: f.time,
       path: f.path,
-      tileUrl: `${host}${f.path}/256/{z}/{x}/{y}/0/0_0.png`,
+      tileUrl: `${host}${f.path}/512/{z}/{x}/{y}/0/0_0.png`,
       label: new Date(f.time * 1000).toLocaleString("it-IT", {
         timeZone: "Europe/Rome",
         dateStyle: "short",
@@ -62,11 +64,15 @@ export async function GET() {
         generated: data.generated,
         frames,
         infrared,
+        maxNativeZoom: 7,
+        tileSize: 512,
         defaultIndex: Math.max(0, past.length - 1),
         fetched_at: new Date().toISOString(),
       },
       {
-        headers: { "Cache-Control": "public, max-age=120, stale-while-revalidate=60" },
+        headers: {
+          "Cache-Control": "public, max-age=120, stale-while-revalidate=60",
+        },
       },
     );
   } catch (err) {

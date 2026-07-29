@@ -3,8 +3,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import {
-  BarChart3,
-  Building2,
   CloudSun,
   Factory,
   Globe2,
