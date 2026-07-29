@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/lib/i18n";
 import { useEffect, useState } from "react";
 import { Phone, MapPin, ExternalLink, Clock, Pill } from "lucide-react";
 import {
@@ -41,6 +42,7 @@ function formatKm(km: number | null): string {
 }
 
 export function FarmacieTurno() {
+  const t = useT();
   const [data, setData] = useState<TurnoResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -91,7 +93,7 @@ export function FarmacieTurno() {
   return (
     <div className="panel">
       <PanelHeading
-        title="Farmacie di turno"
+        title={t("Farmacie di turno")}
         description={
           [
             data?.giorno ? `Giorno: ${data.giorno}` : "Turni più vicini a San Vincenzo",
@@ -108,7 +110,7 @@ export function FarmacieTurno() {
         }
       />
 
-      {loading ? <LoadingBlock label="Caricamento farmacie di turno…" /> : null}
+      {loading ? <LoadingBlock label={t("Caricamento farmacie di turno…")} /> : null}
 
       {!loading && error && shown.length === 0 ? (
         <DataUnavailable message={error} />

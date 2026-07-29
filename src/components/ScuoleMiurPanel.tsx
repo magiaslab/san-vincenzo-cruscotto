@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/lib/i18n";
 import { useEffect, useState } from "react";
 import {
   ExternalLink,
@@ -21,6 +22,7 @@ import { formatInteger, formatPercent } from "@/lib/format";
 import type { MiurScuolePayload } from "@/lib/miur";
 
 export function ScuoleMiurPanel() {
+  const t = useT();
   const [data, setData] = useState<MiurScuolePayload | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -58,7 +60,7 @@ export function ScuoleMiurPanel() {
   }, []);
 
   if (loading) {
-    return <LoadingBlock label="Caricamento scuole da dati.istruzione.it…" />;
+    return <LoadingBlock label={t("Caricamento scuole da dati.istruzione.it…")} />;
   }
 
   if (error || !data) {
@@ -74,7 +76,7 @@ export function ScuoleMiurPanel() {
   return (
     <div className="panel">
       <PanelHeading
-        title="Scuole e alunni (MIUR)"
+        title={t("Scuole e alunni (MIUR)")}
         description={`Anagrafe ${data.anno_anagrafe ?? "n.d."}${
           data.anno_alunni ? ` · alunni ${data.anno_alunni}` : ""
         }. Fonte: Portale Unico dei Dati della Scuola.`}
@@ -89,26 +91,26 @@ export function ScuoleMiurPanel() {
 
       <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
         <KpiCard
-          label="Plessi"
+          label={t("Plessi")}
           value={formatInteger(kpi.n_plessi)}
           hint={`${formatInteger(kpi.n_istituti)} istituto/i`}
           icon={School}
         />
         <KpiCard
-          label="Alunni / bambini"
+          label={t("Alunni / bambini")}
           value={formatInteger(kpi.alunni_totale)}
           hint={`${formatInteger(kpi.classi_totale)} classi`}
           icon={Users}
           variant="info"
         />
         <KpiCard
-          label="Infanzia"
+          label={t("Infanzia")}
           value={formatInteger(kpi.infanzia_bambini)}
           hint={`${formatInteger(kpi.infanzia_classi)} sezioni`}
           icon={GraduationCap}
         />
         <KpiCard
-          label="Cittadinanza non italiana"
+          label={t("Cittadinanza non italiana")}
           value={
             kpi.pct_non_italiani == null
               ? "n.d."

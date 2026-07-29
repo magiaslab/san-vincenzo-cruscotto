@@ -1,5 +1,8 @@
 "use client";
 
+import { useT } from "@/lib/i18n";
+import { getFormatLocale } from "@/lib/i18n/locale-store";
+import { translate } from "@/lib/i18n/translate";
 import dynamic from "next/dynamic";
 import { useEffect, useId, useRef, useState } from "react";
 import { Bot, X } from "lucide-react";
@@ -7,11 +10,12 @@ import { LoadingBlock } from "@/components/ui";
 
 const AssistenteChat = dynamic(() => import("@/components/AssistenteChat"), {
   ssr: false,
-  loading: () => <LoadingBlock label="Caricamento assistente…" />,
+  loading: () => <LoadingBlock label={translate(getFormatLocale(), "Caricamento assistente…")} />,
 });
 
 /** Pulsante flottante + pannello chat per l'assistente RAG. */
 export function AssistenteFab() {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -73,7 +77,7 @@ export function AssistenteFab() {
         aria-controls={open ? titleId : undefined}
       >
         <Bot size={20} aria-hidden strokeWidth={2.25} />
-        Assistente
+        {t("Assistente")}
       </button>
 
       {open ? (
@@ -81,7 +85,7 @@ export function AssistenteFab() {
           <button
             type="button"
             className="absolute inset-0 bg-[rgba(23,50,77,0.45)]"
-            aria-label="Chiudi assistente"
+            aria-label={t("Chiudi assistente")}
             onClick={() => toggle(false)}
           />
           <div
@@ -98,10 +102,10 @@ export function AssistenteFab() {
                   className="m-0 flex items-center gap-2 text-sm font-bold text-[var(--pa-ink)]"
                 >
                   <Bot size={18} className="text-[var(--pa-primary)]" aria-hidden />
-                  Assistente dati
+                  {t("Assistente dati")}
                 </p>
                 <p className="m-0 mt-0.5 text-xs text-[var(--pa-muted)]">
-                  Domande sui dati aperti del cruscotto
+                  {t("Domande sui dati aperti del cruscotto")}
                 </p>
               </div>
               <button
@@ -109,7 +113,7 @@ export function AssistenteFab() {
                 type="button"
                 onClick={() => toggle(false)}
                 className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-[var(--pa-border)] bg-white text-[var(--pa-ink)]"
-                aria-label="Chiudi"
+                aria-label={t("Chiudi")}
               >
                 <X size={18} aria-hidden />
               </button>

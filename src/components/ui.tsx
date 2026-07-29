@@ -1,3 +1,5 @@
+"use client";
+
 import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -7,6 +9,8 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { isMissing } from "@/lib/format";
+import { useT } from "@/lib/i18n";
+import { getFormatLocale } from "@/lib/i18n/locale-store";
 import { resolveKpiIcon } from "@/lib/kpi-icons";
 
 type KpiCardProps = {
@@ -35,12 +39,14 @@ export function KpiCard({
   detailLabel,
   onDetail,
 }: KpiCardProps) {
+  const t = useT();
   const Icon = resolveKpiIcon(label, icon);
   const empty =
     unavailable ||
     value === null ||
     value === undefined ||
-    (typeof value === "string" && (value === "n.d." || value === ""));
+    (typeof value === "string" &&
+      (value === "n.d." || value === "n/a" || value === ""));
 
   const variantStyles = {
     default: "border-[var(--pa-border)] bg-white",
@@ -83,7 +89,7 @@ export function KpiCard({
           {empty ? (
             <span className="flex items-center gap-1 text-base text-[var(--pa-muted)]">
               <AlertCircle size={16} aria-hidden />
-              <span>dato non disponibile</span>
+              <span>{t("dato non disponibile")}</span>
             </span>
           ) : (
             value
@@ -110,7 +116,9 @@ export function KpiCard({
       ) : null}
       {clickable ? (
         <p className="m-0 mt-2 text-xs font-semibold text-[var(--pa-primary)]">
-          {detailLabel ? `Vai a ${detailLabel} →` : "Vai al dettaglio →"}
+          {detailLabel
+            ? `${t("Vai a")} ${detailLabel} →`
+            : t("Vai al dettaglio →")}
         </p>
       ) : null}
     </>
@@ -124,8 +132,8 @@ export function KpiCard({
         onClick={onDetail}
         aria-label={
           detailLabel
-            ? `${label}: vai alla sezione ${detailLabel}`
-            : `${label}: vai al dettaglio`
+            ? `${label}: ${t("vai alla sezione")} ${detailLabel}`
+            : `${label}: ${t("vai al dettaglio")}`
         }
       >
         {body}
@@ -277,21 +285,23 @@ export function SolidButton({
 }
 
 export function DataUnavailable({ message }: { message?: string }) {
+  const t = useT();
   return (
     <div className="rounded-lg border border-dashed border-[var(--pa-border)] bg-[var(--pa-surface-soft)] p-4 text-sm text-[var(--pa-muted)]">
-      {message ?? "dato non disponibile"}
+      {message ?? t("dato non disponibile")}
     </div>
   );
 }
 
-export function LoadingBlock({ label = "Caricamento…" }: { label?: string }) {
+export function LoadingBlock({ label }: { label?: string }) {
+  const t = useT();
   return (
     <div
       className="motion-safe:animate-pulse rounded-lg border border-[var(--pa-border)] bg-[var(--pa-surface)] p-6 text-sm text-[var(--pa-muted)]"
       role="status"
       aria-live="polite"
     >
-      {label}
+      {label ?? t("Caricamento…")}
     </div>
   );
 }
@@ -300,6 +310,8 @@ export function valueOrMissing(
   value: unknown,
   formatter: (v: number) => string,
 ): string {
-  if (isMissing(value) || typeof value !== "number") return "n.d.";
+  if (isMissing(value) || typeof value !== "number") {
+    return getFormatLocale() === "en" ? "n/a" : "n.d.";
+  }
   return formatter(value);
 }

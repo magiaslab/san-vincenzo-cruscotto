@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/lib/i18n";
 import { FormEvent, useState } from "react";
 import { LoadingBlock, SectionIntro } from "@/components/ui";
 
@@ -28,6 +29,7 @@ export default function AssistenteChat({
 }: {
   compact?: boolean;
 }) {
+  const t = useT();
   const [messages, setMessages] = useState<Msg[]>([
     {
       role: "assistant",
@@ -94,7 +96,7 @@ export default function AssistenteChat({
             onClick={() => void ask(s)}
             disabled={loading}
           >
-            {compact ? s.replace(" a San Vincenzo?", "?").slice(0, 42) : s}
+            {compact ? t(s).replace(" in San Vincenzo?", "?").replace(" a San Vincenzo?", "?").slice(0, 42) : t(s)}
           </button>
         ))}
       </div>
@@ -118,7 +120,7 @@ export default function AssistenteChat({
                   : "bg-[var(--pa-surface-soft)] text-[var(--pa-ink)]"
               }`}
             >
-              <p className="m-0 whitespace-pre-wrap">{m.text}</p>
+              <p className="m-0 whitespace-pre-wrap">{t(m.text)}</p>
               {m.sources && m.sources.length > 0 ? (
                 <ul className="mb-0 mt-2 list-disc pl-4 text-xs text-[var(--pa-muted)]">
                   {m.sources.map((s, j) => (
@@ -133,7 +135,7 @@ export default function AssistenteChat({
             </div>
           ))}
           {loading ? (
-            <LoadingBlock label="Generazione risposta su Modal…" />
+            <LoadingBlock label={t("Generazione risposta su Modal…")} />
           ) : null}
         </div>
 
@@ -148,7 +150,7 @@ export default function AssistenteChat({
               onChange={(e) => setInput(e.target.value)}
               rows={compact ? 2 : 2}
               className="w-full resize-y rounded-lg border border-[var(--pa-border)] px-3 py-2 text-[var(--pa-ink)]"
-              placeholder="Es. Quanti impianti carburanti ci sono?"
+              placeholder={t("Es. Quanti impianti carburanti ci sono?")}
               disabled={loading}
             />
           </label>
@@ -172,8 +174,8 @@ export default function AssistenteChat({
   return (
     <section>
       <SectionIntro
-        title="Assistente (RAG)"
-        description="Domande in italiano sui dati del cruscotto. Embedding MiniLM multilingue + SmolLM2-360M su Modal (Hugging Face, self-host)."
+        title={t("Assistente (RAG)")}
+        description={t("Domande in italiano sui dati del cruscotto. Embedding MiniLM multilingue + SmolLM2-360M su Modal (Hugging Face, self-host).")}
       />
       {chatBody}
       <p className="mt-3 text-xs text-[var(--pa-muted)]">

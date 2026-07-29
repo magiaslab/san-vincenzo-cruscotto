@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/lib/i18n";
 import { useEffect, useMemo, useState } from "react";
 import {
   CircleMarker,
@@ -35,6 +36,7 @@ type FeatureCollection = {
 };
 
 function FitPoints({ points }: { points: [number, number][] }) {
+  const t = useT();
   const map = useMap();
   useEffect(() => {
     if (points.length === 0) return;
@@ -49,6 +51,7 @@ function FitPoints({ points }: { points: [number, number][] }) {
 
 /** Mappa farmacie e parafarmacie MDS (coordinate da Cruscotto Italia). */
 export function FarmacieMap() {
+  const t = useT();
   const [data, setData] = useState<FeatureCollection | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -90,7 +93,7 @@ export function FarmacieMap() {
     <div className="panel overflow-hidden p-0">
       <div className="border-b border-[var(--pa-border)] px-4 py-3">
         <PanelHeading
-          title="Mappa farmacie e parafarmacie"
+          title={t("Mappa farmacie e parafarmacie")}
           description={`${data?.features.length ?? 0} punti georeferenziati (anagrafe Ministero della Salute).`}
           icon={Pill}
           actions={
@@ -100,7 +103,7 @@ export function FarmacieMap() {
         />
       </div>
       <div className="relative z-0 h-[320px] w-full overflow-hidden sm:h-[400px]">
-        {loading ? <LoadingBlock label="Caricamento mappa farmacie…" /> : null}
+        {loading ? <LoadingBlock label={t("Caricamento mappa farmacie…")} /> : null}
         {error ? (
           <div className="p-4">
             <DataUnavailable message={error} />
@@ -108,7 +111,7 @@ export function FarmacieMap() {
         ) : null}
         {!loading && !error && data && data.features.length === 0 ? (
           <div className="p-4">
-            <DataUnavailable message="Nessuna farmacia georeferenziata disponibile." />
+            <DataUnavailable message={t("Nessuna farmacia georeferenziata disponibile.")} />
           </div>
         ) : null}
         {!loading && !error && data && data.features.length > 0 ? (

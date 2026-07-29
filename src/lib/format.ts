@@ -1,11 +1,22 @@
+import { getFormatLocale } from "@/lib/i18n/locale-store";
+import { LOCALE_META } from "@/lib/i18n/types";
+
+function intlLocale(): string {
+  return LOCALE_META[getFormatLocale()].intl;
+}
+
+function missingLabel(): string {
+  return getFormatLocale() === "en" ? "n/a" : "n.d.";
+}
+
 export function formatNumber(
   value: number | null | undefined,
   options?: Intl.NumberFormatOptions,
 ): string {
   if (value === null || value === undefined || Number.isNaN(value)) {
-    return "n.d.";
+    return missingLabel();
   }
-  return new Intl.NumberFormat("it-IT", options).format(value);
+  return new Intl.NumberFormat(intlLocale(), options).format(value);
 }
 
 export function formatInteger(value: number | null | undefined): string {
@@ -24,9 +35,9 @@ export function formatDecimal(
 
 export function formatEuro(value: number | null | undefined): string {
   if (value === null || value === undefined || Number.isNaN(value)) {
-    return "n.d.";
+    return missingLabel();
   }
-  return new Intl.NumberFormat("it-IT", {
+  return new Intl.NumberFormat(intlLocale(), {
     style: "currency",
     currency: "EUR",
     maximumFractionDigits: 0,
@@ -35,7 +46,7 @@ export function formatEuro(value: number | null | undefined): string {
 
 export function formatEuroCompact(value: number | null | undefined): string {
   if (value === null || value === undefined || Number.isNaN(value)) {
-    return "n.d.";
+    return missingLabel();
   }
   const abs = Math.abs(value);
   if (abs >= 1_000_000) {
@@ -49,7 +60,7 @@ export function formatEuroCompact(value: number | null | undefined): string {
 
 export function formatPercent(value: number | null | undefined, digits = 1): string {
   if (value === null || value === undefined || Number.isNaN(value)) {
-    return "n.d.";
+    return missingLabel();
   }
   return `${formatDecimal(value, digits)}%`;
 }
@@ -58,6 +69,17 @@ export function isMissing(value: unknown): boolean {
   return (
     value === null ||
     value === undefined ||
-    (typeof value === "number" && Number.isNaN(value))
+    (typeof value === "number" && Number.isNaN(value)) ||
+    value === "n.d." ||
+    value === "n/a"
   );
+}
+
+export function formatDateTime(value: string | Date): string {
+  const d = typeof value === "string" ? new Date(value) : value;
+  if (Number.isNaN(d.getTime())) return missingLabel();
+  return d.toLocaleString(intlLocale(), {
+    dateStyle: "short",
+    timeStyle: "short",
+  });
 }

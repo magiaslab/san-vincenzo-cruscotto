@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Titillium_Web } from "next/font/google";
 import { CookieBanner } from "@/components/CookieBanner";
 import { JsonLd } from "@/components/JsonLd";
+import { Providers } from "@/components/Providers";
 import { AUTHOR, COMUNE_NOME } from "@/lib/constants";
 import {
   SITE_DESCRIPTION,
@@ -104,9 +105,11 @@ export default function RootLayout({
       <body
         className={`${titillium.variable} flex min-h-screen flex-col antialiased`}
       >
-        <JsonLd data={buildHomeJsonLd()} />
-        {children}
-        <CookieBanner />
+        <Providers>
+          <JsonLd data={buildHomeJsonLd()} />
+          {children}
+          <CookieBanner />
+        </Providers>
       </body>
     </html>
   );

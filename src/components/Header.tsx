@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import {
   AUTHOR,
   COMUNE_NOME,
@@ -8,6 +11,8 @@ import {
   ISTAT_CODE,
   STEMMA,
 } from "@/lib/constants";
+import { formatDateTime } from "@/lib/format";
+import { useT } from "@/lib/i18n";
 
 type HeaderProps = {
   generatedAt?: string | null;
@@ -16,29 +21,34 @@ type HeaderProps = {
 };
 
 export function Header({ generatedAt, brandAsHeading = true }: HeaderProps) {
+  const t = useT();
   const BrandTag = brandAsHeading ? "h1" : "p";
   return (
     <header className="site-header relative z-40 bg-white shadow-sm">
-      {/* Slim bar */}
       <div className="bg-[var(--pa-primary)] text-white">
         <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-1.5 px-4 py-2 text-xs sm:flex-row sm:items-center sm:gap-2 sm:text-sm sm:px-6">
           <span className="font-semibold leading-snug tracking-wide">
-            Progetto non ufficiale: non affiliato ad AgID, al Governo italiano o
-            al Comune di San Vincenzo.
+            {t(
+              "Progetto non ufficiale: non affiliato ad AgID, al Governo italiano o al Comune di San Vincenzo.",
+            )}
           </span>
-          <a
-            className="inline-flex min-h-11 shrink-0 items-center text-white underline-offset-2 hover:underline"
-            href={`mailto:${AUTHOR.email}`}
-          >
-            Contatti
-          </a>
+          <div className="flex w-full items-center justify-between gap-3 sm:w-auto sm:justify-end">
+            <a
+              className="inline-flex min-h-11 shrink-0 items-center text-white underline-offset-2 hover:underline"
+              href={`mailto:${AUTHOR.email}`}
+            >
+              {t("Contatti")}
+            </a>
+            <LanguageSelector
+              className="[&_button]:border-white/40 [&_button]:bg-white/10 [&_button]:text-white [&_button]:hover:bg-white/20"
+            />
+          </div>
         </div>
       </div>
 
-      {/* Center: stemma + titolo (senza attribuzione logo, spostata in footer) */}
       <div className="border-b border-[var(--pa-border)] bg-white">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-4 py-3 sm:gap-4 sm:py-4 sm:px-6">
-          <Link href="/" className="shrink-0" aria-label="Torna alla home">
+          <Link href="/" className="shrink-0" aria-label={t("Torna alla home")}>
             <Image
               src={STEMMA.src}
               alt={STEMMA.alt}
@@ -55,10 +65,10 @@ export function Header({ generatedAt, brandAsHeading = true }: HeaderProps) {
               </Link>
             </BrandTag>
             <p className="m-0 mt-1 text-xs text-[var(--pa-muted)] sm:text-sm">
-              Provincia di Livorno ({COMUNE_PROVINCIA}) · {COMUNE_REGIONE} ·
+              {t("Provincia di Livorno")} ({COMUNE_PROVINCIA}) · {COMUNE_REGIONE} ·
               ISTAT {ISTAT_CODE}
               {generatedAt
-                ? ` · agg. ${new Date(generatedAt).toLocaleString("it-IT", { dateStyle: "short", timeStyle: "short" })}`
+                ? ` · ${t("agg.")} ${formatDateTime(generatedAt)}`
                 : ""}
             </p>
           </div>

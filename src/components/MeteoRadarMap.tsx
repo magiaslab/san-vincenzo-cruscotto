@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/lib/i18n";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   CircleMarker,
@@ -52,6 +53,7 @@ function RadarTileUpdater({
   url: string | null;
   opacity: number;
 }) {
+  const t = useT();
   const map = useMap();
   const layerRef = useRef<L.TileLayer | null>(null);
 
@@ -93,6 +95,7 @@ function RadarTileUpdater({
 
 /** Garantisce dimensioni corrette dopo il mount (altrimenti tile “stirate”). */
 function MapReady() {
+  const t = useT();
   const map = useMap();
   useEffect(() => {
     const t = window.setTimeout(() => {
@@ -105,6 +108,7 @@ function MapReady() {
 }
 
 export default function MeteoRadarMap() {
+  const t = useT();
   const [data, setData] = useState<RadarResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [index, setIndex] = useState(0);
@@ -163,7 +167,7 @@ export default function MeteoRadarMap() {
     <div className="panel overflow-hidden p-0">
       <div className="border-b border-[var(--pa-border)] px-4 py-3">
         <PanelHeading
-          title="Radar precipitazioni"
+          title={t("Radar precipitazioni")}
           icon={CloudRain}
           className="mb-2"
           actions={
@@ -219,13 +223,13 @@ export default function MeteoRadarMap() {
       ) : null}
       {!data && !error ? (
         <div className="p-4">
-          <LoadingBlock label="Caricamento frame radar…" />
+          <LoadingBlock label={t("Caricamento frame radar…")} />
         </div>
       ) : null}
 
       {data && frames.length === 0 ? (
         <div className="p-4">
-          <DataUnavailable message="Nessun frame disponibile per questo layer." />
+          <DataUnavailable message={t("Nessun frame disponibile per questo layer.")} />
         </div>
       ) : null}
 
