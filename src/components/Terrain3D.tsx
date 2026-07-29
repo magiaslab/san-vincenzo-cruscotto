@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/lib/i18n";
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
@@ -42,6 +43,7 @@ export default function Terrain3D({
   elevMean,
   slopeMean,
 }: Props) {
+  const t = useT();
   const mountRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -216,7 +218,7 @@ export default function Terrain3D({
       <div
         ref={mountRef}
         className="h-[380px] w-full cursor-grab overflow-hidden rounded-md active:cursor-grabbing"
-        title="Trascina per ruotare · scroll per zoom"
+        title={t("Trascina per ruotare · scroll per zoom")}
       />
       <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
         <div

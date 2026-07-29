@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/lib/i18n";
 import { useEffect, useState } from "react";
 import { Camera, Ship } from "lucide-react";
 import {
@@ -13,6 +14,7 @@ import {
 type CameraItem = { id: string; nome: string; url: string };
 
 export function PortoWebcams() {
+  const t = useT();
   const [camere, setCamere] = useState<CameraItem[]>([]);
   const [fonteUrl, setFonteUrl] = useState(
     "https://lnx.comune.sanvincenzo.li.it/webcam/",
@@ -55,13 +57,13 @@ export function PortoWebcams() {
   return (
     <div className="panel">
       <PanelHeading
-        title="Webcam porto"
+        title={t("Webcam porto")}
         icon={Camera}
         actions={
           <SolidButton onClick={() => setTick((t) => t + 1)}>Aggiorna</SolidButton>
         }
       />
-      {loading ? <LoadingBlock label="Caricamento webcam…" /> : null}
+      {loading ? <LoadingBlock label={t("Caricamento webcam…")} /> : null}
       {error && camere.length === 0 ? <DataUnavailable message={error} /> : null}
       {camere.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2">
@@ -93,12 +95,13 @@ export function PortoWebcams() {
 }
 
 export function VesselFinderEmbed() {
+  const t = useT();
   return (
     <div className="panel overflow-hidden p-0">
       <div className="border-b border-[var(--pa-border)] px-4 py-3">
         <PanelHeading
-          title="Traffico nautico AIS (VesselFinder)"
-          description="Mappa embed gratuita centrata sul porto. Non richiede API key; i dati AIS raw via API VesselFinder sono invece a pagamento."
+          title={t("Traffico nautico AIS (VesselFinder)")}
+          description={t("Mappa embed gratuita centrata sul porto. Non richiede API key; i dati AIS raw via API VesselFinder sono invece a pagamento.")}
           icon={Ship}
           actions={
             <SolidLink href="https://www.vesselfinder.com/">VesselFinder</SolidLink>
@@ -108,7 +111,7 @@ export function VesselFinderEmbed() {
       </div>
       <div className="relative z-0 overflow-hidden">
         <iframe
-          title="VesselFinder — Porto di San Vincenzo"
+          title={t("VesselFinder — Porto di San Vincenzo")}
           src="/embeds/vesselfinder-porto.html"
           className="h-[480px] w-full border-0"
           loading="lazy"

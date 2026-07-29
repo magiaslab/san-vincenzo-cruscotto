@@ -10,12 +10,15 @@ import {
   type ReactNode,
 } from "react";
 import { Menu, X, type LucideIcon } from "lucide-react";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import {
   AUTHOR,
   COMUNE_NOME,
   COMUNE_PROVINCIA,
   STEMMA,
 } from "@/lib/constants";
+import { formatDateTime } from "@/lib/format";
+import { useT } from "@/lib/i18n";
 import { scrollToTopSmooth } from "@/lib/motion";
 
 export type NavItem = {
@@ -46,6 +49,7 @@ export function AppShell({
   children,
   footer,
 }: AppShellProps) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
   const menuBtnRef = useRef<HTMLButtonElement>(null);
@@ -118,14 +122,14 @@ export function AppShell({
           Cruscotto {COMUNE_NOME}
         </p>
         <p className="m-0 mt-0.5 text-xs leading-tight text-[var(--pa-muted)]">
-          {COMUNE_PROVINCIA} · dati aperti
+          {COMUNE_PROVINCIA} · {t("dati aperti")}
         </p>
       </div>
     </Link>
   );
 
   const nav = (
-    <nav aria-label="Sezioni del cruscotto" className="flex h-full flex-col">
+    <nav aria-label={t("Sezioni del cruscotto")} className="flex h-full flex-col">
       <div className="hidden shrink-0 border-b border-[var(--pa-border)] lg:block">
         {brandBlock}
       </div>
@@ -134,7 +138,7 @@ export function AppShell({
         {groups.map((group) => (
           <div key={group.label}>
             <p className="m-0 px-3 pb-1 text-[11px] font-bold uppercase tracking-wide text-[var(--pa-muted)]">
-              {group.label}
+              {t(group.label)}
             </p>
             <ul className="m-0 list-none space-y-0.5 p-0">
               {group.items.map((item) => {
@@ -153,7 +157,7 @@ export function AppShell({
                       }`}
                     >
                       <Icon size={18} strokeWidth={2} className="shrink-0" />
-                      <span>{item.label}</span>
+                      <span>{t(item.label)}</span>
                     </button>
                   </li>
                 );
@@ -169,7 +173,7 @@ export function AppShell({
           className="inline-flex min-h-11 w-full items-center rounded-lg px-2 text-sm font-semibold text-[var(--pa-primary)] underline underline-offset-2 hover:bg-[var(--pa-surface-soft)]"
           onClick={() => setOpen(false)}
         >
-          Attribuzioni e regole
+          {t("Attribuzioni e regole")}
         </Link>
       </div>
     </nav>
@@ -178,7 +182,7 @@ export function AppShell({
   return (
     <div className="flex min-h-screen flex-col bg-[var(--background)]">
       <a href="#contenuto-principale" className="skip-link">
-        Vai al contenuto
+        {t("Vai al contenuto")}
       </a>
 
       <div className="flex min-h-0 flex-1">
@@ -190,7 +194,7 @@ export function AppShell({
           <div className="fixed inset-0 z-50 lg:hidden" role="presentation">
             <button
               type="button"
-              aria-label="Chiudi menu"
+              aria-label={t("Chiudi menu")}
               className="absolute inset-0 bg-[color-mix(in_srgb,var(--pa-ink)_50%,transparent)]"
               onClick={() => setOpen(false)}
             />
@@ -198,15 +202,15 @@ export function AppShell({
               ref={drawerRef}
               role="dialog"
               aria-modal="true"
-              aria-label="Menu sezioni"
+              aria-label={t("Menu sezioni")}
               className="absolute inset-y-0 left-0 flex w-[min(18rem,88vw)] flex-col bg-[var(--pa-surface)] shadow-xl"
             >
               <div className="flex h-[var(--shell-topbar-h)] items-center justify-between border-b border-[var(--pa-border)] px-3">
-                <span className="text-sm font-bold text-[var(--pa-ink)]">Menu</span>
+                <span className="text-sm font-bold text-[var(--pa-ink)]">{t("Menu")}</span>
                 <button
                   ref={closeBtnRef}
                   type="button"
-                  aria-label="Chiudi"
+                  aria-label={t("Chiudi")}
                   className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg text-[var(--pa-ink)] hover:bg-[var(--pa-surface-soft)]"
                   onClick={() => {
                     setOpen(false);
@@ -228,7 +232,7 @@ export function AppShell({
                 ref={menuBtnRef}
                 type="button"
                 className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg text-[var(--pa-ink)] hover:bg-[var(--pa-surface-soft)] lg:hidden"
-                aria-label="Apri menu sezioni"
+                aria-label={t("Apri menu sezioni")}
                 aria-expanded={open}
                 onClick={() => setOpen(true)}
               >
@@ -238,7 +242,7 @@ export function AppShell({
               <Link
                 href="/"
                 className="inline-flex h-9 shrink-0 items-center lg:hidden"
-                aria-label="Home Cruscotto San Vincenzo"
+                aria-label={t("Home Cruscotto San Vincenzo")}
               >
                 <Image
                   src={STEMMA.src}
@@ -262,23 +266,23 @@ export function AppShell({
                 </h1>
                 <p className="m-0 truncate text-xs leading-tight text-[var(--pa-muted)]">
                   {generatedAt
-                    ? `Aggiornato ${new Date(generatedAt).toLocaleString("it-IT", {
-                        dateStyle: "short",
-                        timeStyle: "short",
-                      })}`
-                    : "Dati Cruscotto Italia (AgID)"}
+                    ? `${t("Aggiornato")} ${formatDateTime(generatedAt)}`
+                    : t("Dati Cruscotto Italia (AgID)")}
                   {" · "}
                   <a
                     href={`mailto:${AUTHOR.email}`}
                     className="text-[var(--pa-primary)] underline-offset-2 hover:underline"
                   >
-                    Contatti
+                    {t("Contatti")}
                   </a>
                 </p>
               </div>
+              <LanguageSelector compact />
             </div>
-            <div className="flex h-8 items-center bg-[var(--pa-primary)] px-3 text-xs font-semibold text-white sm:px-4">
-              Progetto indipendente · non ufficiale · dati aperti
+            <div className="bg-[var(--pa-primary)] px-3 py-2 text-xs font-semibold leading-snug text-white sm:px-4 sm:text-sm">
+              {t(
+                "Progetto non ufficiale: non affiliato ad AgID, al Governo italiano o al Comune di San Vincenzo.",
+              )}
             </div>
           </header>
 

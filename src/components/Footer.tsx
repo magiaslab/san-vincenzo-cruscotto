@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import {
   AUTHOR,
@@ -5,8 +7,10 @@ import {
   COMUNE_PROVINCIA,
   CRUSCOTTO_ITALIA_URL,
 } from "@/lib/constants";
+import { useT } from "@/lib/i18n";
 
 export function Footer() {
+  const t = useT();
   return (
     <footer
       className="mt-auto w-full border-t border-[color-mix(in_srgb,white_15%,transparent)] bg-[var(--pa-footer)] text-white"
@@ -19,7 +23,7 @@ export function Footer() {
               Cruscotto {COMUNE_NOME} ({COMUNE_PROVINCIA})
             </p>
             <p className="mb-0 mt-1.5 text-xs leading-relaxed text-[var(--pa-footer-muted)] sm:text-sm">
-              Progetto indipendente su dati{" "}
+              {t("Progetto indipendente su dati")}{" "}
               <a
                 className="font-semibold text-white underline underline-offset-2"
                 href={CRUSCOTTO_ITALIA_URL}
@@ -28,7 +32,7 @@ export function Footer() {
               >
                 Cruscotto Italia (AgID)
               </a>
-              . Realizzato da{" "}
+              . {t("Realizzato da")}{" "}
               <a
                 className="font-semibold text-white underline underline-offset-2"
                 href={`mailto:${AUTHOR.email}`}
@@ -39,27 +43,29 @@ export function Footer() {
             </p>
           </div>
           <nav
-            aria-label="Link di piè di pagina"
+            aria-label={t("Link di piè di pagina")}
             className="flex flex-wrap gap-x-5 gap-y-1 text-sm"
           >
             <Link
               href="/attribuzioni"
               className="inline-flex min-h-11 items-center font-semibold text-white underline underline-offset-2"
             >
-              Attribuzioni e regole
+              {t("Attribuzioni e regole")}
             </Link>
             <a
               href={`mailto:${AUTHOR.email}`}
               className="inline-flex min-h-11 items-center font-semibold text-white underline underline-offset-2"
             >
-              Contatti
+              {t("Contatti")}
             </a>
           </nav>
         </div>
       </div>
       <div className="border-t border-white/15 bg-[var(--pa-footer-deep)] px-3 py-3 text-xs leading-relaxed text-[var(--pa-footer-muted)] sm:px-5 lg:px-6">
-        <strong className="text-white">Progetto non ufficiale:</strong> non
-        affiliato ad AgID, al Governo italiano o al Comune di San Vincenzo.
+        <strong className="text-white">{t("Progetto non ufficiale:")}</strong>{" "}
+        {t(
+          "non affiliato ad AgID, al Governo italiano o al Comune di San Vincenzo.",
+        )}
       </div>
     </footer>
   );

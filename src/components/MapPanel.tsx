@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/lib/i18n";
 import { useEffect, useMemo, useState } from "react";
 import {
   CircleMarker,
@@ -37,6 +38,7 @@ type LayersResponse = {
 };
 
 function FitBounds({ collections }: { collections: FeatureCollection[] }) {
+  const t = useT();
   const map = useMap();
   useEffect(() => {
     const pts: [number, number][] = [];
@@ -56,6 +58,7 @@ function FitBounds({ collections }: { collections: FeatureCollection[] }) {
 }
 
 export default function MapPanel({ kpi }: { kpi?: Record<string, unknown> }) {
+  const t = useT();
   const [data, setData] = useState<LayersResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [showCivici, setShowCivici] = useState(true);
@@ -143,28 +146,28 @@ export default function MapPanel({ kpi }: { kpi?: Record<string, unknown> }) {
   return (
     <section>
       <SectionIntro
-        title="Mappa"
-        description="Layer georeferenziati ANNCSU, punti EV, beni culturali e cartografia catastale. Base OpenStreetMap."
+        title={t("Mappa")}
+        description={t("Layer georeferenziati ANNCSU, punti EV, beni culturali e cartografia catastale. Base OpenStreetMap.")}
       />
 
       <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
         <KpiCard
-          label="Civici ANNCSU"
+          label={t("Civici ANNCSU")}
           value={valueOrMissing(civiciKpi?.n_civici, formatInteger)}
           hint={`${formatInteger(Number(civiciKpi?.n_strade) || null)} strade · geo ${formatPercent(Number(civiciKpi?.pct_geo_ref) || null)}`}
         />
         <KpiCard
-          label="Punti EV"
+          label={t("Punti EV")}
           value={valueOrMissing(evKpi?.n_totale, formatInteger)}
           hint={`${formatInteger(Number(evKpi?.n_attivi) || null)} attivi`}
         />
         <KpiCard
-          label="Beni culturali geo"
+          label={t("Beni culturali geo")}
           value={valueOrMissing(beniKpi?.n_con_coordinate, formatInteger)}
           unavailable={Number(beniKpi?.n_con_coordinate ?? 0) === 0}
         />
         <KpiCard
-          label="Farmacie geo"
+          label={t("Farmacie geo")}
           value={valueOrMissing(sanitaKpi?.n_farmacie, formatInteger)}
           hint={`${formatInteger(Number(sanitaKpi?.n_parafarmacie) || null)} parafarmacie`}
         />
@@ -221,7 +224,7 @@ export default function MapPanel({ kpi }: { kpi?: Record<string, unknown> }) {
 
       {beniUnavailable ? (
         <div className="mb-3">
-          <DataUnavailable message="Beni culturali MiC: nessun punto con coordinate per San Vincenzo." />
+          <DataUnavailable message={t("Beni culturali MiC: nessun punto con coordinate per San Vincenzo.")} />
         </div>
       ) : null}
       {showCatasto && catastoError ? (
@@ -230,11 +233,11 @@ export default function MapPanel({ kpi }: { kpi?: Record<string, unknown> }) {
         </div>
       ) : null}
       {showCatasto && catastoLoading ? (
-        <LoadingBlock label="Download layer catastale…" />
+        <LoadingBlock label={t("Download layer catastale…")} />
       ) : null}
 
       {error ? <DataUnavailable message={error} /> : null}
-      {!data && !error ? <LoadingBlock label="Caricamento layer…" /> : null}
+      {!data && !error ? <LoadingBlock label={t("Caricamento layer…")} /> : null}
 
       {data ? (
         <div className="overflow-hidden rounded-lg border border-[#d9e6f2]">

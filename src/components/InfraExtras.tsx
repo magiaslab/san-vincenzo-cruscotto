@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/lib/i18n";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   CircleMarker,
@@ -38,6 +39,7 @@ type FeatureCollection = {
 };
 
 function FitPoints({ points }: { points: [number, number][] }) {
+  const t = useT();
   const map = useMap();
   useEffect(() => {
     if (points.length === 0) return;
@@ -67,6 +69,7 @@ function MapShell({
   footer?: ReactNode;
   heightClass?: string;
 }) {
+  const t = useT();
   const icon =
     title.toLowerCase().includes("ricarica") || title.toLowerCase().includes("ev")
       ? Zap
@@ -159,6 +162,7 @@ function pointsFrom(fc: FeatureCollection | null): [number, number][] {
 
 /** Mappa Leaflet dei punti di ricarica EV (PUN / IDR via Cruscotto Italia). */
 export function PunIdrMap() {
+  const t = useT();
   const { data, error, loading } = useMapLayer("ev");
   const points = useMemo(() => pointsFrom(data), [data]);
   const nAttivi = useMemo(
@@ -168,13 +172,13 @@ export function PunIdrMap() {
 
   return (
     <MapShell
-      title="Mappa colonnine di ricarica (PUN / IDR)"
+      title={t("Mappa colonnine di ricarica (PUN / IDR)")}
       description={`${data?.features.length ?? 0} punti EV georeferenziati nel comune · ${nAttivi} attivi.`}
       sourceLabel="PUN / IDR (Cruscotto Italia)"
       sourceUrl="https://www.piattaformaunicanazionale.it/idr"
       footer=" · verde = attivo, rosso = non attivo"
     >
-      {loading ? <LoadingBlock label="Caricamento colonnine…" /> : null}
+      {loading ? <LoadingBlock label={t("Caricamento colonnine…")} /> : null}
       {error ? (
         <div className="p-4">
           <DataUnavailable message={error} />
@@ -182,7 +186,7 @@ export function PunIdrMap() {
       ) : null}
       {!loading && !error && data && data.features.length === 0 ? (
         <div className="p-4">
-          <DataUnavailable message="Nessun punto di ricarica georeferenziato disponibile." />
+          <DataUnavailable message={t("Nessun punto di ricarica georeferenziato disponibile.")} />
         </div>
       ) : null}
       {!loading && !error && data && data.features.length > 0 ? (
@@ -246,17 +250,18 @@ function prezzoLabel(prezzi: unknown, key: string): string | null {
 
 /** Mappa Leaflet degli impianti carburanti (MIMIT via Cruscotto Italia). */
 export function CarburantiMap() {
+  const t = useT();
   const { data, error, loading } = useMapLayer("carburanti");
   const points = useMemo(() => pointsFrom(data), [data]);
 
   return (
     <MapShell
-      title="Mappa impianti carburanti"
+      title={t("Mappa impianti carburanti")}
       description={`${data?.features.length ?? 0} impianti georeferenziati nel comune (prezzi MIMIT).`}
       sourceLabel="Osservatorio prezzi carburanti (MIMIT)"
       sourceUrl="https://www.mimit.gov.it/it/open-data/elenco-dataset/osservatorio-prezzi-carburanti"
     >
-      {loading ? <LoadingBlock label="Caricamento impianti…" /> : null}
+      {loading ? <LoadingBlock label={t("Caricamento impianti…")} /> : null}
       {error ? (
         <div className="p-4">
           <DataUnavailable message={error} />
@@ -264,7 +269,7 @@ export function CarburantiMap() {
       ) : null}
       {!loading && !error && data && data.features.length === 0 ? (
         <div className="p-4">
-          <DataUnavailable message="Nessun impianto carburanti georeferenziato disponibile." />
+          <DataUnavailable message={t("Nessun impianto carburanti georeferenziato disponibile.")} />
         </div>
       ) : null}
       {!loading && !error && data && data.features.length > 0 ? (
@@ -339,14 +344,15 @@ export function BandaUltralargaPanel({
   ftthPct?: number | null;
   ftth20mPct?: number | null;
 }) {
+  const t = useT();
   const pct = typeof ftthPct === "number" ? ftthPct : null;
   const pct20 = typeof ftth20mPct === "number" ? ftth20mPct : null;
 
   return (
     <div className="panel">
       <PanelHeading
-        title="Copertura banda ultralarga / FTTH"
-        description="Indicatori AGCOM Broadband Map per San Vincenzo. La mappa ufficiale nazionale non espone layer incorporabili: apri il portale per i dettagli civico per civico."
+        title={t("Copertura banda ultralarga / FTTH")}
+        description={t("Indicatori AGCOM Broadband Map per San Vincenzo. La mappa ufficiale nazionale non espone layer incorporabili: apri il portale per i dettagli civico per civico.")}
         icon={Wifi}
         actions={
           <>
@@ -358,8 +364,8 @@ export function BandaUltralargaPanel({
         }
       />
       <div className="grid gap-3 sm:grid-cols-2">
-        <CoverageBar label="Copertura FTTH (DESI)" value={pct} color="#0066CC" />
-        <CoverageBar label="FTTH entro 20 m" value={pct20} color="#008758" />
+        <CoverageBar label={t("Copertura FTTH (DESI)")} value={pct} color="#0066CC" />
+        <CoverageBar label={t("FTTH entro 20 m")} value={pct20} color="#008758" />
       </div>
     </div>
   );
@@ -374,6 +380,7 @@ function CoverageBar({
   value: number | null;
   color: string;
 }) {
+  const t = useT();
   const width = value == null ? 0 : Math.max(0, Math.min(100, value));
   return (
     <div>

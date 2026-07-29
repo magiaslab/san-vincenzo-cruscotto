@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/lib/i18n";
 import { useEffect, useId, useRef, useState } from "react";
 import { Cookie } from "lucide-react";
 
@@ -8,6 +9,7 @@ const STORAGE_KEY = "sv-cruscotto-cookie-consent";
 type Consent = "accepted" | "essential";
 
 export function CookieBanner() {
+  const t = useT();
   const [visible, setVisible] = useState(false);
   const firstBtnRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -52,6 +54,7 @@ export function CookieBanner() {
         STORAGE_KEY,
         JSON.stringify({ value, at: new Date().toISOString() }),
       );
+      window.dispatchEvent(new Event("sv-cookie-consent"));
     } catch {
       /* ignore */
     }
@@ -78,19 +81,16 @@ export function CookieBanner() {
               aria-hidden
             />
             <h2 id={titleId} className="m-0 text-base font-bold">
-              Informativa cookie
+              {t("Informativa cookie")}
             </h2>
           </div>
           <p
             id={descId}
             className="m-0 text-sm leading-relaxed text-[var(--pa-muted)]"
           >
-            Questo sito usa cookie tecnici e memoria locale del browser per
-            salvare le tue preferenze (es. consenso). Per mappe e radar vengono
-            caricati tile da servizi terzi (OpenStreetMap/CARTO, RainViewer). Non
-            usiamo cookie di profilazione pubblicitaria. Continuando puoi
-            accettare tutti i cookie tecnici necessari al funzionamento, oppure
-            solo quelli essenziali.
+            {t(
+              "Questo sito usa cookie tecnici e memoria locale del browser per salvare le tue preferenze (es. consenso). Per mappe e radar vengono caricati tile da servizi terzi (OpenStreetMap/CARTO, RainViewer). Non usiamo cookie di profilazione pubblicitaria. Continuando puoi accettare tutti i cookie tecnici necessari al funzionamento, oppure solo quelli essenziali.",
+            )}
           </p>
         </div>
         <div className="flex shrink-0 flex-wrap gap-2">
@@ -100,7 +100,7 @@ export function CookieBanner() {
             onClick={() => save("essential")}
             className="inline-flex min-h-11 items-center rounded-lg border border-[var(--pa-primary)] bg-white px-4 py-2 text-sm font-semibold text-[var(--pa-primary)] hover:bg-[var(--pa-surface-soft)]"
           >
-            Solo essenziali
+            {t("Solo essenziali")}
           </button>
           <button
             type="button"

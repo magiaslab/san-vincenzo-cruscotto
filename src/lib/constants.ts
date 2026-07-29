@@ -77,6 +77,15 @@ export const COMUNI_LOOKUP: Record<string, string> = {
 
 /** URL fonti open data aggiuntive */
 export const SAN_VINCENZO_OPENDATA_URL = "https://cloud.ldpgis.it/sanvincenzoopen/";
+export const COMUNE_SAN_VINCENZO_URL = "https://www.comune.sanvincenzo.li.it/";
+export const COMUNE_EVENTI_URL =
+  "https://www.comune.sanvincenzo.li.it/Vivere-il-comune/Eventi";
+export const VISIT_SAN_VINCENZO_EVENTI_URL =
+  "https://visitsanvincenzo.it/it/calendario-eventi/";
+export const BIBLIOTECA_COMUNALE_URL =
+  "https://www.comune.sanvincenzo.li.it/Vivere-il-comune/Luoghi/Biblioteca-Comunale-Giorgio-Calandra";
+export const BIBLIOTECA_OPAC_URL =
+  "https://opacsol.comune.livorno.it/SebinaOpac/library/SAN%20VINCENZO%20-%20Biblioteca%20comunale/LIASA";
 export const ARPAT_BASE_URL = "https://www.arpat.toscana.it";
 export const ARPAT_OPENDATA_URL = "https://www.arpat.toscana.it/opendata";
 export const ARPAT_BALNEAZIONE_URL =
@@ -95,6 +104,13 @@ export const FARMACIE_DI_TURNO_COD = "49018" as const;
 export const FARMACIE_DI_TURNO_URL =
   `https://www.farmaciediturno.org/ricercaditurno.asp?cod=${FARMACIE_DI_TURNO_COD}` as const;
 export const FARMACIE_DI_TURNO_BASE = "https://www.farmaciediturno.org";
+
+/**
+ * Endpoint POST del RAG su Modal (workspace magiaslab).
+ * Sovrascrivibile con ASSISTENTE_MODAL_URL.
+ */
+export const ASSISTENTE_MODAL_URL_DEFAULT =
+  "https://magiaslab--san-vincenzo-rag-ragservice-web-ask.modal.run" as const;
 
 /** Open data Ministero dell'Istruzione — Portale Unico dei Dati della Scuola. */
 export const MIUR_OPENDATA_URL = "https://dati.istruzione.it/opendata/" as const;
