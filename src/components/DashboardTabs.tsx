@@ -29,6 +29,7 @@ import {
   Heart,
   Ship,
   LandPlot,
+  Bot,
 } from "lucide-react";
 import { AppShell, type NavGroup } from "@/components/AppShell";
 import { FarmacieTurno } from "@/components/FarmacieTurno";
@@ -119,6 +120,11 @@ const BandaUltralargaPanel = dynamic(
   },
 );
 
+const AssistenteChat = dynamic(() => import("@/components/AssistenteChat"), {
+  ssr: false,
+  loading: () => <LoadingBlock label="Caricamento assistente…" />,
+});
+
 type Kpi = Record<string, unknown>;
 
 type TabId =
@@ -132,7 +138,8 @@ type TabId =
   | "infra"
   | "sanita"
   | "meteo"
-  | "mappa";
+  | "mappa"
+  | "assistente";
 
 const NAV_GROUPS: NavGroup[] = [
   {
@@ -142,6 +149,7 @@ const NAV_GROUPS: NavGroup[] = [
       { id: "sanita", label: "Sanità", Icon: Stethoscope },
       { id: "infra", label: "Mobilità", Icon: Train },
       { id: "meteo", label: "Meteo", Icon: CloudSun },
+      { id: "assistente", label: "Assistente", Icon: Bot },
     ],
   },
   {
@@ -271,6 +279,7 @@ export function DashboardTabs({
         {tab === "sanita" && <Sanita kpi={kpi} />}
         {tab === "meteo" && <Meteo kpi={kpi} />}
         {tab === "mappa" && <MapPanel kpi={kpi} />}
+        {tab === "assistente" && <AssistenteChat />}
       </div>
     </AppShell>
   );
