@@ -28,6 +28,12 @@ export const AUTHOR = {
   email: "cipriani.alessandro@gmail.com",
 } as const;
 
+/** Repository e deploy di questo cruscotto. */
+export const GITHUB_REPO_URL =
+  "https://github.com/magiaslab/san-vincenzo-cruscotto" as const;
+export const VERCEL_DEPLOY_URL =
+  "https://vercel.com/magiaslab/san-vincenzo-cruscotto" as const;
+
 /** Centro approssimativo del comune (per mappa iniziale). */
 export const MAP_CENTER: [number, number] = [43.085, 10.54];
 export const MAP_DEFAULT_ZOOM = 13;
