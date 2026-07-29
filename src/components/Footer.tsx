@@ -139,6 +139,26 @@ export function Footer() {
                   </a>
                 </li>
                 <li>
+                  Traffico nautico:{" "}
+                  <a
+                    className="text-white text-decoration-underline"
+                    href="https://www.vesselfinder.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    VesselFinder
+                  </a>{" "}
+                  (embed mappa AIS) · Webcam porto:{" "}
+                  <a
+                    className="text-white text-decoration-underline"
+                    href="https://lnx.comune.sanvincenzo.li.it/webcam/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Comune di San Vincenzo
+                  </a>
+                </li>
+                <li>
                   Licenza contenuti dati: CC-BY 4.0 (ove non diversamente
                   indicato).
                 </li>
@@ -211,7 +231,43 @@ export function Footer() {
             >
               RainViewer
             </a>{" "}
-            — radar precipitazioni; OpenStreetMap/CARTO — cartografia di base.
+            — radar precipitazioni;{" "}
+            <a
+              className="text-white text-decoration-underline"
+              href="https://www.vesselfinder.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              VesselFinder
+            </a>{" "}
+            — traffico AIS (embed);{" "}
+            <a
+              className="text-white text-decoration-underline"
+              href="https://lnx.comune.sanvincenzo.li.it/webcam/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Comune di San Vincenzo
+            </a>{" "}
+            — webcam porto;{" "}
+            <a
+              className="text-white text-decoration-underline"
+              href="https://www.piattaformaunicanazionale.it/idr"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              PUN / IDR
+            </a>{" "}
+            — mappa colonnine;{" "}
+            <a
+              className="text-white text-decoration-underline"
+              href="https://bandaultralarga.italia.it/mappa/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Banda Ultralarga
+            </a>{" "}
+            — copertura fibra; OpenStreetMap/CARTO — cartografia di base.
           </p>
           <p className="mb-0">
             <strong>Cruscotto Italia:</strong> Progettato e sviluppato da{" "}

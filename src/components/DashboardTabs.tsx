@@ -62,11 +62,45 @@ const MeteoRadarMap = dynamic(() => import("@/components/MeteoRadarMap"), {
   loading: () => <LoadingBlock label="Caricamento radar…" />,
 });
 
+const VesselFinderEmbed = dynamic(
+  () =>
+    import("@/components/PortoExtras").then((m) => m.VesselFinderEmbed),
+  {
+    ssr: false,
+    loading: () => <LoadingBlock label="Caricamento mappa AIS…" />,
+  },
+);
+
+const PortoWebcams = dynamic(
+  () => import("@/components/PortoExtras").then((m) => m.PortoWebcams),
+  {
+    ssr: false,
+    loading: () => <LoadingBlock label="Caricamento webcam…" />,
+  },
+);
+
+const PunIdrMap = dynamic(
+  () => import("@/components/InfraExtras").then((m) => m.PunIdrMap),
+  {
+    ssr: false,
+    loading: () => <LoadingBlock label="Caricamento mappa colonnine…" />,
+  },
+);
+
+const BandaUltralargaMap = dynamic(
+  () => import("@/components/InfraExtras").then((m) => m.BandaUltralargaMap),
+  {
+    ssr: false,
+    loading: () => <LoadingBlock label="Caricamento mappa fibra…" />,
+  },
+);
+
 type Kpi = Record<string, unknown>;
 
 const TABS = [
   { id: "panoramica", label: "Panoramica", Icon: Globe2 },
   { id: "turismo", label: "Turismo", Icon: Palmtree },
+  { id: "porto", label: "Porto", Icon: Ship },
   { id: "economia", label: "Economia", Icon: Factory },
   { id: "finanza", label: "Finanza", Icon: Landmark },
   { id: "territorio", label: "Territorio", Icon: Mountain },
@@ -168,6 +202,7 @@ export function DashboardTabs({ kpi }: { kpi: Kpi }) {
       <div className="mx-auto max-w-7xl px-3 py-4 sm:px-4 sm:py-5 lg:px-6 lg:py-6" role="tabpanel">
         {tab === "panoramica" && <Panoramica kpi={kpi} />}
         {tab === "turismo" && <Turismo kpi={kpi} />}
+        {tab === "porto" && <Porto kpi={kpi} />}
         {tab === "economia" && <Economia kpi={kpi} />}
         {tab === "finanza" && <Finanza kpi={kpi} />}
         {tab === "territorio" && <Territorio kpi={kpi} />}
@@ -660,6 +695,178 @@ function Turismo({ kpi }: { kpi: Kpi }) {
   );
 }
 
+function Porto({ kpi }: { kpi: Kpi }) {
+  const [porti, setPorti] = useState<Record<string, unknown> | null>(null);
+  const [balneazione, setBalneazione] = useState<Record<string, unknown> | null>(
+    null,
+  );
+  const [loading, setLoading] = useState(true);
+  const carburanti = asRecord(kpi.carburanti_mimit);
+  const ev = asRecord(kpi.ricarica_ev_pun);
+  const meteo = asRecord(kpi.meteo_italiameteo);
+
+  useEffect(() => {
+    let cancelled = false;
+    Promise.all([
+      fetch("/api/toscana/porti").then((r) => (r.ok ? r.json() : null)),
+      fetch("/api/arpat/balneazione").then((r) => (r.ok ? r.json() : null)),
+    ])
+      .then(([p, b]) => {
+        if (cancelled) return;
+        setPorti(p);
+        setBalneazione(b);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const portualita = asRecord(porti?.portualita);
+  const ormeggio = asRecord(porti?.ormeggio);
+  const contesto = asRecord(porti?.contesto_regionale);
+  const servizi = Array.isArray(porti?.servizi)
+    ? (porti.servizi as string[])
+    : [];
+  const fonti = Array.isArray(porti?.fonti)
+    ? (porti.fonti as Array<{ nome?: string; url?: string }>)
+    : [];
+
+  return (
+    <section>
+      <SectionIntro
+        title="Porto"
+        description="Dati aggregati sul porto turistico: posti barca, servizi, webcam ufficiali del Comune e traffico AIS via VesselFinder."
+      />
+
+      <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
+        <KpiCard
+          label="Posti barca"
+          value={valueOrMissing(
+            portualita?.posti_barca ?? ormeggio?.posti_barca,
+            formatInteger,
+          )}
+          hint={String(portualita?.tipo ?? "")}
+          icon={Ship}
+          variant="info"
+        />
+        <KpiCard
+          label="Classificazione"
+          value={String(porti?.classificazione ?? "n.d.")}
+        />
+        <KpiCard
+          label="Punti ricarica EV (comune)"
+          value={valueOrMissing(ev?.n_totale, formatInteger)}
+          hint={`${formatInteger(num(ev?.n_attivi))} attivi`}
+          icon={Car}
+        />
+        <KpiCard
+          label="Impianti carburanti"
+          value={valueOrMissing(carburanti?.n_impianti, formatInteger)}
+          hint={
+            carburanti?.prezzo_medio_benzina_self != null
+              ? `Benzina self ${formatDecimal(num(carburanti.prezzo_medio_benzina_self), 3)} €/L`
+              : undefined
+          }
+        />
+        <KpiCard
+          label="Vento (live)"
+          value={valueOrMissing(meteo?.vento_kmh, (v) =>
+            `${formatDecimal(v, 1)} km/h`,
+          )}
+          hint={meteo?.ww_desc ? String(meteo.ww_desc) : undefined}
+          icon={Wind}
+        />
+        <KpiCard
+          label="Balneazione eccellente"
+          value={valueOrMissing(
+            balneazione?.classificazione_eccellente_pct,
+            formatPercent,
+          )}
+          hint={
+            balneazione?.aree_totali != null
+              ? `${formatInteger(num(balneazione.aree_totali))} aree ARPAT`
+              : undefined
+          }
+          icon={Waves}
+          variant="success"
+        />
+        <KpiCard
+          label="Posti barca in Toscana"
+          value={valueOrMissing(contesto?.totale_posti_barca, formatInteger)}
+          hint="Contesto regionale"
+        />
+        <KpiCard
+          label="Coordinate porto"
+          value={
+            portualita?.lat != null && portualita?.lon != null
+              ? `${formatDecimal(num(portualita.lat), 4)}, ${formatDecimal(num(portualita.lon), 4)}`
+              : "n.d."
+          }
+        />
+      </div>
+
+      {loading ? <LoadingBlock label="Caricamento dati porto…" /> : null}
+
+      {portualita?.descrizione ? (
+        <div className="mb-4 panel">
+          <h3>Scheda porto</h3>
+          <p className="mb-2 text-sm text-[#5b6f82]">
+            {String(portualita.descrizione)}
+          </p>
+          {servizi.length > 0 ? (
+            <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
+              {servizi.map((s) => (
+                <li
+                  key={s}
+                  className="rounded-full bg-[#e8f2fc] px-3 py-1 text-sm font-semibold text-[#17324d]"
+                >
+                  {s}
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
+      ) : null}
+
+      <div className="mb-4">
+        <PortoWebcams />
+      </div>
+
+      <div className="mb-4">
+        <VesselFinderEmbed />
+      </div>
+
+      {fonti.length > 0 ? (
+        <p className="text-xs text-[#5b6f82]">
+          Fonti sezione:{" "}
+          {fonti.map((f, i) => (
+            <span key={f.url ?? f.nome}>
+              {i > 0 ? " · " : null}
+              {f.url ? (
+                <a
+                  href={f.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline"
+                >
+                  {f.nome}
+                </a>
+              ) : (
+                f.nome
+              )}
+            </span>
+          ))}
+          . Per dati AIS programmatici (JSON) VesselFinder richiede un&apos;API a
+          pagamento; qui usiamo solo l&apos;embed gratuito della mappa.
+        </p>
+      ) : null}
+    </section>
+  );
+}
+
 function Economia({ kpi }: { kpi: Kpi }) {
   const { detail, loading } = useDettaglio("asia,redditi,profilo,scuole");
   const lavoro = asRecord(kpi.lavoro_profilo);
@@ -1087,6 +1294,28 @@ function Territorio({ kpi }: { kpi: Kpi }) {
   );
 }
 
+function FuelPriceCell({
+  value,
+  isBest,
+}: {
+  value: number | null;
+  isBest: boolean;
+}) {
+  if (value == null) return <span>—</span>;
+  return (
+    <span className="inline-flex flex-wrap items-center gap-1.5">
+      <span className={isBest ? "font-bold text-[#008758]" : undefined}>
+        {formatDecimal(value, 3)}
+      </span>
+      {isBest ? (
+        <span className="rounded bg-[#008758] px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+          Miglior prezzo
+        </span>
+      ) : null}
+    </span>
+  );
+}
+
 function Infra({ kpi }: { kpi: Kpi }) {
   const { detail, loading } = useDettaglio("ev,pendolarismo,veicoli,banda,carburanti");
   const banda = asRecord(kpi.banda_larga_agcom);
@@ -1112,6 +1341,32 @@ function Infra({ kpi }: { kpi: Kpi }) {
   const impianti = Array.isArray(carb?.punti) ? (carb.punti as Array<Record<string, unknown>>) : [];
   const prezzoMedio = asRecord(carbKpi?.prezzo_medio);
 
+  const bestBenzina = useMemo(() => {
+    let min: number | null = null;
+    for (const p of impianti) {
+      const v = num(asRecord(p.prezzi)?.benzina_self);
+      if (v != null && (min == null || v < min)) min = v;
+    }
+    return min;
+  }, [impianti]);
+
+  const bestGasolio = useMemo(() => {
+    let min: number | null = null;
+    for (const p of impianti) {
+      const v = num(asRecord(p.prezzi)?.gasolio_self);
+      if (v != null && (min == null || v < min)) min = v;
+    }
+    return min;
+  }, [impianti]);
+
+  const impiantiOrdinati = useMemo(() => {
+    return [...impianti].sort((a, b) => {
+      const pa = num(asRecord(a.prezzi)?.benzina_self) ?? Number.POSITIVE_INFINITY;
+      const pb = num(asRecord(b.prezzi)?.benzina_self) ?? Number.POSITIVE_INFINITY;
+      return pa - pb;
+    });
+  }, [impianti]);
+
   return (
     <section>
       <SectionIntro title="Infrastrutture & Mobilità" description="Banda larga, EV, veicoli, incidenti, pendolarismo e carburanti." />
@@ -1123,7 +1378,6 @@ function Infra({ kpi }: { kpi: Kpi }) {
         <KpiCard label="% veicoli inquinanti" value={valueOrMissing(veicoli?.pct_inquinanti ?? euro?.pct_inquinanti, formatPercent)} />
         <KpiCard label="Incidenti (ultimo anno)" value={valueOrMissing(incidenti?.incidenti, formatInteger)} hint={incidenti ? `${formatInteger(num(incidenti.morti))} morti · ${formatInteger(num(incidenti.feriti))} feriti` : undefined} />
         <KpiCard label="Impianti carburanti" value={valueOrMissing(carbKpi?.n_impianti ?? asRecord(kpi.carburanti_mimit)?.n_impianti, formatInteger)} />
-        <KpiCard label="Benzina self media" value={valueOrMissing(prezzoMedio?.benzina_self ?? asRecord(kpi.carburanti_mimit)?.prezzo_medio_benzina_self, (v) => `${formatDecimal(v, 3)} €/L`)} />
       </div>
 
       {loading ? <LoadingBlock /> : null}
@@ -1193,10 +1447,55 @@ function Infra({ kpi }: { kpi: Kpi }) {
         ) : null}
       </div>
 
-      {impianti.length > 0 ? (
+      <div className="mb-4">
+        <PunIdrMap />
+      </div>
+
+      <div className="mb-4">
+        <BandaUltralargaMap />
+      </div>
+
+      <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
+        <KpiCard
+          label="Benzina self media"
+          value={valueOrMissing(
+            prezzoMedio?.benzina_self ??
+              asRecord(kpi.carburanti_mimit)?.prezzo_medio_benzina_self,
+            (v) => `${formatDecimal(v, 3)} €/L`,
+          )}
+          icon={Car}
+        />
+        <KpiCard
+          label="Gasolio self media"
+          value={valueOrMissing(prezzoMedio?.gasolio_self, (v) => `${formatDecimal(v, 3)} €/L`)}
+          icon={Car}
+        />
+        <KpiCard
+          label="Miglior benzina self"
+          value={valueOrMissing(bestBenzina, (v) => `${formatDecimal(v, 3)} €/L`)}
+          hint="Prezzo più basso nel comune"
+          variant="success"
+        />
+        <KpiCard
+          label="Miglior gasolio self"
+          value={valueOrMissing(bestGasolio, (v) => `${formatDecimal(v, 3)} €/L`)}
+          hint="Prezzo più basso nel comune"
+          variant="success"
+        />
+      </div>
+
+      {impiantiOrdinati.length > 0 ? (
         <div className="overflow-x-auto panel p-0">
-          <h3 className="px-3 pt-3 sm:px-4 sm:pt-4">Impianti carburanti</h3>
-          <table className="min-w-full text-left text-xs sm:text-sm">
+          <div className="flex flex-wrap items-end justify-between gap-2 px-3 pt-3 sm:px-4 sm:pt-4">
+            <div>
+              <h3 className="m-0">Impianti carburanti</h3>
+              <p className="mb-0 mt-1 text-xs text-[#5b6f82] sm:text-sm">
+                Ordinati per benzina self crescente. Badge verde = prezzo migliore
+                tra gli impianti del comune.
+              </p>
+            </div>
+          </div>
+          <table className="mt-2 min-w-full text-left text-xs sm:text-sm">
             <thead className="bg-[#e8f2fc]">
               <tr>
                 <th className="px-2 py-1.5 sm:px-3 sm:py-2">Impianto</th>
@@ -1207,24 +1506,42 @@ function Infra({ kpi }: { kpi: Kpi }) {
               </tr>
             </thead>
             <tbody>
-              {impianti.map((p) => {
+              {impiantiOrdinati.map((p) => {
                 const prezzi = asRecord(p.prezzi);
+                const benzina = num(prezzi?.benzina_self);
+                const gasolio = num(prezzi?.gasolio_self);
+                const isBestBenzina =
+                  benzina != null && bestBenzina != null && benzina === bestBenzina;
+                const isBestGasolio =
+                  gasolio != null && bestGasolio != null && gasolio === bestGasolio;
                 return (
-                  <tr key={String(p.name)} className="border-t border-[#eef2f5]">
+                  <tr
+                    key={String(p.name)}
+                    className={`border-t border-[#eef2f5] ${
+                      isBestBenzina || isBestGasolio ? "bg-[#f0faf4]" : ""
+                    }`}
+                  >
                     <td className="px-2 py-1.5 sm:px-3 sm:py-2">
                       <strong>{String(p.name)}</strong>
                       <br />
                       <span className="text-[#5b6f82]">{String(p.indirizzo ?? "")}</span>
                     </td>
                     <td className="px-2 py-1.5 sm:px-3 sm:py-2">{String(p.brand ?? "")}</td>
-                    <td className="px-2 py-1.5 sm:px-3 sm:py-2">{prezzi?.benzina_self != null ? formatDecimal(num(prezzi.benzina_self), 3) : "—"}</td>
-                    <td className="px-2 py-1.5 sm:px-3 sm:py-2">{prezzi?.gasolio_self != null ? formatDecimal(num(prezzi.gasolio_self), 3) : "—"}</td>
+                    <td className="px-2 py-1.5 sm:px-3 sm:py-2">
+                      <FuelPriceCell value={benzina} isBest={isBestBenzina} />
+                    </td>
+                    <td className="px-2 py-1.5 sm:px-3 sm:py-2">
+                      <FuelPriceCell value={gasolio} isBest={isBestGasolio} />
+                    </td>
                     <td className="px-2 py-1.5 sm:px-3 sm:py-2">{String(p.ultimo_aggiornamento ?? "—")}</td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
+          <p className="m-0 border-t border-[#eef2f5] px-3 py-2 text-xs text-[#5b6f82] sm:px-4">
+            Fonte prezzi: MIMIT / Osservatorio carburanti via Cruscotto Italia.
+          </p>
         </div>
       ) : null}
     </section>
