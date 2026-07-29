@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import {
   AUTHOR,
   COMUNE_NOME,
@@ -33,17 +34,21 @@ export function Header({ generatedAt }: HeaderProps) {
       {/* Center: stemma + titolo (senza attribuzione logo, spostata in footer) */}
       <div className="border-b border-[#d9e6f2] bg-white">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-4 py-3 sm:gap-4 sm:py-4 sm:px-6">
-          <Image
-            src={STEMMA.src}
-            alt={STEMMA.alt}
-            width={44}
-            height={55}
-            priority
-            className="h-[44px] w-auto shrink-0 sm:h-[55px]"
-          />
+          <Link href="/" className="shrink-0" aria-label="Torna alla home">
+            <Image
+              src={STEMMA.src}
+              alt={STEMMA.alt}
+              width={44}
+              height={55}
+              priority
+              className="h-[44px] w-auto sm:h-[55px]"
+            />
+          </Link>
           <div className="min-w-0 flex-1">
             <h1 className="m-0 text-xl font-bold leading-tight text-[#17324d] sm:text-2xl md:text-3xl">
-              Cruscotto {COMUNE_NOME}
+              <Link href="/" className="text-inherit no-underline hover:underline">
+                Cruscotto {COMUNE_NOME}
+              </Link>
             </h1>
             <p className="m-0 mt-1 text-xs text-[#5b6f82] sm:text-sm">
               Provincia di Livorno ({COMUNE_PROVINCIA}) · {COMUNE_REGIONE} ·
