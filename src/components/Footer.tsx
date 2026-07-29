@@ -110,6 +110,27 @@ export function Footer() {
             </a>
           </p>
           <p className="mb-0">
+            <strong>Cruscotto Italia:</strong> Progettato e sviluppato da{" "}
+            <a
+              className="text-white text-decoration-underline"
+              href="https://github.com/piersoft"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Francesco Piero Paolicelli (Piersoft)
+            </a>{" "}
+            per AgID - Agenzia per l&apos;Italia Digitale. Codice sorgente{" "}
+            <a
+              className="text-white text-decoration-underline"
+              href="https://github.com/AgID/cruscotto-italia"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              disponibile su GitHub
+            </a>{" "}
+            con licenza AGPL-3.0.
+          </p>
+          <p className="mb-0">
             <strong>Progetto non ufficiale:</strong> Questo sito è un progetto
             indipendente, non affiliato ad AgID, al Governo italiano o al Comune
             di San Vincenzo. Utilizza dati pubblici aperti riaggregati dal
