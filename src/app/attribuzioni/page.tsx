@@ -12,6 +12,8 @@ import {
   CRUSCOTTO_ITALIA_URL,
   FARMACIE_DI_TURNO_URL,
   MINISTERO_CULTURA_URL,
+  MIUR_ESPLORA_URL,
+  MIUR_OPENDATA_URL,
   OPEN_METEO_ATTRIBUTION_URL,
   OSM_COPYRIGHT_URL,
   RAINVIEWER_ATTRIBUTION_URL,
@@ -85,15 +87,6 @@ export default function AttribuzioniPage() {
               al momento dell&apos;ultima estrazione, senza garanzia di
               completezza, correttezza o aggiornamento in tempo reale. Per usi
               ufficiali o legali fare sempre riferimento alle fonti primarie.
-            </p>
-          </Section>
-
-          <Section title="Tassa di soggiorno">
-            <p>
-              La tassa/imposta di soggiorno non è inclusa: non fa parte delle
-              fonti federate da Cruscotto Italia, in quanto tariffa deliberata
-              autonomamente dal comune. Per informazioni ufficiali consultare
-              il sito istituzionale del Comune di San Vincenzo.
             </p>
           </Section>
 
@@ -179,6 +172,27 @@ export default function AttribuzioniPage() {
                   Ministero della Cultura
                 </a>{" "}
                 — luoghi e beni culturali
+              </li>
+              <li>
+                <a
+                  className="text-[#0066CC] underline"
+                  href={MIUR_OPENDATA_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Portale Unico dei Dati della Scuola (MIUR)
+                </a>{" "}
+                (
+                <a
+                  className="text-[#0066CC] underline"
+                  href={MIUR_ESPLORA_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Esplora i dati
+                </a>
+                ) — anagrafe scuole, alunni/classi e infanzia per San Vincenzo
+                (IODL 2.0)
               </li>
               <li>
                 <a

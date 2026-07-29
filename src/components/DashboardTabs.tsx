@@ -29,15 +29,19 @@ import {
   Heart,
   Ship,
   LandPlot,
+  Fuel,
+  Pill,
 } from "lucide-react";
 import { AppShell, type NavGroup } from "@/components/AppShell";
 import { FarmacieTurno } from "@/components/FarmacieTurno";
 import { Footer } from "@/components/Footer";
+import { ScuoleMiurPanel } from "@/components/ScuoleMiurPanel";
 import {
   DataUnavailable,
   KpiCard,
   LoadingBlock,
   SectionIntro,
+  SolidButton,
   valueOrMissing,
 } from "@/components/ui";
 import { COMUNI_LOOKUP } from "@/lib/constants";
@@ -292,7 +296,7 @@ function Panoramica({
     onDetail: () => onNavigate(id),
   });
   const { detail, loading } = useDettaglio(
-    "demografia,profilo,censimento,scuole,redditi,patrimonio",
+    "demografia,profilo,censimento,redditi,patrimonio",
   );
   const demo = asRecord(kpi.demografia);
   const turismo = asRecord(kpi.turismo);
@@ -321,7 +325,6 @@ function Panoramica({
   const fasce = asRecord(demoExt?.fasce_eta);
   const profilo = asRecord(detail?.profilo);
   const cens = asRecord(asRecord(detail?.censimento)?.kpi_comune);
-  const scuole = asRecord(detail?.scuole);
   const piramideFasce = Array.isArray(demoExt?.piramide_fasce)
     ? (demoExt.piramide_fasce as Array<{ label: string; m: number; f: number; tot: number }>)
     : [];
@@ -334,43 +337,52 @@ function Panoramica({
       />
 
       <div className="mb-5 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
-        <button
-          type="button"
-          onClick={() => onNavigate("sanita")}
-          className="panel min-h-11 text-left transition hover:border-[var(--pa-primary)]"
-        >
-          <p className="m-0 text-sm font-bold text-[var(--pa-ink)]">Farmacie di turno</p>
-          <p className="m-0 mt-1 text-xs text-[var(--pa-muted)]">
-            Orari e punti più vicini
-          </p>
-        </button>
-        <button
-          type="button"
-          onClick={() => onNavigate("infra")}
-          className="panel min-h-11 text-left transition hover:border-[var(--pa-primary)]"
-        >
-          <p className="m-0 text-sm font-bold text-[var(--pa-ink)]">Prezzi carburanti</p>
-          <p className="m-0 mt-1 text-xs text-[var(--pa-muted)]">
-            Benzina self media{" "}
-            {formatDecimal(num(carburanti?.prezzo_medio_benzina_self), 3)} €/L
-          </p>
-        </button>
-        <button
-          type="button"
-          onClick={() => onNavigate("ambiente")}
-          className="panel min-h-11 text-left transition hover:border-[var(--pa-primary)]"
-        >
-          <p className="m-0 text-sm font-bold text-[var(--pa-ink)]">Mare e balneazione</p>
-          <p className="m-0 mt-1 text-xs text-[var(--pa-muted)]">Qualità acque ARPAT</p>
-        </button>
-        <button
-          type="button"
-          onClick={() => onNavigate("meteo")}
-          className="panel min-h-11 text-left transition hover:border-[var(--pa-primary)]"
-        >
-          <p className="m-0 text-sm font-bold text-[var(--pa-ink)]">Meteo e radar</p>
-          <p className="m-0 mt-1 text-xs text-[var(--pa-muted)]">Previsioni e precipitazioni</p>
-        </button>
+        {(
+          [
+            {
+              id: "sanita",
+              title: "Farmacie di turno",
+              hint: "Orari e punti più vicini",
+              Icon: Pill,
+            },
+            {
+              id: "infra",
+              title: "Prezzi carburanti",
+              hint: `Benzina self media ${formatDecimal(num(carburanti?.prezzo_medio_benzina_self), 3)} €/L`,
+              Icon: Fuel,
+            },
+            {
+              id: "ambiente",
+              title: "Mare e balneazione",
+              hint: "Qualità acque ARPAT",
+              Icon: Waves,
+            },
+            {
+              id: "meteo",
+              title: "Meteo e radar",
+              hint: "Previsioni e precipitazioni",
+              Icon: CloudSun,
+            },
+          ] as const
+        ).map(({ id, title, hint, Icon }) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => onNavigate(id)}
+            className="panel min-h-11 text-left transition hover:border-[var(--pa-primary)]"
+          >
+            <div className="flex items-start justify-between gap-2">
+              <p className="m-0 text-sm font-bold text-[var(--pa-ink)]">{title}</p>
+              <Icon
+                size={20}
+                className="shrink-0 text-[var(--pa-primary)]"
+                strokeWidth={2}
+                aria-hidden
+              />
+            </div>
+            <p className="m-0 mt-1 text-xs text-[var(--pa-muted)]">{hint}</p>
+          </button>
+        ))}
       </div>
 
       <h3 className="mb-2 mt-0 text-sm font-bold text-[var(--pa-ink)]">
@@ -569,23 +581,10 @@ function Panoramica({
             </ul>
           </div>
         ) : null}
-        {scuole ? (
-          <div className="panel">
-            <h3>Scuole MIUR {String(scuole.anno_scolastico ?? "")}</h3>
-            <p className="text-xs text-[#5b6f82] sm:text-sm">
-              {formatInteger(num(asRecord(scuole.kpi)?.n_scuole))} plessi
-            </p>
-            <ul className="mt-2 space-y-1 text-xs sm:text-sm">
-              {(Array.isArray(scuole.scuole) ? (scuole.scuole as Array<Record<string, unknown>>) : []).map((s) => (
-                <li key={String(s.codice_scuola)}>
-                  <strong>{String(s.denominazione)}</strong> — {String(s.tipologia)}
-                  <br />
-                  <span className="text-[#5b6f82]">{String(s.indirizzo)}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : null}
+      </div>
+
+      <div className="mt-4">
+        <ScuoleMiurPanel />
       </div>
     </section>
   );
@@ -637,7 +636,7 @@ function Turismo({ kpi }: { kpi: Kpi }) {
     <section>
       <SectionIntro
         title="Turismo"
-        description="Capacità ricettiva comunale e flussi provinciali ISTAT. La tassa di soggiorno non è inclusa nelle fonti Cruscotto Italia."
+        description="Capacità ricettiva comunale e flussi provinciali ISTAT."
       />
       <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
         <KpiCard label="Strutture" value={valueOrMissing(capacita?.totale_strutture ?? turismoKpi?.totale_strutture, formatInteger)} />
@@ -817,10 +816,6 @@ function Turismo({ kpi }: { kpi: Kpi }) {
           </p>
         </div>
       ) : null}
-
-      <p className="mt-3 text-xs text-[#5b6f82] sm:mt-4 sm:text-sm">
-        Nota: la tassa/imposta di soggiorno non è disponibile in queste fonti.
-      </p>
     </section>
   );
 }
@@ -1547,14 +1542,20 @@ function Infra({ kpi }: { kpi: Kpi }) {
 
       {impiantiOrdinati.length > 0 ? (
         <div className="mb-4 overflow-x-auto panel p-0">
-          <div className="flex flex-wrap items-end justify-between gap-2 px-3 pt-3 sm:px-4 sm:pt-4">
-            <div>
-              <h3 className="m-0">Impianti carburanti</h3>
-              <p className="mb-0 mt-1 text-xs text-[#5b6f82] sm:text-sm">
-                Ordinati per benzina self crescente. Badge verde = prezzo migliore
-                tra gli impianti del comune.
-              </p>
-            </div>
+          <div className="px-3 pt-3 sm:px-4 sm:pt-4">
+            <h3 className="m-0 flex items-center gap-2">
+              <Fuel
+                size={20}
+                className="shrink-0 text-[var(--pa-primary)]"
+                strokeWidth={2}
+                aria-hidden
+              />
+              Impianti carburanti
+            </h3>
+            <p className="mb-0 mt-1 text-xs text-[var(--pa-muted)] sm:text-sm">
+              Ordinati per benzina self crescente. Badge verde = prezzo migliore
+              tra gli impianti del comune.
+            </p>
           </div>
           <table className="mt-2 min-w-full text-left text-xs sm:text-sm">
             <thead className="bg-[#e8f2fc]">
@@ -2050,15 +2051,11 @@ function Meteo({ kpi }: { kpi: Kpi }) {
         description="Condizioni live (ItaliaMeteo/Cineca + Open-Meteo), previsioni orarie/giornaliere e radar precipitazioni RainViewer su mappa."
       />
       <div className="mb-3 flex flex-wrap items-center gap-2 sm:gap-3">
-        <button
-          type="button"
-          onClick={() => void load()}
-          className="rounded-full bg-[#0066CC] px-3 py-1.5 text-xs font-semibold text-white sm:px-4 sm:py-2 sm:text-sm"
-        >
-          Aggiorna ora
-        </button>
+        <SolidButton onClick={() => void load()}>Aggiorna ora</SolidButton>
         {loading ? (
-          <span className="text-xs text-[#5b6f82] sm:text-sm">Aggiornamento…</span>
+          <span className="text-xs text-[var(--pa-muted)] sm:text-sm">
+            Aggiornamento…
+          </span>
         ) : null}
       </div>
       {error ? <DataUnavailable message={error} /> : null}

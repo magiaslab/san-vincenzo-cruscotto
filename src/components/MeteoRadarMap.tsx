@@ -17,7 +17,13 @@ import {
   OSM_COPYRIGHT_URL,
   RAINVIEWER_ATTRIBUTION_URL,
 } from "@/lib/constants";
-import { DataUnavailable, LoadingBlock } from "@/components/ui";
+import {
+  DataUnavailable,
+  LoadingBlock,
+  PanelHeading,
+  SolidButton,
+} from "@/components/ui";
+import { CloudRain } from "lucide-react";
 
 type RadarFrame = {
   time: number;
@@ -146,50 +152,55 @@ export default function MeteoRadarMap() {
 
   const current = frames[index] ?? null;
 
+  const toggleClass = (active: boolean) =>
+    `inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-semibold transition ${
+      active
+        ? "bg-[var(--pa-primary)] text-white"
+        : "bg-[var(--pa-surface-soft)] text-[var(--pa-ink)] hover:bg-[color-mix(in_srgb,var(--pa-primary)_12%,white)]"
+    }`;
+
   return (
     <div className="panel overflow-hidden p-0">
-      <div className="flex flex-wrap items-center gap-3 border-b border-[#d9e6f2] px-4 py-3">
-        <h3 className="m-0 text-base font-bold text-[#17324d]">
-          Radar precipitazioni
-        </h3>
-        <div className="flex flex-wrap items-center gap-2 text-sm">
-          <button
-            type="button"
-            className={`rounded-full px-3 py-1 font-semibold ${
-              layer === "radar" ? "bg-[#0066CC] text-white" : "bg-[#e8f2fc] text-[#17324d]"
-            }`}
-            onClick={() => {
-              setLayer("radar");
-              setPlaying(false);
-            }}
-          >
-            Radar
-          </button>
-          <button
-            type="button"
-            className={`rounded-full px-3 py-1 font-semibold ${
-              layer === "infrared"
-                ? "bg-[#0066CC] text-white"
-                : "bg-[#e8f2fc] text-[#17324d]"
-            }`}
-            onClick={() => {
-              setLayer("infrared");
-              setPlaying(false);
-            }}
-            disabled={!data?.infrared?.length}
-          >
-            Satellite IR
-          </button>
-          <button
-            type="button"
-            className="rounded-full bg-[#17324d] px-3 py-1 font-semibold text-white"
-            onClick={() => setPlaying((p) => !p)}
-            disabled={frames.length < 2}
-          >
-            {playing ? "Pausa" : "Play"}
-          </button>
-        </div>
-        <label className="ml-auto flex items-center gap-2 text-xs text-[#5b6f82]">
+      <div className="border-b border-[var(--pa-border)] px-4 py-3">
+        <PanelHeading
+          title="Radar precipitazioni"
+          icon={CloudRain}
+          className="mb-2"
+          actions={
+            <>
+              <button
+                type="button"
+                className={toggleClass(layer === "radar")}
+                style={layer === "radar" ? { color: "#ffffff" } : undefined}
+                onClick={() => {
+                  setLayer("radar");
+                  setPlaying(false);
+                }}
+              >
+                Radar
+              </button>
+              <button
+                type="button"
+                className={toggleClass(layer === "infrared")}
+                style={layer === "infrared" ? { color: "#ffffff" } : undefined}
+                onClick={() => {
+                  setLayer("infrared");
+                  setPlaying(false);
+                }}
+                disabled={!data?.infrared?.length}
+              >
+                Satellite IR
+              </button>
+              <SolidButton
+                onClick={() => setPlaying((p) => !p)}
+                disabled={frames.length < 2}
+              >
+                {playing ? "Pausa" : "Play"}
+              </SolidButton>
+            </>
+          }
+        />
+        <label className="flex items-center gap-2 text-xs text-[var(--pa-muted)]">
           Opacità
           <input
             type="range"

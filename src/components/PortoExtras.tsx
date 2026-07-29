@@ -1,12 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { DataUnavailable, LoadingBlock } from "@/components/ui";
+import { Camera, Ship } from "lucide-react";
+import {
+  DataUnavailable,
+  LoadingBlock,
+  PanelHeading,
+  SolidButton,
+  SolidLink,
+} from "@/components/ui";
 
-type Camera = { id: string; nome: string; url: string };
+type CameraItem = { id: string; nome: string; url: string };
 
 export function PortoWebcams() {
-  const [camere, setCamere] = useState<Camera[]>([]);
+  const [camere, setCamere] = useState<CameraItem[]>([]);
   const [fonteUrl, setFonteUrl] = useState(
     "https://lnx.comune.sanvincenzo.li.it/webcam/",
   );
@@ -47,16 +54,13 @@ export function PortoWebcams() {
 
   return (
     <div className="panel">
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <h3 className="m-0">Webcam porto</h3>
-        <button
-          type="button"
-          className="rounded-full bg-[#0066CC] px-3 py-1 text-sm font-semibold text-white"
-          onClick={() => setTick((t) => t + 1)}
-        >
-          Aggiorna
-        </button>
-      </div>
+      <PanelHeading
+        title="Webcam porto"
+        icon={Camera}
+        actions={
+          <SolidButton onClick={() => setTick((t) => t + 1)}>Aggiorna</SolidButton>
+        }
+      />
       {loading ? <LoadingBlock label="Caricamento webcam…" /> : null}
       {error && camere.length === 0 ? <DataUnavailable message={error} /> : null}
       {camere.length > 0 ? (
@@ -67,25 +71,20 @@ export function PortoWebcams() {
               <img
                 src={`${c.url}?t=${tick}`}
                 alt={c.nome}
-                className="h-56 w-full rounded-md object-cover bg-[#e8eef4]"
+                className="h-56 w-full rounded-md bg-[var(--pa-surface-soft)] object-cover"
                 loading="lazy"
               />
-              <figcaption className="mt-2 text-sm text-[#5b6f82]">
+              <figcaption className="mt-2 text-sm text-[var(--pa-muted)]">
                 {c.nome}
               </figcaption>
             </figure>
           ))}
         </div>
       ) : null}
-      <p className="mt-3 mb-0 text-xs text-[#5b6f82]">
+      <p className="mb-0 mt-3 text-xs text-[var(--pa-muted)]">
         Fonte:{" "}
-        <a
-          href={fonteUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline"
-        >
-          Comune di San Vincenzo — WebCam
+        <a href={fonteUrl} target="_blank" rel="noopener noreferrer" className="underline">
+          Webcam ufficiali del Comune
         </a>{" "}
         (aggiornamento circa ogni 5 minuti).
       </p>
@@ -96,29 +95,33 @@ export function PortoWebcams() {
 export function VesselFinderEmbed() {
   return (
     <div className="panel overflow-hidden p-0">
-      <div className="border-b border-[#d9e6f2] px-4 py-3">
-        <h3 className="m-0 text-base font-bold text-[#17324d]">
-          Traffico nautico AIS (VesselFinder)
-        </h3>
-        <p className="m-0 mt-1 text-sm text-[#5b6f82]">
-          Mappa embed gratuita centrata sul porto. Non richiede API key; i dati
-          AIS raw via API VesselFinder sono invece a pagamento.
-        </p>
+      <div className="border-b border-[var(--pa-border)] px-4 py-3">
+        <PanelHeading
+          title="Traffico nautico AIS (VesselFinder)"
+          description="Mappa embed gratuita centrata sul porto. Non richiede API key; i dati AIS raw via API VesselFinder sono invece a pagamento."
+          icon={Ship}
+          actions={
+            <SolidLink href="https://www.vesselfinder.com/">VesselFinder</SolidLink>
+          }
+          className="mb-0"
+        />
       </div>
-      <iframe
-        title="VesselFinder — Porto di San Vincenzo"
-        src="/embeds/vesselfinder-porto.html"
-        className="h-[480px] w-full border-0"
-        loading="lazy"
-        referrerPolicy="no-referrer-when-downgrade"
-      />
-      <p className="m-0 border-t border-[#d9e6f2] bg-[#f5f8fc] px-4 py-2 text-xs text-[#5b6f82]">
+      <div className="relative z-0 overflow-hidden">
+        <iframe
+          title="VesselFinder — Porto di San Vincenzo"
+          src="/embeds/vesselfinder-porto.html"
+          className="h-[480px] w-full border-0"
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+        />
+      </div>
+      <p className="m-0 border-t border-[var(--pa-border)] bg-[var(--pa-surface-soft)] px-4 py-2 text-xs text-[var(--pa-muted)]">
         ©{" "}
         <a
           href="https://www.vesselfinder.com/"
           target="_blank"
           rel="noopener noreferrer"
-          className="underline"
+          className="font-semibold underline"
         >
           VesselFinder.com
         </a>{" "}
@@ -127,7 +130,7 @@ export function VesselFinderEmbed() {
           href="https://www.vesselfinder.com/embed"
           target="_blank"
           rel="noopener noreferrer"
-          className="underline"
+          className="font-semibold underline"
         >
           Informazioni sull&apos;embed
         </a>

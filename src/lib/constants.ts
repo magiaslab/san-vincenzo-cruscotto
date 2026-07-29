@@ -95,3 +95,12 @@ export const FARMACIE_DI_TURNO_COD = "49018" as const;
 export const FARMACIE_DI_TURNO_URL =
   `https://www.farmaciediturno.org/ricercaditurno.asp?cod=${FARMACIE_DI_TURNO_COD}` as const;
 export const FARMACIE_DI_TURNO_BASE = "https://www.farmaciediturno.org";
+
+/** Open data Ministero dell'Istruzione — Portale Unico dei Dati della Scuola. */
+export const MIUR_OPENDATA_URL = "https://dati.istruzione.it/opendata/" as const;
+export const MIUR_ESPLORA_URL =
+  "https://dati.istruzione.it/opendata/esploraidati/" as const;
+export const MIUR_CATALOG_BASE =
+  "https://dati.istruzione.it/opendata/opendata/catalogo/elements1" as const;
+/** Codice catastale comune (campo CODICECOMUNESCUOLA nei CSV MIUR). */
+export const MIUR_COMUNE_CATASTALE = "I390" as const;

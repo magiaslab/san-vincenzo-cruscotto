@@ -1,7 +1,13 @@
 import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
-import { TrendingUp, TrendingDown, AlertCircle } from "lucide-react";
+import {
+  AlertCircle,
+  ExternalLink,
+  TrendingDown,
+  TrendingUp,
+} from "lucide-react";
 import { isMissing } from "@/lib/format";
+import { resolveKpiIcon } from "@/lib/kpi-icons";
 
 type KpiCardProps = {
   label: string;
@@ -17,18 +23,19 @@ type KpiCardProps = {
   onDetail?: () => void;
 };
 
-export function KpiCard({ 
-  label, 
-  value, 
-  hint, 
-  unavailable, 
-  icon: Icon,
+export function KpiCard({
+  label,
+  value,
+  hint,
+  unavailable,
+  icon,
   trend,
   trendValue,
   variant = "default",
   detailLabel,
   onDetail,
 }: KpiCardProps) {
+  const Icon = resolveKpiIcon(label, icon);
   const empty =
     unavailable ||
     value === null ||
@@ -36,70 +43,73 @@ export function KpiCard({
     (typeof value === "string" && (value === "n.d." || value === ""));
 
   const variantStyles = {
-    default: "border-[#d9e6f2] bg-white",
-    success: "border-green-200 bg-green-50",
-    warning: "border-yellow-200 bg-yellow-50",
-    danger: "border-red-200 bg-red-50",
-    info: "border-blue-200 bg-blue-50",
+    default: "border-[var(--pa-border)] bg-white",
+    success: "border-[color-mix(in_srgb,var(--pa-success)_35%,var(--pa-border))] bg-[color-mix(in_srgb,var(--pa-success)_8%,white)]",
+    warning: "border-[color-mix(in_srgb,var(--pa-warning)_35%,var(--pa-border))] bg-[color-mix(in_srgb,var(--pa-warning)_8%,white)]",
+    danger: "border-[color-mix(in_srgb,var(--pa-danger)_35%,var(--pa-border))] bg-[color-mix(in_srgb,var(--pa-danger)_8%,white)]",
+    info: "border-[color-mix(in_srgb,var(--pa-primary)_35%,var(--pa-border))] bg-[var(--pa-surface-soft)]",
   };
 
   const iconColor = {
-    default: "text-[#0066CC]",
-    success: "text-green-600",
-    warning: "text-yellow-600",
-    danger: "text-red-600",
-    info: "text-blue-600",
+    default: "text-[var(--pa-primary)]",
+    success: "text-[var(--pa-success)]",
+    warning: "text-[var(--pa-warning)]",
+    danger: "text-[var(--pa-danger)]",
+    info: "text-[var(--pa-primary)]",
   };
 
   const clickable = typeof onDetail === "function";
   const className = `rounded-lg border p-3 shadow-sm sm:p-4 text-left w-full ${variantStyles[variant]} ${
     clickable
-      ? "cursor-pointer transition hover:border-[#0066CC] hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0066CC]"
+      ? "cursor-pointer transition hover:border-[var(--pa-primary)] hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pa-primary)]"
       : ""
   }`;
 
   const body = (
     <>
-      <div className="flex items-start justify-between">
-        <p className="m-0 text-xs font-semibold uppercase tracking-wide text-[#5b6f82]">
+      <div className="flex items-start justify-between gap-2">
+        <p className="m-0 text-xs font-semibold uppercase tracking-wide text-[var(--pa-muted)]">
           {label}
         </p>
-        {Icon && (
-          <Icon 
-            size={20} 
-            className={`shrink-0 ${iconColor[variant]}`} 
-            strokeWidth={2}
-          />
-        )}
+        <Icon
+          size={20}
+          className={`shrink-0 ${iconColor[variant]}`}
+          strokeWidth={2}
+          aria-hidden
+        />
       </div>
       <div className="mt-1.5 flex items-end justify-between sm:mt-2">
-        <p className="m-0 text-xl font-bold text-[#17324d] sm:text-2xl">
+        <p className="m-0 text-xl font-bold text-[var(--pa-ink)] sm:text-2xl">
           {empty ? (
-            <span className="flex items-center gap-1 text-base text-[#5b6f82]">
-              <AlertCircle size={16} />
+            <span className="flex items-center gap-1 text-base text-[var(--pa-muted)]">
+              <AlertCircle size={16} aria-hidden />
               <span>dato non disponibile</span>
             </span>
           ) : (
             value
           )}
         </p>
-        {trend && !empty && (
-          <div className={`flex items-center gap-0.5 text-xs font-semibold ${
-            trend === "up" ? "text-green-600" : 
-            trend === "down" ? "text-red-600" : 
-            "text-[#5b6f82]"
-          }`}>
-            {trend === "up" && <TrendingUp size={14} />}
-            {trend === "down" && <TrendingDown size={14} />}
-            {trendValue && <span>{trendValue}</span>}
+        {trend && !empty ? (
+          <div
+            className={`flex items-center gap-0.5 text-xs font-semibold ${
+              trend === "up"
+                ? "text-[var(--pa-success)]"
+                : trend === "down"
+                  ? "text-[var(--pa-danger)]"
+                  : "text-[var(--pa-muted)]"
+            }`}
+          >
+            {trend === "up" ? <TrendingUp size={14} aria-hidden /> : null}
+            {trend === "down" ? <TrendingDown size={14} aria-hidden /> : null}
+            {trendValue ? <span>{trendValue}</span> : null}
           </div>
-        )}
+        ) : null}
       </div>
       {hint ? (
-        <p className="m-0 mt-1.5 text-xs text-[#5b6f82] sm:mt-2">{hint}</p>
+        <p className="m-0 mt-1.5 text-xs text-[var(--pa-muted)] sm:mt-2">{hint}</p>
       ) : null}
       {clickable ? (
-        <p className="m-0 mt-2 text-xs font-semibold text-[#0066CC]">
+        <p className="m-0 mt-2 text-xs font-semibold text-[var(--pa-primary)]">
           {detailLabel ? `Vai a ${detailLabel} →` : "Vai al dettaglio →"}
         </p>
       ) : null}
@@ -135,7 +145,6 @@ export function SectionIntro({
 }) {
   return (
     <div className="mb-4 sm:mb-5">
-      {/* h2 sotto l'h1 di pagina in AppShell */}
       <h2 className="m-0 text-lg font-bold text-[var(--pa-ink)] sm:text-xl">
         {title}
       </h2>
@@ -148,9 +157,128 @@ export function SectionIntro({
   );
 }
 
+/** Intestazione pannello con icona e azioni a destra. */
+export function PanelHeading({
+  title,
+  description,
+  icon: Icon,
+  actions,
+  className,
+}: {
+  title: string;
+  description?: string;
+  icon?: LucideIcon;
+  actions?: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={`flex flex-wrap items-start justify-between gap-3 ${className ?? "mb-3"}`}
+    >
+      <div className="min-w-0 flex-1">
+        <h3 className="m-0 flex items-center gap-2 text-base font-bold text-[var(--pa-ink)]">
+          {Icon ? (
+            <Icon
+              size={20}
+              className="shrink-0 text-[var(--pa-primary)]"
+              strokeWidth={2}
+              aria-hidden
+            />
+          ) : null}
+          <span>{title}</span>
+        </h3>
+        {description ? (
+          <p className="m-0 mt-1 text-sm text-[var(--pa-muted)]">{description}</p>
+        ) : null}
+      </div>
+      {actions ? (
+        <div className="flex flex-wrap items-center gap-2">{actions}</div>
+      ) : null}
+    </div>
+  );
+}
+
+const linkBtnBase =
+  "inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-lg px-3 text-sm font-semibold no-underline transition";
+
+/** Link/CTA pieno: testo sempre bianco (evita override globale `a { color }`). */
+export function SolidLink({
+  href,
+  children,
+  external = true,
+}: {
+  href: string;
+  children: ReactNode;
+  external?: boolean;
+}) {
+  return (
+    <a
+      href={href}
+      target={external ? "_blank" : undefined}
+      rel={external ? "noopener noreferrer" : undefined}
+      className={`${linkBtnBase} bg-[var(--pa-primary)] text-white hover:bg-[var(--pa-primary-hover)]`}
+      style={{ color: "#ffffff" }}
+    >
+      {children}
+      {external ? <ExternalLink size={14} aria-hidden /> : null}
+    </a>
+  );
+}
+
+export function OutlineLink({
+  href,
+  children,
+  external = true,
+}: {
+  href: string;
+  children: ReactNode;
+  external?: boolean;
+}) {
+  return (
+    <a
+      href={href}
+      target={external ? "_blank" : undefined}
+      rel={external ? "noopener noreferrer" : undefined}
+      className={`${linkBtnBase} border border-[var(--pa-primary)] bg-white text-[var(--pa-primary)] hover:bg-[var(--pa-surface-soft)]`}
+    >
+      {children}
+      {external ? <ExternalLink size={14} aria-hidden /> : null}
+    </a>
+  );
+}
+
+export function SolidButton({
+  children,
+  onClick,
+  disabled,
+  tone = "primary",
+}: {
+  children: ReactNode;
+  onClick?: () => void;
+  disabled?: boolean;
+  tone?: "primary" | "ink";
+}) {
+  const tones = {
+    primary:
+      "bg-[var(--pa-primary)] text-white hover:bg-[var(--pa-primary-hover)] disabled:opacity-50",
+    ink: "bg-[var(--pa-ink)] text-white hover:opacity-90 disabled:opacity-50",
+  };
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className={`${linkBtnBase} ${tones[tone]}`}
+      style={{ color: "#ffffff" }}
+    >
+      {children}
+    </button>
+  );
+}
+
 export function DataUnavailable({ message }: { message?: string }) {
   return (
-    <div className="rounded-lg border border-dashed border-[#c5c7c9] bg-[#f5f6f7] p-4 text-sm text-[#5b6f82]">
+    <div className="rounded-lg border border-dashed border-[var(--pa-border)] bg-[var(--pa-surface-soft)] p-4 text-sm text-[var(--pa-muted)]">
       {message ?? "dato non disponibile"}
     </div>
   );
