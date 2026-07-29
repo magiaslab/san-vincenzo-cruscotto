@@ -82,7 +82,7 @@ export async function GET() {
   return NextResponse.json({
     configured,
     models: {
-      embed: "sentence-transformers/all-MiniLM-L6-v2",
+      embed: "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
       gen: "HuggingFaceTB/SmolLM2-360M-Instruct",
     },
     docs: "modal_rag/README.md",

@@ -6,7 +6,7 @@ Piccolo **RAG** (non un fine-tune a pagamento) sui contenuti/dati del cruscotto.
 
 | Pezzo | Modello HF | Dove gira |
 | --- | --- | --- |
-| Embedding | [`sentence-transformers/all-MiniLM-L6-v2`](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2) | CPU Modal |
+| Embedding | [`paraphrase-multilingual-MiniLM-L12-v2`](https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2) | CPU Modal |
 | Generazione | [`HuggingFaceTB/SmolLM2-360M-Instruct`](https://huggingface.co/HuggingFaceTB/SmolLM2-360M-Instruct) | CPU Modal (opz. T4) |
 | Indice | cosine similarity NumPy sul corpus in `corpus/` | in memoria al boot |
 
@@ -22,10 +22,12 @@ modal setup   # login browser sul tuo account magiaslab
 modal deploy modal_rag/app.py
 ```
 
-Dopo il deploy, Modal stampa URL tipo:
+App deployata: [san-vincenzo-rag](https://modal.com/apps/magiaslab/main/deployed/san-vincenzo-rag)
 
-- `https://magiaslab--san-vincenzo-rag-ragservice-web-ask.modal.run` (POST JSON)
-- `...-health.modal.run` (GET)
+Endpoint (workspace `magiaslab`):
+
+- POST ask: `https://magiaslab--san-vincenzo-rag-ragservice-web-ask.modal.run`
+- GET health: `https://magiaslab--san-vincenzo-rag-ragservice-health.modal.run`
 
 Nel progetto Next.js (Vercel):
 

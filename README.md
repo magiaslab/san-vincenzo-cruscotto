@@ -42,11 +42,15 @@ Piccolo RAG sui dati del cruscotto, **senza API LLM a pagamento**:
 - embedding [`paraphrase-multilingual-MiniLM-L12-v2`](https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2)
 - generazione [`SmolLM2-360M-Instruct`](https://huggingface.co/HuggingFaceTB/SmolLM2-360M-Instruct)
 - deploy su Modal (crediti starter, scale-to-zero)
+- app: [san-vincenzo-rag](https://modal.com/apps/magiaslab/main/deployed/san-vincenzo-rag)
 
-Vedi `modal_rag/README.md`. Dopo il deploy:
+Vedi `modal_rag/README.md`. Su Vercel / `.env.local`:
 
 ```bash
+<<<<<<< HEAD
 # su Vercel / .env.local
+=======
+>>>>>>> 9c7d88d (Migliora RAG Modal: embedding multilingue, retrieval ibrido e URL deploy.)
 ASSISTENTE_MODAL_URL=https://magiaslab--san-vincenzo-rag-ragservice-web-ask.modal.run
 ```
 
