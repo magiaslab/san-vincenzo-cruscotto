@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { JsonLd } from "@/components/JsonLd";
 import {
   ARPAT_BALNEAZIONE_URL,
   ARPAT_OPENDATA_URL,
@@ -20,11 +21,36 @@ import {
   REGIONE_TOSCANA_OPENDATA_URL,
   STEMMA,
 } from "@/lib/constants";
+import {
+  SITE_NAME,
+  absoluteUrl,
+  buildBreadcrumbJsonLd,
+} from "@/lib/seo";
+
+const ATTRIBUZIONI_DESCRIPTION =
+  `Fonti dati, licenze, attribuzioni e regole d'uso del ${SITE_NAME}: Cruscotto Italia (AgID), ARPAT, MIUR, OpenStreetMap e altre fonti open.`;
 
 export const metadata: Metadata = {
-  title: `Attribuzioni e regole | Cruscotto ${COMUNE_NOME}`,
-  description:
-    "Fonti dati, licenze, attribuzioni e regole d'uso del Cruscotto San Vincenzo.",
+  title: "Attribuzioni e regole",
+  description: ATTRIBUZIONI_DESCRIPTION,
+  alternates: {
+    canonical: "/attribuzioni",
+  },
+  openGraph: {
+    title: `Attribuzioni e regole | ${SITE_NAME}`,
+    description: ATTRIBUZIONI_DESCRIPTION,
+    url: absoluteUrl("/attribuzioni"),
+    type: "article",
+  },
+  twitter: {
+    card: "summary",
+    title: `Attribuzioni e regole | ${SITE_NAME}`,
+    description: ATTRIBUZIONI_DESCRIPTION,
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 function Section({
@@ -47,14 +73,31 @@ function Section({
 export default function AttribuzioniPage() {
   return (
     <>
+      <JsonLd
+        data={buildBreadcrumbJsonLd([
+          { name: SITE_NAME, path: "/" },
+          { name: "Attribuzioni e regole", path: "/attribuzioni" },
+        ])}
+      />
       <Header brandAsHeading={false} />
       <main className="flex-1">
         <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 sm:py-8">
-          <p className="mb-2 text-sm">
-            <Link href="/" className="text-[var(--pa-primary)] underline underline-offset-2">
-              ← Torna al cruscotto
-            </Link>
-          </p>
+          <nav aria-label="Breadcrumb" className="mb-2 text-sm">
+            <ol className="m-0 flex list-none flex-wrap gap-1 p-0 text-[var(--pa-muted)]">
+              <li>
+                <Link
+                  href="/"
+                  className="text-[var(--pa-primary)] underline underline-offset-2"
+                >
+                  Cruscotto
+                </Link>
+                <span aria-hidden className="mx-1">
+                  /
+                </span>
+              </li>
+              <li aria-current="page">Attribuzioni e regole</li>
+            </ol>
+          </nav>
           <h1 className="mb-2 text-2xl font-bold text-[var(--pa-ink)] sm:text-3xl">
             Attribuzioni e regole
           </h1>
