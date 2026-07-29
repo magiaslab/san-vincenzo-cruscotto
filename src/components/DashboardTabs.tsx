@@ -200,7 +200,15 @@ export function DashboardTabs({ kpi }: { kpi: Kpi }) {
       </nav>
 
       <div className="mx-auto max-w-7xl px-3 py-4 sm:px-4 sm:py-5 lg:px-6 lg:py-6" role="tabpanel">
-        {tab === "panoramica" && <Panoramica kpi={kpi} />}
+        {tab === "panoramica" && (
+          <Panoramica
+            kpi={kpi}
+            onNavigate={(id) => {
+              setTab(id);
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+          />
+        )}
         {tab === "turismo" && <Turismo kpi={kpi} />}
         {tab === "porto" && <Porto kpi={kpi} />}
         {tab === "economia" && <Economia kpi={kpi} />}
@@ -216,7 +224,21 @@ export function DashboardTabs({ kpi }: { kpi: Kpi }) {
   );
 }
 
-function Panoramica({ kpi }: { kpi: Kpi }) {
+function tabLabel(id: TabId): string {
+  return TABS.find((t) => t.id === id)?.label ?? id;
+}
+
+function Panoramica({
+  kpi,
+  onNavigate,
+}: {
+  kpi: Kpi;
+  onNavigate: (id: TabId) => void;
+}) {
+  const go = (id: TabId) => ({
+    detailLabel: tabLabel(id),
+    onDetail: () => onNavigate(id),
+  });
   const { detail, loading } = useDettaglio(
     "demografia,profilo,censimento,scuole,redditi,patrimonio",
   );
@@ -289,21 +311,25 @@ function Panoramica({ kpi }: { kpi: Kpi }) {
           hint={lavoro?.anno ? `Anno ${lavoro.anno}` : undefined}
           icon={Briefcase}
           variant="success"
+          {...go("economia")}
         />
         <KpiCard 
           label="Tasso disoccupazione" 
           value={valueOrMissing(lavoro?.tasso_disoccupazione, formatPercent)}
           icon={Briefcase}
+          {...go("economia")}
         />
         <KpiCard 
           label="Diploma o oltre" 
           value={valueOrMissing(istruzione?.pct_diploma_oltre, formatPercent)}
           icon={GraduationCap}
+          {...go("economia")}
         />
         <KpiCard 
           label="Terziario" 
           value={valueOrMissing(istruzione?.pct_terziario, formatPercent)}
           icon={GraduationCap}
+          {...go("economia")}
         />
         <KpiCard 
           label="Reddito medio" 
@@ -311,6 +337,7 @@ function Panoramica({ kpi }: { kpi: Kpi }) {
           hint={`${formatInteger(num(redditi?.n_contribuenti))} contribuenti`}
           icon={Euro}
           variant="success"
+          {...go("economia")}
         />
         <KpiCard 
           label="Indice turisticità" 
@@ -318,12 +345,14 @@ function Panoramica({ kpi }: { kpi: Kpi }) {
           hint={`${formatInteger(num(turismo?.totale_strutture))} strutture · ${formatInteger(num(turismo?.totale_letti))} letti`}
           icon={Palmtree}
           variant="success"
+          {...go("turismo")}
         />
         <KpiCard 
           label="Raccolta differenziata" 
           value={valueOrMissing(ambiente?.raccolta_differenziata_pct, formatPercent)}
           icon={Recycle}
           variant="success"
+          {...go("ambiente")}
         />
         <KpiCard 
           label="Consumo di suolo" 
@@ -331,14 +360,16 @@ function Panoramica({ kpi }: { kpi: Kpi }) {
           hint={`${formatDecimal(num(ambiente?.superficie_kmq), 2)} km²`}
           icon={LandPlot}
           variant="warning"
+          {...go("territorio")}
         />
-        <KpiCard label="Copertura FTTH" value={valueOrMissing(banda?.copertura_ftth_pct, formatPercent)} />
-        <KpiCard label="Punti ricarica EV" value={valueOrMissing(ev?.n_totale, formatInteger)} hint={`${formatPercent(num(ev?.pct_attivi))} attivi`} />
+        <KpiCard label="Copertura FTTH" value={valueOrMissing(banda?.copertura_ftth_pct, formatPercent)} {...go("infra")} />
+        <KpiCard label="Punti ricarica EV" value={valueOrMissing(ev?.n_totale, formatInteger)} hint={`${formatPercent(num(ev?.pct_attivi))} attivi`} {...go("infra")} />
         <KpiCard 
           label="Veicoli" 
           value={valueOrMissing(veicoli?.totale_veicoli, formatInteger)} 
           hint={`${formatDecimal(num(veicoli?.tasso_motorizzazione_per_1000_ab), 0)} /1000 ab.`}
           icon={Car}
+          {...go("infra")}
         />
         <KpiCard 
           label="Unità locali ASIA" 
@@ -355,30 +386,33 @@ function Panoramica({ kpi }: { kpi: Kpi }) {
               : undefined
           }
           trendValue={imprese?.ul_yoy_pct != null ? formatPercent(num(imprese?.ul_yoy_pct)) : undefined}
+          {...go("economia")}
         />
-        <KpiCard label="Saldo cassa SIOPE" value={valueOrMissing(siope?.saldo_cassa_eur, formatEuroCompact)} hint={`Anno ${String(siope?.anno ?? "")}`} />
-        <KpiCard label="PNRR" value={valueOrMissing(pnrr?.importo_assegnato_eur, formatEuroCompact)} hint={`${formatInteger(num(pnrr?.n_progetti))} progetti · ${formatInteger(num(pnrr?.n_concluso))} conclusi`} />
-        <KpiCard label="Opere BDAP" value={valueOrMissing(opere?.n_progetti, formatInteger)} hint={valueOrMissing(opere?.importo_totale_eur, formatEuroCompact)} />
-        <KpiCard label="Contratti ANAC" value={valueOrMissing(anac?.n_aggiudicazioni, formatInteger)} hint={valueOrMissing(anac?.importo_totale_eur, formatEuroCompact)} />
+        <KpiCard label="Saldo cassa SIOPE" value={valueOrMissing(siope?.saldo_cassa_eur, formatEuroCompact)} hint={`Anno ${String(siope?.anno ?? "")}`} {...go("finanza")} />
+        <KpiCard label="PNRR" value={valueOrMissing(pnrr?.importo_assegnato_eur, formatEuroCompact)} hint={`${formatInteger(num(pnrr?.n_progetti))} progetti · ${formatInteger(num(pnrr?.n_concluso))} conclusi`} {...go("finanza")} />
+        <KpiCard label="Opere BDAP" value={valueOrMissing(opere?.n_progetti, formatInteger)} hint={valueOrMissing(opere?.importo_totale_eur, formatEuroCompact)} {...go("finanza")} />
+        <KpiCard label="Contratti ANAC" value={valueOrMissing(anac?.n_aggiudicazioni, formatInteger)} hint={valueOrMissing(anac?.importo_totale_eur, formatEuroCompact)} {...go("finanza")} />
         <KpiCard 
           label="Patrimonio PA" 
           value={valueOrMissing(patrimonio?.n_immobili, formatInteger)} 
           hint={`${formatInteger(num(patrimonio?.n_fabbricati))} fabbricati · ${formatInteger(num(patrimonio?.n_terreni))} terreni`}
           icon={Building2}
+          {...go("finanza")}
         />
-        <KpiCard label="Enti RUNTS" value={valueOrMissing(runts?.n_enti_totali, formatInteger)} />
+        <KpiCard label="Enti RUNTS" value={valueOrMissing(runts?.n_enti_totali, formatInteger)} {...go("sanita")} />
         <KpiCard 
           label="Farmacie" 
           value={valueOrMissing(sanita?.n_farmacie, formatInteger)} 
           hint={`${formatInteger(num(sanita?.n_parafarmacie))} parafarmacie`}
           icon={Heart}
           variant="info"
+          {...go("sanita")}
         />
-        <KpiCard label="Civici ANNCSU" value={valueOrMissing(civici?.n_civici, formatInteger)} hint={`${formatInteger(num(civici?.n_strade))} strade`} />
-        <KpiCard label="Impianti carburanti" value={valueOrMissing(carburanti?.n_impianti, formatInteger)} hint={`Benzina self ${formatDecimal(num(carburanti?.prezzo_medio_benzina_self), 3)} €/L`} />
-        <KpiCard label="Pendolarismo netto" value={valueOrMissing(pendol?.saldo_netto, formatInteger)} hint={`Uscenti ${formatInteger(num(pendol?.uscenti_totali))} · Entranti ${formatInteger(num(pendol?.entranti_totali))}`} />
-        <KpiCard label="Elevazione media" value={valueOrMissing(morfo?.elev_mean, (v) => `${formatInteger(v)} m`)} hint={`min ${formatInteger(num(morfo?.elev_min))} · max ${formatInteger(num(morfo?.elev_max))}`} />
-        <KpiCard label="CF / Catastale" value={`${String(anagrafica?.codice_fiscale ?? "n.d.")}`} hint={`Catastale ${String(anagrafica?.codice_catastale ?? "")}`} />
+        <KpiCard label="Civici ANNCSU" value={valueOrMissing(civici?.n_civici, formatInteger)} hint={`${formatInteger(num(civici?.n_strade))} strade`} {...go("mappa")} />
+        <KpiCard label="Impianti carburanti" value={valueOrMissing(carburanti?.n_impianti, formatInteger)} hint={`Benzina self ${formatDecimal(num(carburanti?.prezzo_medio_benzina_self), 3)} €/L`} {...go("infra")} />
+        <KpiCard label="Pendolarismo netto" value={valueOrMissing(pendol?.saldo_netto, formatInteger)} hint={`Uscenti ${formatInteger(num(pendol?.uscenti_totali))} · Entranti ${formatInteger(num(pendol?.entranti_totali))}`} {...go("infra")} />
+        <KpiCard label="Elevazione media" value={valueOrMissing(morfo?.elev_mean, (v) => `${formatInteger(v)} m`)} hint={`min ${formatInteger(num(morfo?.elev_min))} · max ${formatInteger(num(morfo?.elev_max))}`} {...go("territorio")} />
+        <KpiCard label="CF / Catastale" value={`${String(anagrafica?.codice_fiscale ?? "n.d.")}`} hint={`Catastale ${String(anagrafica?.codice_catastale ?? "")}`} {...go("territorio")} />
       </div>
 
       {loading ? <LoadingBlock label="Caricamento approfondimenti demografici…" /> : null}
@@ -1338,7 +1372,13 @@ function Infra({ kpi }: { kpi: Kpi }) {
   const serieInc = asRecord(asRecord(veicoliExt?.incidenti)?.serie_storica);
   const carb = asRecord(detail?.carburanti);
   const carbKpi = asRecord(carb?.kpi);
-  const impianti = Array.isArray(carb?.punti) ? (carb.punti as Array<Record<string, unknown>>) : [];
+  const impianti = useMemo(
+    () =>
+      Array.isArray(carb?.punti)
+        ? (carb.punti as Array<Record<string, unknown>>)
+        : [],
+    [carb?.punti],
+  );
   const prezzoMedio = asRecord(carbKpi?.prezzo_medio);
 
   const bestBenzina = useMemo(() => {

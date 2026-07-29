@@ -12,6 +12,9 @@ type KpiCardProps = {
   trend?: "up" | "down" | "neutral";
   trendValue?: string;
   variant?: "default" | "success" | "warning" | "danger" | "info";
+  /** Destinazione del dettaglio (es. etichetta tab). */
+  detailLabel?: string;
+  onDetail?: () => void;
 };
 
 export function KpiCard({ 
@@ -23,6 +26,8 @@ export function KpiCard({
   trend,
   trendValue,
   variant = "default",
+  detailLabel,
+  onDetail,
 }: KpiCardProps) {
   const empty =
     unavailable ||
@@ -46,8 +51,15 @@ export function KpiCard({
     info: "text-blue-600",
   };
 
-  return (
-    <article className={`rounded-lg border p-3 shadow-sm sm:p-4 ${variantStyles[variant]}`}>
+  const clickable = typeof onDetail === "function";
+  const className = `rounded-lg border p-3 shadow-sm sm:p-4 text-left w-full ${variantStyles[variant]} ${
+    clickable
+      ? "cursor-pointer transition hover:border-[#0066CC] hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0066CC]"
+      : ""
+  }`;
+
+  const body = (
+    <>
       <div className="flex items-start justify-between">
         <p className="m-0 text-xs font-semibold uppercase tracking-wide text-[#5b6f82]">
           {label}
@@ -86,8 +98,32 @@ export function KpiCard({
       {hint ? (
         <p className="m-0 mt-1.5 text-xs text-[#5b6f82] sm:mt-2">{hint}</p>
       ) : null}
-    </article>
+      {clickable ? (
+        <p className="m-0 mt-2 text-xs font-semibold text-[#0066CC]">
+          {detailLabel ? `Vai a ${detailLabel} →` : "Vai al dettaglio →"}
+        </p>
+      ) : null}
+    </>
   );
+
+  if (clickable) {
+    return (
+      <button
+        type="button"
+        className={className}
+        onClick={onDetail}
+        aria-label={
+          detailLabel
+            ? `${label}: vai alla sezione ${detailLabel}`
+            : `${label}: vai al dettaglio`
+        }
+      >
+        {body}
+      </button>
+    );
+  }
+
+  return <article className={className}>{body}</article>;
 }
 
 export function SectionIntro({
