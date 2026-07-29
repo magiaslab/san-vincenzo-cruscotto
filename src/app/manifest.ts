@@ -14,8 +14,20 @@ export default function manifest(): MetadataRoute.Manifest {
     lang: "it",
     icons: [
       {
-        src: "/stemma-san-vincenzo.png",
-        sizes: "399x500",
+        src: "/favicon.svg",
+        sizes: "any",
+        type: "image/svg+xml",
+        purpose: "any",
+      },
+      {
+        src: "/icon",
+        sizes: "64x64",
+        type: "image/png",
+        purpose: "any",
+      },
+      {
+        src: "/apple-icon",
+        sizes: "180x180",
         type: "image/png",
         purpose: "any",
       },

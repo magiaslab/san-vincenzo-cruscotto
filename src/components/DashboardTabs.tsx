@@ -31,7 +31,6 @@ import {
   LandPlot,
   Fuel,
   Pill,
-  Bot,
   School,
   Handshake,
 } from "lucide-react";
@@ -126,10 +125,18 @@ const BandaUltralargaPanel = dynamic(
   },
 );
 
-const AssistenteChat = dynamic(() => import("@/components/AssistenteChat"), {
-  ssr: false,
-  loading: () => <LoadingBlock label="Caricamento assistente…" />,
-});
+const AssistenteFab = dynamic(
+  () => import("@/components/AssistenteFab").then((m) => m.AssistenteFab),
+  { ssr: false },
+);
+
+const FarmacieMap = dynamic(
+  () => import("@/components/FarmacieMap").then((m) => m.FarmacieMap),
+  {
+    ssr: false,
+    loading: () => <LoadingBlock label="Caricamento mappa farmacie…" />,
+  },
+);
 
 type Kpi = Record<string, unknown>;
 
@@ -146,8 +153,7 @@ type TabId =
   | "infra"
   | "sanita"
   | "meteo"
-  | "mappa"
-  | "assistente";
+  | "mappa";
 
 const NAV_GROUPS: NavGroup[] = [
   {
@@ -157,7 +163,6 @@ const NAV_GROUPS: NavGroup[] = [
       { id: "sanita", label: "Sanità", Icon: Stethoscope },
       { id: "infra", label: "Mobilità", Icon: Train },
       { id: "meteo", label: "Meteo", Icon: CloudSun },
-      { id: "assistente", label: "Assistente", Icon: Bot },
     ],
   },
   {
@@ -291,8 +296,8 @@ export function DashboardTabs({
         {tab === "sanita" && <Sanita kpi={kpi} />}
         {tab === "meteo" && <Meteo kpi={kpi} />}
         {tab === "mappa" && <MapPanel kpi={kpi} />}
-        {tab === "assistente" && <AssistenteChat />}
       </div>
+      <AssistenteFab />
     </AppShell>
   );
 }
@@ -380,6 +385,12 @@ function Panoramica({
               title: "Porto",
               hint: "Posti barca, webcam e AIS",
               Icon: Ship,
+            },
+            {
+              id: "turismo" as const,
+              title: "Eventi e biblioteca",
+              hint: "Calendario Visit SV e Biblioteca Calandra",
+              Icon: Palmtree,
             },
           ] as const
         ).map(({ id, title, hint, Icon }) => (
@@ -820,18 +831,24 @@ function Turismo({
   onNavigate: (id: TabId) => void;
 }) {
   const { detail, error, loading } = useDettaglio("turismo");
-  const [eventi, setEventi] = useState<Record<string, unknown> | null>(null);
+  const [eventiComune, setEventiComune] = useState<Record<string, unknown> | null>(null);
+  const [eventiToscana, setEventiToscana] = useState<Record<string, unknown> | null>(null);
+  const [biblioteca, setBiblioteca] = useState<Record<string, unknown> | null>(null);
   const [cultura, setCultura] = useState<Record<string, unknown> | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     Promise.all([
+      fetch("/api/comune/eventi").then((r) => (r.ok ? r.json() : null)),
       fetch("/api/toscana/eventi").then((r) => (r.ok ? r.json() : null)),
+      fetch("/api/comune/biblioteca").then((r) => (r.ok ? r.json() : null)),
       fetch("/api/cultura/luoghi").then((r) => (r.ok ? r.json() : null)),
     ])
-      .then(([e, c]) => {
+      .then(([ec, et, bib, c]) => {
         if (!cancelled) {
-          setEventi(e);
+          setEventiComune(ec);
+          setEventiToscana(et);
+          setBiblioteca(bib);
           setCultura(c);
         }
       })
@@ -850,6 +867,15 @@ function Turismo({
   const luoghiCultura = Array.isArray(cultura?.luoghi)
     ? (cultura.luoghi as Array<Record<string, unknown>>)
     : [];
+  const listaEventiComune = Array.isArray(eventiComune?.eventi)
+    ? (eventiComune.eventi as Array<Record<string, unknown>>).slice(0, 24)
+    : [];
+  const listaEventiToscana = Array.isArray(eventiToscana?.eventi)
+    ? (eventiToscana.eventi as Array<Record<string, unknown>>).slice(0, 12)
+    : [];
+  const orariBiblio = Array.isArray(biblioteca?.orari)
+    ? (biblioteca.orari as Array<{ giorno?: string; orario?: string }>)
+    : [];
 
   const stelleLabels = ["5", "4", "3", "2", "1"];
   const stelleData = stelleLabels.map((s) => num(asRecord(alberghi?.[`stelle_${s}`])?.strutture) ?? 0);
@@ -859,13 +885,20 @@ function Turismo({
     <section>
       <SectionIntro
         title="Turismo"
-        description="Capacità ricettiva comunale, flussi provinciali ISTAT, cultura ed eventi. I dati del porto sono nella sezione dedicata."
+        description="Ricettività ISTAT, calendario eventi comunale, biblioteca e cultura. I dati del porto sono nella sezione dedicata."
       />
       <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
         <KpiCard label="Strutture" value={valueOrMissing(capacita?.totale_strutture, formatInteger)} />
         <KpiCard label="Letti" value={valueOrMissing(capacita?.totale_letti, formatInteger)} />
         <KpiCard label="Camere" value={valueOrMissing(capacita?.totale_camere, formatInteger)} />
         <KpiCard label="Indice turisticità" value={valueOrMissing(capacita?.indice_turisticita_per_100ab, (v) => `${formatDecimal(v, 1)} /100 ab.`)} />
+        <KpiCard
+          label="Eventi in calendario"
+          value={valueOrMissing(eventiComune?.n_eventi, formatInteger)}
+          hint="Visit San Vincenzo"
+          icon={Palmtree}
+          variant="info"
+        />
       </div>
 
       <p className="mb-4 text-sm text-[var(--pa-muted)]">
@@ -949,6 +982,123 @@ function Turismo({
         </div>
       ) : null}
 
+      {listaEventiComune.length > 0 ? (
+        <div className="mt-4 panel">
+          <h3>Eventi e manifestazioni (Comune)</h3>
+          <p className="mb-3 text-xs text-[#5b6f82] sm:text-sm">
+            Calendario ufficiale su Visit San Vincenzo — {formatInteger(num(eventiComune?.n_eventi))} voci.
+          </p>
+          <ul className="space-y-3 text-xs sm:text-sm">
+            {listaEventiComune.map((ev, i) => (
+              <li
+                key={`${String(ev.titolo)}-${String(ev.periodo)}-${i}`}
+                className="border-b border-[#eef2f5] pb-3 last:border-0 last:pb-0"
+              >
+                <strong className="text-sm sm:text-base">{String(ev.titolo)}</strong>
+                {ev.periodo ? (
+                  <>
+                    <br />
+                    <span className="font-semibold text-[var(--pa-primary)]">{String(ev.periodo)}</span>
+                  </>
+                ) : null}
+                <br />
+                <span className="text-[#5b6f82]">
+                  {[ev.orario, ev.luogo].filter(Boolean).map(String).join(" · ")}
+                </span>
+                {ev.descrizione ? (
+                  <>
+                    <br />
+                    <span className="text-xs text-[#5b6f82]">{String(ev.descrizione)}</span>
+                  </>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+          <p className="mb-0 mt-3 text-xs text-[#5b6f82] sm:text-sm">
+            Fonte:{" "}
+            <a
+              href={String(asRecord(eventiComune?.fonte)?.url ?? "https://visitsanvincenzo.it/it/calendario-eventi/")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline"
+            >
+              Visit San Vincenzo
+            </a>
+            {" · "}
+            <a
+              href={String(asRecord(eventiComune?.fonte)?.comune_url ?? "https://www.comune.sanvincenzo.li.it/Vivere-il-comune/Eventi")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline"
+            >
+              pagina Eventi del Comune
+            </a>
+          </p>
+        </div>
+      ) : eventiComune?.disponibile === false ? (
+        <div className="mt-4">
+          <DataUnavailable
+            message={String(eventiComune?.messaggio ?? "Eventi comunali non disponibili")}
+          />
+        </div>
+      ) : null}
+
+      {biblioteca?.disponibile === true ? (
+        <div className="mt-4 panel">
+          <h3>{String(biblioteca.nome ?? "Biblioteca comunale")}</h3>
+          <p className="mb-2 text-xs sm:text-sm text-[#5b6f82]">
+            {String(biblioteca.descrizione ?? "")}
+          </p>
+          <ul className="mb-3 space-y-1 text-xs sm:text-sm">
+            <li>
+              <strong>Indirizzo:</strong> {String(biblioteca.indirizzo ?? "—")}
+            </li>
+            <li>
+              <strong>Telefono:</strong>{" "}
+              <a href={`tel:${String(biblioteca.telefono ?? "").replace(/\s/g, "")}`} className="underline">
+                {String(biblioteca.telefono ?? "—")}
+              </a>
+            </li>
+            <li>
+              <strong>Email:</strong>{" "}
+              <a href={`mailto:${String(biblioteca.email ?? "")}`} className="underline">
+                {String(biblioteca.email ?? "—")}
+              </a>
+            </li>
+          </ul>
+          {orariBiblio.length > 0 ? (
+            <div className="mb-3 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+              {orariBiblio.map((o) => (
+                <div key={String(o.giorno)} className="rounded bg-[var(--pa-surface-soft)] px-2 py-1.5 text-center text-xs">
+                  <div className="font-bold text-[var(--pa-ink)]">{String(o.giorno)}</div>
+                  <div className="text-[var(--pa-muted)]">{String(o.orario)}</div>
+                </div>
+              ))}
+            </div>
+          ) : null}
+          <p className="mb-0 text-xs text-[#5b6f82] sm:text-sm">
+            Fonte:{" "}
+            <a
+              href={String(asRecord(biblioteca.fonte)?.url ?? "")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline"
+            >
+              Comune di San Vincenzo
+            </a>
+            {" · "}
+            <a
+              href={String(biblioteca.opac_url ?? "")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline"
+            >
+              Catalogo OPAC
+            </a>
+          </p>
+        </div>
+      ) : null}
+
       {luoghiCultura.length > 0 ? (
         <div className="mt-4 panel">
           <h3>Luoghi di interesse culturale</h3>
@@ -976,37 +1126,65 @@ function Turismo({
         </div>
       ) : null}
 
-      {eventi?.disponibile === true ? (
-        <div className="mt-4 panel bg-[#fff4e6]">
-          <h3>Eventi culturali Regione Toscana</h3>
-          <p className="mb-2 text-xs sm:text-sm">
-            {String(eventi.note ?? "Eventi promossi dalla Regione Toscana")}
+      <div className="mt-4 panel bg-[#fff4e6]">
+        <h3>Eventi culturali Regione Toscana</h3>
+        <p className="mb-2 text-xs sm:text-sm">
+          {String(
+            eventiToscana?.note ??
+              eventiToscana?.messaggio ??
+              "Dataset Sistema Cultura (open data regionale).",
+          )}
+        </p>
+        {listaEventiToscana.length > 0 ? (
+          <ul className="mb-3 space-y-2 text-xs sm:text-sm">
+            {listaEventiToscana.map((ev, i) => (
+              <li key={`${String(ev.titolo)}-${i}`} className="border-b border-[#f0e6d4] pb-2 last:border-0">
+                <strong>{String(ev.titolo)}</strong>
+                {ev.categoria ? (
+                  <span className="ml-2 rounded bg-[#0066CC] px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                    {String(ev.categoria)}
+                  </span>
+                ) : null}
+                <br />
+                <span className="text-[#5b6f82]">
+                  {[ev.comune, ev.luogo, ev.data_inizio].filter(Boolean).map(String).join(" · ")}
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mb-2 text-xs text-[#5b6f82] sm:text-sm">
+            Nessun evento attivo restituito dalle risorse JSON regionali al momento
+            {eventiToscana?.filtro_territoriale
+              ? ` (${String(eventiToscana.filtro_territoriale)})`
+              : ""}
+            . Usa il calendario comunale sopra.
           </p>
-          {Array.isArray(eventi.categorie) ? (
-            <ul className="flex flex-wrap gap-2">
-              {(eventi.categorie as string[]).map((cat) => (
-                <li
-                  key={cat}
-                  className="rounded bg-[#0066CC] px-2 py-1 text-xs font-semibold text-white"
-                >
-                  {cat}
-                </li>
-              ))}
-            </ul>
-          ) : null}
-          <p className="mb-0 mt-2.5 text-xs text-[#5b6f82] sm:mt-3 sm:text-sm">
-            Fonte:{" "}
-            <a
-              href="https://dati.toscana.it/dataset/rt-eventi-sistcult"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline"
-            >
-              Regione Toscana Open Data
-            </a>
-          </p>
-        </div>
-      ) : null}
+        )}
+        {Array.isArray(eventiToscana?.categorie) ? (
+          <ul className="mb-2 flex flex-wrap gap-2">
+            {(eventiToscana.categorie as string[]).map((cat) => (
+              <li
+                key={cat}
+                className="rounded bg-[#0066CC] px-2 py-1 text-xs font-semibold text-white"
+              >
+                {cat}
+              </li>
+            ))}
+          </ul>
+        ) : null}
+        <p className="mb-0 mt-2.5 text-xs text-[#5b6f82] sm:mt-3 sm:text-sm">
+          Fonte:{" "}
+          <a
+            href="https://dati.toscana.it/dataset/rt-eventi-sistcult"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline"
+          >
+            Regione Toscana Open Data
+          </a>
+        </p>
+      </div>
     </section>
   );
 }
@@ -1805,7 +1983,7 @@ function Sanita({ kpi }: { kpi: Kpi }) {
     <section>
       <SectionIntro
         title="Sanità"
-        description="Farmacie di turno (orari/date) e anagrafe Ministero della Salute. Il terzo settore è in Società."
+        description="Farmacie di turno, mappa dei punti MDS e anagrafe Ministero della Salute. Il terzo settore è in Società."
       />
       <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3">
         <KpiCard label="Farmacie" value={valueOrMissing(sanita?.n_farmacie, formatInteger)} icon={Heart} variant="info" />
@@ -1824,20 +2002,15 @@ function Sanita({ kpi }: { kpi: Kpi }) {
 
       {loading ? <LoadingBlock /> : null}
 
+      <div className="mb-4">
+        <FarmacieMap />
+      </div>
+
       {(farmacie.length > 0 || para.length > 0) ? (
-        <div className="mb-4 panel">
-          <h3>Farmacie e parafarmacie</h3>
-          <ul className="space-y-2 text-xs sm:text-sm">
-            {[...farmacie, ...para].map((p) => (
-              <li key={String(p.nome)}>
-                <strong>{String(p.nome)}</strong>
-                {p.tipo ? ` (${String(p.tipo)})` : " (Parafarmacia)"}
-                <br />
-                <span className="text-[#5b6f82]">{String(p.indirizzo ?? "")} {String(p.cap ?? "")}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <p className="text-xs text-[var(--pa-muted)] sm:text-sm">
+          Anagrafe MDS: {farmacie.length} farmacie e {para.length} parafarmacie
+          (vedi mappa sopra). I turni sono aggiornati dalla fonte dedicata.
+        </p>
       ) : null}
     </section>
   );

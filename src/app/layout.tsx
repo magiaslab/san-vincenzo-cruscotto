@@ -81,8 +81,11 @@ export const metadata: Metadata = {
     images: ["/og-image.png"],
   },
   icons: {
-    icon: [{ url: "/stemma-san-vincenzo.png", type: "image/png" }],
-    apple: [{ url: "/stemma-san-vincenzo.png" }],
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/icon", type: "image/png", sizes: "64x64" },
+    ],
+    apple: [{ url: "/apple-icon", type: "image/png", sizes: "180x180" }],
   },
   other: {
     author: AUTHOR.name,

@@ -23,7 +23,11 @@ const SUGGESTIONS = [
   "Cosa mostra la sezione Porto?",
 ];
 
-export default function AssistenteChat() {
+export default function AssistenteChat({
+  compact = false,
+}: {
+  compact?: boolean;
+}) {
   const [messages, setMessages] = useState<Msg[]>([
     {
       role: "assistant",
@@ -79,14 +83,9 @@ export default function AssistenteChat() {
     void ask(input);
   }
 
-  return (
-    <section>
-      <SectionIntro
-        title="Assistente (RAG)"
-        description="Domande in italiano sui dati del cruscotto. Embedding MiniLM multilingue + SmolLM2-360M su Modal (Hugging Face, self-host)."
-      />
-
-      <div className="mb-3 flex flex-wrap gap-2">
+  const chatBody = (
+    <>
+      <div className={`mb-3 flex flex-wrap gap-2 ${compact ? "px-1" : ""}`}>
         {SUGGESTIONS.map((s) => (
           <button
             key={s}
@@ -95,13 +94,21 @@ export default function AssistenteChat() {
             onClick={() => void ask(s)}
             disabled={loading}
           >
-            {s}
+            {compact ? s.replace(" a San Vincenzo?", "?").slice(0, 42) : s}
           </button>
         ))}
       </div>
 
-      <div className="panel flex min-h-[360px] flex-col overflow-hidden p-0">
-        <div className="flex-1 space-y-3 overflow-y-auto px-3 py-3 sm:px-4 sm:py-4">
+      <div
+        className={`panel flex flex-col overflow-hidden p-0 ${
+          compact ? "min-h-0 flex-1" : "min-h-[360px]"
+        }`}
+      >
+        <div
+          className={`flex-1 space-y-3 overflow-y-auto px-3 py-3 sm:px-4 sm:py-4 ${
+            compact ? "max-h-[min(48vh,420px)]" : ""
+          }`}
+        >
           {messages.map((m, i) => (
             <div
               key={`${m.role}-${i}`}
@@ -139,7 +146,7 @@ export default function AssistenteChat() {
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              rows={2}
+              rows={compact ? 2 : 2}
               className="w-full resize-y rounded-lg border border-[var(--pa-border)] px-3 py-2 text-[var(--pa-ink)]"
               placeholder="Es. Quanti impianti carburanti ci sono?"
               disabled={loading}
@@ -155,7 +162,20 @@ export default function AssistenteChat() {
           </button>
         </form>
       </div>
+    </>
+  );
 
+  if (compact) {
+    return <div className="flex h-full flex-col">{chatBody}</div>;
+  }
+
+  return (
+    <section>
+      <SectionIntro
+        title="Assistente (RAG)"
+        description="Domande in italiano sui dati del cruscotto. Embedding MiniLM multilingue + SmolLM2-360M su Modal (Hugging Face, self-host)."
+      />
+      {chatBody}
       <p className="mt-3 text-xs text-[var(--pa-muted)]">
         Modelli:{" "}
         <a
