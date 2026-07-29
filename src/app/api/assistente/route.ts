@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { ASSISTENTE_MODAL_URL_DEFAULT } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
@@ -9,24 +10,18 @@ type AskBody = {
   k?: number;
 };
 
+function resolveModalUrl(): string {
+  return (
+    process.env.ASSISTENTE_MODAL_URL?.trim() || ASSISTENTE_MODAL_URL_DEFAULT
+  );
+}
+
 /**
- * Proxy verso il RAG su Modal (modelli HF self-host, niente API LLM a pagamento).
- * Imposta ASSISTENTE_MODAL_URL sull'endpoint POST web_ask deployato.
+ * Proxy verso il RAG su Modal (modelli HF self-host).
+ * Usa ASSISTENTE_MODAL_URL se impostata, altrimenti l'endpoint magiaslab di default.
  */
 export async function POST(req: NextRequest) {
-  const modalUrl = process.env.ASSISTENTE_MODAL_URL?.trim();
-  if (!modalUrl) {
-    return NextResponse.json(
-      {
-        error: "assistente_non_configurato",
-        message:
-          "Imposta ASSISTENTE_MODAL_URL con l'endpoint Modal (vedi modal_rag/README.md).",
-        answer: "",
-        sources: [],
-      },
-      { status: 503 },
-    );
-  }
+  const modalUrl = resolveModalUrl();
 
   let body: AskBody;
   try {
@@ -78,9 +73,11 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET() {
-  const configured = Boolean(process.env.ASSISTENTE_MODAL_URL?.trim());
+  const modalUrl = resolveModalUrl();
   return NextResponse.json({
-    configured,
+    configured: Boolean(modalUrl),
+    using_default: !process.env.ASSISTENTE_MODAL_URL?.trim(),
+    endpoint: modalUrl,
     models: {
       embed: "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
       gen: "HuggingFaceTB/SmolLM2-360M-Instruct",

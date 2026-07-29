@@ -105,6 +105,13 @@ export const FARMACIE_DI_TURNO_URL =
   `https://www.farmaciediturno.org/ricercaditurno.asp?cod=${FARMACIE_DI_TURNO_COD}` as const;
 export const FARMACIE_DI_TURNO_BASE = "https://www.farmaciediturno.org";
 
+/**
+ * Endpoint POST del RAG su Modal (workspace magiaslab).
+ * Sovrascrivibile con ASSISTENTE_MODAL_URL.
+ */
+export const ASSISTENTE_MODAL_URL_DEFAULT =
+  "https://magiaslab--san-vincenzo-rag-ragservice-web-ask.modal.run" as const;
+
 /** Open data Ministero dell'Istruzione — Portale Unico dei Dati della Scuola. */
 export const MIUR_OPENDATA_URL = "https://dati.istruzione.it/opendata/" as const;
 export const MIUR_ESPLORA_URL =
