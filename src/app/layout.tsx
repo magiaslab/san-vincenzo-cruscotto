@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Titillium_Web } from "next/font/google";
+import { CookieBanner } from "@/components/CookieBanner";
 import { AUTHOR, COMUNE_NOME } from "@/lib/constants";
 import "./globals.css";
 
@@ -32,6 +33,7 @@ export default function RootLayout({
       </head>
       <body className={`${titillium.variable} flex min-h-screen flex-col antialiased`}>
         {children}
+        <CookieBanner />
       </body>
     </html>
   );
