@@ -54,6 +54,7 @@ export function CookieBanner() {
         STORAGE_KEY,
         JSON.stringify({ value, at: new Date().toISOString() }),
       );
+      window.dispatchEvent(new Event("sv-cookie-consent"));
     } catch {
       /* ignore */
     }

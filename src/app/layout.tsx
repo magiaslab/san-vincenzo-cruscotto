@@ -1,8 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Titillium_Web } from "next/font/google";
 import { CookieBanner } from "@/components/CookieBanner";
+import { InstallPrompt } from "@/components/InstallPrompt";
 import { JsonLd } from "@/components/JsonLd";
 import { Providers } from "@/components/Providers";
+import { PwaRegister } from "@/components/PwaRegister";
 import { AUTHOR, COMUNE_NOME } from "@/lib/constants";
 import {
   SITE_DESCRIPTION,
@@ -85,13 +87,21 @@ export const metadata: Metadata = {
     icon: [
       { url: "/favicon.svg", type: "image/svg+xml" },
       { url: "/icon", type: "image/png", sizes: "64x64" },
+      { url: "/icons/icon-192", type: "image/png", sizes: "192x192" },
+      { url: "/icons/icon-512", type: "image/png", sizes: "512x512" },
     ],
     apple: [{ url: "/apple-icon", type: "image/png", sizes: "180x180" }],
+  },
+  appleWebApp: {
+    capable: true,
+    title: SITE_NAME,
+    statusBarStyle: "default",
   },
   other: {
     author: AUTHOR.name,
     "geo.region": "IT-LI",
     "geo.placename": COMUNE_NOME,
+    "mobile-web-app-capable": "yes",
   },
 };
 
@@ -109,6 +119,8 @@ export default function RootLayout({
           <JsonLd data={buildHomeJsonLd()} />
           {children}
           <CookieBanner />
+          <InstallPrompt />
+          <PwaRegister />
         </Providers>
       </body>
     </html>
