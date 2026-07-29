@@ -277,8 +277,9 @@ export function AppShell({
                 </p>
               </div>
             </div>
-            <div className="flex h-8 items-center bg-[var(--pa-primary)] px-3 text-xs font-semibold text-white sm:px-4">
-              Progetto indipendente · non ufficiale · dati aperti
+            <div className="bg-[var(--pa-primary)] px-3 py-2 text-xs font-semibold leading-snug text-white sm:px-4 sm:text-sm">
+              Progetto non ufficiale: non affiliato ad AgID, al Governo italiano
+              o al Comune di San Vincenzo.
             </div>
           </header>
 
