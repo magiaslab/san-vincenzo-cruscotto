@@ -147,7 +147,7 @@ export default function MapPanel({ kpi }: { kpi?: Record<string, unknown> }) {
         description="Layer georeferenziati ANNCSU, punti EV, beni culturali e cartografia catastale. Base OpenStreetMap."
       />
 
-      <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
         <KpiCard
           label="Civici ANNCSU"
           value={valueOrMissing(civiciKpi?.n_civici, formatInteger)}
@@ -170,47 +170,52 @@ export default function MapPanel({ kpi }: { kpi?: Record<string, unknown> }) {
         />
       </div>
 
-      <div className="mb-3 flex flex-wrap gap-3 text-sm">
-        <label className="inline-flex items-center gap-2">
+      <div className="mb-3 flex flex-wrap gap-2 text-xs sm:gap-3 sm:text-sm">
+        <label className="inline-flex cursor-pointer items-center gap-1.5 sm:gap-2">
           <input
             type="checkbox"
             checked={showCivici}
             onChange={(e) => setShowCivici(e.target.checked)}
+            className="h-4 w-4 cursor-pointer"
           />
-          Civici ANNCSU
+          <span>Civici ANNCSU</span>
         </label>
-        <label className="inline-flex items-center gap-2">
+        <label className="inline-flex cursor-pointer items-center gap-1.5 sm:gap-2">
           <input
             type="checkbox"
             checked={showEv}
             onChange={(e) => setShowEv(e.target.checked)}
+            className="h-4 w-4 cursor-pointer"
           />
-          Punti ricarica EV
+          <span>Punti ricarica EV</span>
         </label>
-        <label className="inline-flex items-center gap-2">
+        <label className="inline-flex cursor-pointer items-center gap-1.5 sm:gap-2">
           <input
             type="checkbox"
             checked={showBeni}
             onChange={(e) => setShowBeni(e.target.checked)}
             disabled={Boolean(beniUnavailable)}
+            className="h-4 w-4 cursor-pointer disabled:cursor-not-allowed"
           />
-          Beni culturali MiC
+          <span>Beni culturali MiC</span>
         </label>
-        <label className="inline-flex items-center gap-2">
+        <label className="inline-flex cursor-pointer items-center gap-1.5 sm:gap-2">
           <input
             type="checkbox"
             checked={showSanita}
             onChange={(e) => setShowSanita(e.target.checked)}
+            className="h-4 w-4 cursor-pointer"
           />
-          Farmacie
+          <span>Farmacie</span>
         </label>
-        <label className="inline-flex items-center gap-2">
+        <label className="inline-flex cursor-pointer items-center gap-1.5 sm:gap-2">
           <input
             type="checkbox"
             checked={showCatasto}
             onChange={(e) => setShowCatasto(e.target.checked)}
+            className="h-4 w-4 cursor-pointer"
           />
-          Catasto (particelle)
+          <span>Catasto (particelle)</span>
         </label>
       </div>
 
@@ -237,7 +242,7 @@ export default function MapPanel({ kpi }: { kpi?: Record<string, unknown> }) {
             center={MAP_CENTER}
             zoom={MAP_DEFAULT_ZOOM}
             scrollWheelZoom
-            className="h-[560px] w-full"
+            className="h-[400px] w-full sm:h-[500px] lg:h-[560px]"
             attributionControl
           >
             <TileLayer

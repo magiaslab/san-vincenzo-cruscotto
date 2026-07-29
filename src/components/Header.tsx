@@ -17,7 +17,7 @@ export function Header({ generatedAt }: HeaderProps) {
     <header className="site-header relative z-40 bg-white shadow-sm">
       {/* Slim bar */}
       <div className="bg-[#0066CC] text-white">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 px-4 py-2 text-sm sm:px-6">
+        <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-1.5 px-4 py-2 text-xs sm:flex-row sm:items-center sm:gap-2 sm:text-sm sm:px-6">
           <span className="font-semibold tracking-wide">
             Progetto indipendente · dati Cruscotto Italia (AgID)
           </span>
@@ -32,20 +32,20 @@ export function Header({ generatedAt }: HeaderProps) {
 
       {/* Center: stemma + titolo (senza attribuzione logo, spostata in footer) */}
       <div className="border-b border-[#d9e6f2] bg-white">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-4 px-4 py-4 sm:px-6">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-4 py-3 sm:gap-4 sm:py-4 sm:px-6">
           <Image
             src={STEMMA.src}
             alt={STEMMA.alt}
             width={44}
             height={55}
             priority
-            className="h-[55px] w-auto shrink-0"
+            className="h-[44px] w-auto shrink-0 sm:h-[55px]"
           />
           <div className="min-w-0 flex-1">
-            <h1 className="m-0 text-2xl font-bold leading-tight text-[#17324d] md:text-3xl">
+            <h1 className="m-0 text-xl font-bold leading-tight text-[#17324d] sm:text-2xl md:text-3xl">
               Cruscotto {COMUNE_NOME}
             </h1>
-            <p className="m-0 mt-1 text-sm text-[#5b6f82]">
+            <p className="m-0 mt-1 text-xs text-[#5b6f82] sm:text-sm">
               Provincia di Livorno ({COMUNE_PROVINCIA}) · {COMUNE_REGIONE} ·
               ISTAT {ISTAT_CODE}
               {generatedAt

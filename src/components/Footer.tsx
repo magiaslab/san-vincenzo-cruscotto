@@ -12,12 +12,12 @@ export function Footer() {
     <footer className="it-footer mt-auto" role="contentinfo">
       <div className="it-footer-main bg-[#003366] text-white">
         <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6">
-          <div className="row g-4">
-            <div className="col-12 col-md-6">
-              <h3 className="h5 text-white mb-3">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div>
+              <h3 className="mb-3 text-base font-bold text-white sm:text-lg">
                 Cruscotto {COMUNE_NOME} ({COMUNE_PROVINCIA})
               </h3>
-              <p className="small mb-2 opacity-90">
+              <p className="mb-2 text-sm opacity-90">
                 Progetto indipendente che riaggrega dati aperti del{" "}
                 <a
                   className="text-white text-decoration-underline"
@@ -29,7 +29,7 @@ export function Footer() {
                 </a>
                 .
               </p>
-              <p className="small mb-0">
+              <p className="mb-0 text-sm">
                 Realizzato da{" "}
                 <a
                   className="text-white text-decoration-underline"
@@ -39,9 +39,9 @@ export function Footer() {
                 </a>
               </p>
             </div>
-            <div className="col-12 col-md-6">
-              <h3 className="h5 text-white mb-3">Attribuzioni</h3>
-              <ul className="list-unstyled small opacity-90 space-y-2">
+            <div>
+              <h3 className="mb-3 text-base font-bold text-white sm:text-lg">Attribuzioni</h3>
+              <ul className="list-none space-y-2 p-0 text-sm opacity-90">
                 <li>
                   ©{" "}
                   <a

@@ -61,12 +61,42 @@ a {
   border-radius: 0.5rem;
   border: 1px solid #d9e6f2;
   background: #fff;
-  padding: 1rem;
+  padding: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .panel {
+    padding: 1rem;
+  }
 }
 
 .panel h3 {
   margin: 0 0 0.75rem;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: #17324d;
+}
+
+@media (min-width: 640px) {
+  .panel h3 {
+    font-size: 1rem;
+  }
+}
+
+/* Scrollbar sottili su mobile */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 102, 204, 0.3) transparent;
+}
+
+/* Miglioramenti per overflow orizzontale */
+.overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Ottimizzazioni checkbox mobile */
+@media (max-width: 639px) {
+  input[type="checkbox"] {
+    flex-shrink: 0;
+  }
 }

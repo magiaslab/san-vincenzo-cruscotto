@@ -16,14 +16,14 @@ export function KpiCard({ label, value, hint, unavailable }: KpiCardProps) {
     (typeof value === "string" && (value === "n.d." || value === ""));
 
   return (
-    <article className="rounded-lg border border-[#d9e6f2] bg-white p-4 shadow-sm">
+    <article className="rounded-lg border border-[#d9e6f2] bg-white p-3 shadow-sm sm:p-4">
       <p className="m-0 text-xs font-semibold uppercase tracking-wide text-[#5b6f82]">
         {label}
       </p>
-      <p className="m-0 mt-2 text-2xl font-bold text-[#17324d]">
+      <p className="m-0 mt-1.5 text-xl font-bold text-[#17324d] sm:mt-2 sm:text-2xl">
         {empty ? "dato non disponibile" : value}
       </p>
-      {hint ? <p className="m-0 mt-2 text-xs text-[#5b6f82]">{hint}</p> : null}
+      {hint ? <p className="m-0 mt-1.5 text-xs text-[#5b6f82] sm:mt-2">{hint}</p> : null}
     </article>
   );
 }
@@ -36,10 +36,10 @@ export function SectionIntro({
   description?: string;
 }) {
   return (
-    <div className="mb-4">
-      <h2 className="m-0 text-xl font-bold text-[#17324d]">{title}</h2>
+    <div className="mb-4 sm:mb-5">
+      <h2 className="m-0 text-lg font-bold text-[#17324d] sm:text-xl">{title}</h2>
       {description ? (
-        <p className="m-0 mt-1 text-sm text-[#5b6f82]">{description}</p>
+        <p className="m-0 mt-1 text-xs text-[#5b6f82] sm:text-sm">{description}</p>
       ) : null}
     </div>
   );

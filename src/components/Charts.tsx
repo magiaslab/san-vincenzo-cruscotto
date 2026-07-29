@@ -49,7 +49,7 @@ type SeriesProps = {
 
 export function LineChart({ labels, datasets }: SeriesProps) {
   return (
-    <div className="h-72 w-full">
+    <div className="h-64 w-full sm:h-72">
       <Line
         options={{
           ...baseOptions,
@@ -85,7 +85,7 @@ export function LineChart({ labels, datasets }: SeriesProps) {
 
 export function BarChart({ labels, datasets }: SeriesProps) {
   return (
-    <div className="h-72 w-full">
+    <div className="h-64 w-full sm:h-72">
       <Bar
         options={{
           ...baseOptions,
@@ -113,7 +113,7 @@ export function DoughnutChart({
   values: number[];
 }) {
   return (
-    <div className="h-64 w-full">
+    <div className="h-56 w-full sm:h-64">
       <Doughnut
         options={baseOptions}
         data={{

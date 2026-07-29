@@ -117,27 +117,28 @@ export function DashboardTabs({ kpi }: { kpi: Kpi }) {
       >
         <div className="mx-auto max-w-7xl px-2 sm:px-4">
           <ul
-            className="m-0 flex list-none justify-between gap-0 p-0 py-1.5 sm:justify-start sm:gap-1"
+            className="m-0 flex list-none gap-1 overflow-x-auto p-0 py-2 sm:gap-1.5 sm:py-1.5"
             role="tablist"
+            style={{ scrollbarWidth: 'thin' }}
           >
             {TABS.map((t) => {
               const active = tab === t.id;
               const Icon = t.Icon;
               return (
-                <li key={t.id} role="presentation" className="flex-1 sm:flex-none">
+                <li key={t.id} role="presentation" className="flex-shrink-0">
                   <button
                     type="button"
                     role="tab"
                     aria-selected={active}
-                    className={`flex w-full flex-col items-center gap-0.5 rounded-lg px-1.5 py-1.5 text-[11px] font-semibold leading-tight transition sm:flex-row sm:gap-1.5 sm:px-3 sm:py-2 sm:text-sm ${
+                    className={`flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold transition sm:gap-2 sm:px-4 ${
                       active
                         ? "bg-[#0066CC] text-white"
                         : "bg-transparent text-[#17324d] hover:bg-[#e8f2fc]"
                     }`}
                     onClick={() => setTab(t.id)}
                   >
-                    <Icon size={16} strokeWidth={2} className="shrink-0" />
-                    <span className="truncate">{t.label}</span>
+                    <Icon size={18} strokeWidth={2} className="shrink-0" />
+                    <span>{t.label}</span>
                   </button>
                 </li>
               );
@@ -146,7 +147,7 @@ export function DashboardTabs({ kpi }: { kpi: Kpi }) {
         </div>
       </nav>
 
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6" role="tabpanel">
+      <div className="mx-auto max-w-7xl px-3 py-4 sm:px-4 sm:py-5 lg:px-6 lg:py-6" role="tabpanel">
         {tab === "panoramica" && <Panoramica kpi={kpi} />}
         {tab === "turismo" && <Turismo kpi={kpi} />}
         {tab === "economia" && <Economia kpi={kpi} />}
@@ -204,7 +205,7 @@ function Panoramica({ kpi }: { kpi: Kpi }) {
         description={`Cruscotto completo di ${String(anagrafica?.nome ?? "San Vincenzo")} — KPI sintetici e approfondimenti demografici.`}
       />
 
-      <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="mb-4 grid gap-2.5 sm:mb-6 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3 xl:grid-cols-4">
         <KpiCard label="Popolazione" value={valueOrMissing(demo?.popolazione, formatInteger)} hint={String(demo?.riferimento ?? "")} />
         <KpiCard label="Maschi / Femmine" value={`${formatInteger(num(demo?.maschi))} / ${formatInteger(num(demo?.femmine))}`} />
         <KpiCard label="Età media" value={valueOrMissing(demo?.eta_media, (v) => formatDecimal(v, 1))} />
@@ -239,7 +240,7 @@ function Panoramica({ kpi }: { kpi: Kpi }) {
       {loading ? <LoadingBlock label="Caricamento approfondimenti demografici…" /> : null}
 
       {fasce ? (
-        <div className="mb-4 grid gap-4 lg:grid-cols-2">
+        <div className="mb-4 grid gap-3 sm:gap-4 lg:grid-cols-2">
           <div className="panel">
             <h3>Fasce d&apos;età</h3>
             <DoughnutChart
@@ -250,7 +251,7 @@ function Panoramica({ kpi }: { kpi: Kpi }) {
                 num(asRecord(fasce["65_piu"])?.n) ?? 0,
               ]}
             />
-            <ul className="mt-3 space-y-1 text-sm text-[#5b6f82]">
+            <ul className="mt-2.5 space-y-1 text-xs text-[#5b6f82] sm:mt-3 sm:text-sm">
               <li>0–14: {formatInteger(num(asRecord(fasce["0_14"])?.n))} ({formatPercent(num(asRecord(fasce["0_14"])?.pct))})</li>
               <li>15–64: {formatInteger(num(asRecord(fasce["15_64"])?.n))} ({formatPercent(num(asRecord(fasce["15_64"])?.pct))})</li>
               <li>65+: {formatInteger(num(asRecord(fasce["65_piu"])?.n))} ({formatPercent(num(asRecord(fasce["65_piu"])?.pct))})</li>
@@ -272,11 +273,11 @@ function Panoramica({ kpi }: { kpi: Kpi }) {
         </div>
       ) : null}
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-3 sm:gap-4 lg:grid-cols-3">
         {cens ? (
           <div className="panel">
             <h3>Censimento (sezioni)</h3>
-            <ul className="space-y-1 text-sm">
+            <ul className="space-y-1 text-xs sm:text-sm">
               <li>Sezioni: {formatInteger(num(cens.n_sezioni))}</li>
               <li>Famiglie: {formatInteger(num(cens.famiglie_totali))}</li>
               <li>Abitazioni: {formatInteger(num(cens.abitazioni_totali))} ({formatInteger(num(cens.abitazioni_occupate))} occupate, {formatInteger(num(cens.abitazioni_vuote))} vuote)</li>
@@ -287,7 +288,7 @@ function Panoramica({ kpi }: { kpi: Kpi }) {
         {asRecord(profilo?.cittadinanza) || asRecord(profilo?.famiglie) ? (
           <div className="panel">
             <h3>Famiglie e cittadinanza</h3>
-            <ul className="space-y-1 text-sm">
+            <ul className="space-y-1 text-xs sm:text-sm">
               <li>Famiglie: {formatInteger(num(asRecord(profilo?.famiglie)?.n_famiglie))} (dim. media {formatDecimal(num(asRecord(profilo?.famiglie)?.dim_media_famiglia), 1)})</li>
               <li>Italiani: {formatInteger(num(asRecord(profilo?.cittadinanza)?.italiani_n))}</li>
               <li>Stranieri: {formatInteger(num(asRecord(profilo?.cittadinanza)?.stranieri_n))} ({formatPercent(num(asRecord(profilo?.cittadinanza)?.stranieri_pct))})</li>
@@ -297,10 +298,10 @@ function Panoramica({ kpi }: { kpi: Kpi }) {
         {scuole ? (
           <div className="panel">
             <h3>Scuole MIUR {String(scuole.anno_scolastico ?? "")}</h3>
-            <p className="text-sm text-[#5b6f82]">
+            <p className="text-xs text-[#5b6f82] sm:text-sm">
               {formatInteger(num(asRecord(scuole.kpi)?.n_scuole))} plessi
             </p>
-            <ul className="mt-2 space-y-1 text-sm">
+            <ul className="mt-2 space-y-1 text-xs sm:text-sm">
               {(Array.isArray(scuole.scuole) ? (scuole.scuole as Array<Record<string, unknown>>) : []).map((s) => (
                 <li key={String(s.codice_scuola)}>
                   <strong>{String(s.denominazione)}</strong> — {String(s.tipologia)}
@@ -335,7 +336,7 @@ function Turismo({ kpi }: { kpi: Kpi }) {
         title="Turismo"
         description="Capacità ricettiva comunale e flussi provinciali ISTAT. La tassa di soggiorno non è inclusa nelle fonti Cruscotto Italia."
       />
-      <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
         <KpiCard label="Strutture" value={valueOrMissing(capacita?.totale_strutture ?? turismoKpi?.totale_strutture, formatInteger)} />
         <KpiCard label="Letti" value={valueOrMissing(capacita?.totale_letti ?? turismoKpi?.totale_letti, formatInteger)} />
         <KpiCard label="Camere" value={valueOrMissing(capacita?.totale_camere, formatInteger)} />
@@ -349,7 +350,7 @@ function Turismo({ kpi }: { kpi: Kpi }) {
         <div className="mt-4 grid gap-4 lg:grid-cols-2">
           <div className="panel">
             <h3>Alberghiero — strutture per stelle</h3>
-            <p className="mb-3 text-sm text-[#5b6f82]">
+            <p className="mb-2.5 text-xs text-[#5b6f82] sm:mb-3 sm:text-sm">
               {formatInteger(num(alberghi?.totale_strutture))} strutture · {formatInteger(num(alberghi?.totale_letti))} letti
               {asRecord(alberghi?.residence)?.strutture != null
                 ? ` · residence ${formatInteger(num(asRecord(alberghi?.residence)?.strutture))}`
@@ -365,7 +366,7 @@ function Turismo({ kpi }: { kpi: Kpi }) {
           </div>
           <div className="panel">
             <h3>Extra-alberghiero</h3>
-            <p className="mb-3 text-sm text-[#5b6f82]">
+            <p className="mb-2.5 text-xs text-[#5b6f82] sm:mb-3 sm:text-sm">
               {formatInteger(num(extra?.totale_strutture))} strutture · {formatInteger(num(extra?.totale_letti))} letti
             </p>
             <BarChart
@@ -404,14 +405,14 @@ function Turismo({ kpi }: { kpi: Kpi }) {
             <KpiCard label="Permanenza media" value={`${formatDecimal(num(flussi.permanenza_media), 1)} gg`} />
             <KpiCard label="Quota stranieri" value={formatPercent(num(flussi.stranieri_pct))} />
           </div>
-          <p className="mt-3 mb-0 text-sm text-[#5b6f82]">
-            Arrivi IT {formatInteger(num(flussi.arrivi_italiani))} / EST {formatInteger(num(flussi.arrivi_stranieri))} ·
-            Presenze IT {formatInteger(num(flussi.presenze_italiane))} / EST {formatInteger(num(flussi.presenze_straniere))}
-          </p>
+            <p className="mb-0 mt-2.5 text-xs text-[#5b6f82] sm:mt-3 sm:text-sm">
+              Arrivi IT {formatInteger(num(flussi.arrivi_italiani))} / EST {formatInteger(num(flussi.arrivi_stranieri))} ·
+              Presenze IT {formatInteger(num(flussi.presenze_italiane))} / EST {formatInteger(num(flussi.presenze_straniere))}
+            </p>
         </div>
       ) : null}
 
-      <p className="mt-4 text-sm text-[#5b6f82]">
+      <p className="mt-3 text-xs text-[#5b6f82] sm:mt-4 sm:text-sm">
         Nota: la tassa/imposta di soggiorno non è disponibile in queste fonti.
       </p>
     </section>
@@ -452,7 +453,7 @@ function Economia({ kpi }: { kpi: Kpi }) {
   return (
     <section>
       <SectionIntro title="Economia & Lavoro" description="Redditi MEF (serie e fasce), profilo occupazionale/istruzione ISTAT e imprese ASIA con ATECO." />
-      <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
         <KpiCard label="Tasso occupazione" value={valueOrMissing(lavoro?.tasso_occupazione, formatPercent)} hint={lavoroExt ? `${formatInteger(num(lavoroExt.occupati_n))} occupati` : undefined} />
         <KpiCard label="Tasso disoccupazione" value={valueOrMissing(lavoro?.tasso_disoccupazione, formatPercent)} hint={lavoroExt ? `${formatInteger(num(lavoroExt.in_cerca_n))} in cerca` : undefined} />
         <KpiCard label="Tasso di attività" value={valueOrMissing(lavoro?.tasso_attivita, formatPercent)} />
@@ -465,7 +466,7 @@ function Economia({ kpi }: { kpi: Kpi }) {
 
       {loading ? <LoadingBlock /> : null}
 
-      <div className="mb-4 grid gap-4 lg:grid-cols-2">
+      <div className="mb-4 grid gap-3 sm:gap-4 lg:grid-cols-2">
         {trend.length > 0 ? (
           <div className="panel">
             <h3>Trend reddito medio MEF</h3>
@@ -489,7 +490,7 @@ function Economia({ kpi }: { kpi: Kpi }) {
         ) : null}
       </div>
 
-      <div className="mb-4 grid gap-4 lg:grid-cols-2">
+      <div className="mb-4 grid gap-3 sm:gap-4 lg:grid-cols-2">
         {serie && Array.isArray(serie.anni) ? (
           <div className="panel">
             <h3>Serie storica unità locali ASIA</h3>
@@ -588,7 +589,7 @@ function Finanza({ kpi }: { kpi: Kpi }) {
   return (
     <section>
       <SectionIntro title="Finanza pubblica" description="SIOPE mensile, contratti ANAC, opere BDAP, PNRR e patrimonio immobiliare PA." />
-      <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
         <KpiCard label="Uscite SIOPE" value={valueOrMissing(siopeKpi?.totale_uscite_eur, formatEuroCompact)} hint={`${formatEuro(num(siopeKpi?.uscite_per_abitante_eur))} /ab.`} />
         <KpiCard label="Incassi SIOPE" value={valueOrMissing(siopeKpi?.totale_incassi_eur, formatEuroCompact)} hint={`${formatEuro(num(siopeKpi?.incassi_per_abitante_eur))} /ab.`} />
         <KpiCard label="Saldo cassa" value={valueOrMissing(siopeKpi?.saldo_cassa_eur, formatEuroCompact)} />
@@ -614,7 +615,7 @@ function Finanza({ kpi }: { kpi: Kpi }) {
         </div>
       ) : null}
 
-      <div className="mb-4 grid gap-4 lg:grid-cols-2">
+      <div className="mb-4 grid gap-3 sm:gap-4 lg:grid-cols-2">
         {topCpv.length > 0 ? (
           <div className="panel">
             <h3>Top CPV ANAC</h3>
@@ -638,7 +639,7 @@ function Finanza({ kpi }: { kpi: Kpi }) {
       {missioni.length > 0 ? (
         <div className="mb-4 panel">
           <h3>PNRR per missione</h3>
-          <ul className="space-y-2 text-sm">
+          <ul className="space-y-2 text-xs sm:text-sm">
             {missioni.map((m) => (
               <li key={String(m.missione)}>
                 <strong>{m.missione} — {m.descrizione}</strong>: {formatInteger(num(m.n_progetti))} progetti · {formatEuroCompact(num(m.tot_pnrr))}
@@ -650,23 +651,23 @@ function Finanza({ kpi }: { kpi: Kpi }) {
 
       {progettiPnrr.length > 0 ? (
         <div className="mb-4 overflow-x-auto panel p-0">
-          <h3 className="px-4 pt-4">Progetti PNRR</h3>
-          <table className="min-w-full text-left text-sm">
+          <h3 className="px-3 pt-3 sm:px-4 sm:pt-4">Progetti PNRR</h3>
+          <table className="min-w-full text-left text-xs sm:text-sm">
             <thead className="bg-[#e8f2fc] text-[#17324d]">
               <tr>
-                <th className="px-3 py-2">Titolo</th>
-                <th className="px-3 py-2">Stato</th>
-                <th className="px-3 py-2">Finanziamento</th>
-                <th className="px-3 py-2">Fine</th>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Titolo</th>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Stato</th>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Finanziamento</th>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Fine</th>
               </tr>
             </thead>
             <tbody>
               {progettiPnrr.map((p) => (
                 <tr key={String(p.cup)} className="border-t border-[#eef2f5]">
-                  <td className="px-3 py-2">{String(p.titolo)}</td>
-                  <td className="px-3 py-2">{String(p.stato_avanzamento ?? "—")}</td>
-                  <td className="px-3 py-2">{formatEuroCompact(num(p.finanziamento_pnrr))}</td>
-                  <td className="px-3 py-2">{String(p.data_fine_effettiva ?? p.data_fine_prevista ?? "—")}</td>
+                  <td className="px-2 py-1.5 sm:px-3 sm:py-2">{String(p.titolo)}</td>
+                  <td className="px-2 py-1.5 sm:px-3 sm:py-2">{String(p.stato_avanzamento ?? "—")}</td>
+                  <td className="px-2 py-1.5 sm:px-3 sm:py-2">{formatEuroCompact(num(p.finanziamento_pnrr))}</td>
+                  <td className="px-2 py-1.5 sm:px-3 sm:py-2">{String(p.data_fine_effettiva ?? p.data_fine_prevista ?? "—")}</td>
                 </tr>
               ))}
             </tbody>
@@ -676,23 +677,23 @@ function Finanza({ kpi }: { kpi: Kpi }) {
 
       {progettiOpere.length > 0 ? (
         <div className="mb-4 overflow-x-auto panel p-0">
-          <h3 className="px-4 pt-4">Opere BDAP (campione)</h3>
-          <table className="min-w-full text-left text-sm">
+          <h3 className="px-3 pt-3 sm:px-4 sm:pt-4">Opere BDAP (campione)</h3>
+          <table className="min-w-full text-left text-xs sm:text-sm">
             <thead className="bg-[#e8f2fc] text-[#17324d]">
               <tr>
-                <th className="px-3 py-2">Descrizione</th>
-                <th className="px-3 py-2">Settore</th>
-                <th className="px-3 py-2">Stato</th>
-                <th className="px-3 py-2">Costo prev.</th>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Descrizione</th>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Settore</th>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Stato</th>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Costo prev.</th>
               </tr>
             </thead>
             <tbody>
               {progettiOpere.slice(0, 20).map((p) => (
                 <tr key={String(p.cup)} className="border-t border-[#eef2f5]">
-                  <td className="px-3 py-2 max-w-md">{String(p.descrizione)}</td>
-                  <td className="px-3 py-2">{String(p.settore ?? "—")}</td>
-                  <td className="px-3 py-2">{String(p.stato ?? "—")}</td>
-                  <td className="px-3 py-2">{formatEuroCompact(num(p.costo_prev))}</td>
+                  <td className="max-w-md px-2 py-1.5 sm:px-3 sm:py-2">{String(p.descrizione)}</td>
+                  <td className="px-2 py-1.5 sm:px-3 sm:py-2">{String(p.settore ?? "—")}</td>
+                  <td className="px-2 py-1.5 sm:px-3 sm:py-2">{String(p.stato ?? "—")}</td>
+                  <td className="px-2 py-1.5 sm:px-3 sm:py-2">{formatEuroCompact(num(p.costo_prev))}</td>
                 </tr>
               ))}
             </tbody>
@@ -739,7 +740,7 @@ function Territorio({ kpi }: { kpi: Kpi }) {
   return (
     <section>
       <SectionIntro title="Territorio & Ambiente" description="Suolo, rifiuti, rischio idrogeologico, sismica e morfologia CNR-IRPI." />
-      <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
         <KpiCard label="Superficie" value={valueOrMissing(ambiente?.superficie_kmq, (v) => `${formatDecimal(v, 2)} km²`)} />
         <KpiCard label="Consumo di suolo" value={valueOrMissing(ambiente?.consumo_suolo_pct, formatPercent)} hint={suolo ? `${formatDecimal(num(asRecord(suolo.stock_2024)?.ha), 1)} ha` : undefined} />
         <KpiCard label="Raccolta differenziata" value={valueOrMissing(ambiente?.raccolta_differenziata_pct, formatPercent)} />
@@ -756,7 +757,7 @@ function Territorio({ kpi }: { kpi: Kpi }) {
 
       {loading ? <LoadingBlock /> : null}
 
-      <div className="mb-4 grid gap-4 lg:grid-cols-2">
+      <div className="mb-4 grid gap-3 sm:gap-4 lg:grid-cols-2">
         {serieRifiuti.length > 0 ? (
           <div className="panel">
             <h3>Serie raccolta differenziata</h3>
@@ -780,7 +781,7 @@ function Territorio({ kpi }: { kpi: Kpi }) {
         ) : null}
       </div>
 
-      <div className="mb-4 grid gap-4 lg:grid-cols-2">
+      <div className="mb-4 grid gap-3 sm:gap-4 lg:grid-cols-2">
         {alluvioni ? (
           <div className="panel">
             <h3>Rischio alluvioni (popolazione esposta)</h3>
@@ -788,7 +789,7 @@ function Territorio({ kpi }: { kpi: Kpi }) {
               labels={["P3 alto", "P2 medio", "P1 basso"]}
               datasets={[{ label: "Abitanti", data: [num(alluvioni.pop_p3) ?? 0, num(alluvioni.pop_p2) ?? 0, num(alluvioni.pop_p1) ?? 0], color: "#0066CC" }]}
             />
-            <p className="mt-2 text-xs text-[#5b6f82]">
+            <p className="mt-2 text-[11px] text-[#5b6f82] sm:text-xs">
               Area P3 {formatDecimal(num(alluvioni.ar_p3_kmq), 2)} km² · P2 {formatDecimal(num(alluvioni.ar_p2_kmq), 2)} km² · P1 {formatDecimal(num(alluvioni.ar_p1_kmq), 2)} km²
             </p>
           </div>
@@ -796,7 +797,7 @@ function Territorio({ kpi }: { kpi: Kpi }) {
         {frane ? (
           <div className="panel">
             <h3>Rischio frane</h3>
-            <ul className="space-y-1 text-sm">
+            <ul className="space-y-1 text-xs sm:text-sm">
               <li>Area P3+P4: {formatDecimal(num(frane.ar_p3p4_kmq), 2)} km² ({formatPercent(num(frane.ar_p3p4_pct))})</li>
               <li>Popolazione P3+P4: {formatInteger(num(frane.pop_p3p4))} ({formatPercent(num(frane.pop_p3p4_pct))})</li>
               <li>Edifici P3+P4: {formatInteger(num(frane.ed_p3p4))}</li>
@@ -805,7 +806,7 @@ function Territorio({ kpi }: { kpi: Kpi }) {
         ) : null}
       </div>
 
-      <div className="mb-4 grid gap-4 lg:grid-cols-2">
+      <div className="mb-4 grid gap-3 sm:gap-4 lg:grid-cols-2">
         {aspect ? (
           <div className="panel">
             <h3>Esposizione versanti (%)</h3>
@@ -873,7 +874,7 @@ function Infra({ kpi }: { kpi: Kpi }) {
   return (
     <section>
       <SectionIntro title="Infrastrutture & Mobilità" description="Banda larga, EV, veicoli, incidenti, pendolarismo e carburanti." />
-      <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
         <KpiCard label="Copertura FTTH" value={valueOrMissing(banda?.copertura_ftth_pct ?? asRecord(agcom?.kpi)?.copertura_ftth_desi_pct, formatPercent)} hint={`FTTH 20m ${formatPercent(num(banda?.copertura_ftth_20m_pct ?? asRecord(agcom?.kpi)?.copertura_ftth_20m_pct))}`} />
         <KpiCard label="Punti ricarica EV" value={valueOrMissing(punKpi?.n_totale, formatInteger)} hint={`${formatInteger(num(punKpi?.n_attivi))} attivi · ${formatDecimal(num(punKpi?.potenza_tot_kw ?? punKpi?.potenza_totale_kw), 0)} kW`} />
         <KpiCard label="Veicoli" value={valueOrMissing(veicoli?.totale_veicoli ?? parco?.totale, formatInteger)} hint={`${formatDecimal(num(veicoli?.tasso_motorizzazione_per_1000_ab ?? parco?.tasso_motorizzazione_per_1000_ab), 0)} /1000 ab.`} />
@@ -886,7 +887,7 @@ function Infra({ kpi }: { kpi: Kpi }) {
 
       {loading ? <LoadingBlock /> : null}
 
-      <div className="mb-4 grid gap-4 lg:grid-cols-2">
+      <div className="mb-4 grid gap-3 sm:gap-4 lg:grid-cols-2">
         {mixPotenza ? (
           <div className="panel">
             <h3>Mix potenza punti EV</h3>
@@ -930,7 +931,7 @@ function Infra({ kpi }: { kpi: Kpi }) {
         </div>
       ) : null}
 
-      <div className="mb-4 grid gap-4 lg:grid-cols-2">
+      <div className="mb-4 grid gap-3 sm:gap-4 lg:grid-cols-2">
         {topDest.length > 0 ? (
           <div className="panel">
             <h3>Top destinazioni pendolari</h3>
@@ -953,15 +954,15 @@ function Infra({ kpi }: { kpi: Kpi }) {
 
       {impianti.length > 0 ? (
         <div className="overflow-x-auto panel p-0">
-          <h3 className="px-4 pt-4">Impianti carburanti</h3>
-          <table className="min-w-full text-left text-sm">
+          <h3 className="px-3 pt-3 sm:px-4 sm:pt-4">Impianti carburanti</h3>
+          <table className="min-w-full text-left text-xs sm:text-sm">
             <thead className="bg-[#e8f2fc]">
               <tr>
-                <th className="px-3 py-2">Impianto</th>
-                <th className="px-3 py-2">Bandiera</th>
-                <th className="px-3 py-2">Benzina self</th>
-                <th className="px-3 py-2">Gasolio self</th>
-                <th className="px-3 py-2">Aggiornato</th>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Impianto</th>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Bandiera</th>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Benzina self</th>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Gasolio self</th>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Aggiornato</th>
               </tr>
             </thead>
             <tbody>
@@ -969,15 +970,15 @@ function Infra({ kpi }: { kpi: Kpi }) {
                 const prezzi = asRecord(p.prezzi);
                 return (
                   <tr key={String(p.name)} className="border-t border-[#eef2f5]">
-                    <td className="px-3 py-2">
+                    <td className="px-2 py-1.5 sm:px-3 sm:py-2">
                       <strong>{String(p.name)}</strong>
                       <br />
                       <span className="text-[#5b6f82]">{String(p.indirizzo ?? "")}</span>
                     </td>
-                    <td className="px-3 py-2">{String(p.brand ?? "")}</td>
-                    <td className="px-3 py-2">{prezzi?.benzina_self != null ? formatDecimal(num(prezzi.benzina_self), 3) : "—"}</td>
-                    <td className="px-3 py-2">{prezzi?.gasolio_self != null ? formatDecimal(num(prezzi.gasolio_self), 3) : "—"}</td>
-                    <td className="px-3 py-2">{String(p.ultimo_aggiornamento ?? "—")}</td>
+                    <td className="px-2 py-1.5 sm:px-3 sm:py-2">{String(p.brand ?? "")}</td>
+                    <td className="px-2 py-1.5 sm:px-3 sm:py-2">{prezzi?.benzina_self != null ? formatDecimal(num(prezzi.benzina_self), 3) : "—"}</td>
+                    <td className="px-2 py-1.5 sm:px-3 sm:py-2">{prezzi?.gasolio_self != null ? formatDecimal(num(prezzi.gasolio_self), 3) : "—"}</td>
+                    <td className="px-2 py-1.5 sm:px-3 sm:py-2">{String(p.ultimo_aggiornamento ?? "—")}</td>
                   </tr>
                 );
               })}
@@ -1011,7 +1012,7 @@ function Sanita({ kpi }: { kpi: Kpi }) {
   return (
     <section>
       <SectionIntro title="Sanità & Terzo settore" description="Farmacie/parafarmacie Ministero della Salute ed enti RUNTS." />
-      <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
         <KpiCard label="Farmacie" value={valueOrMissing(sanita?.n_farmacie, formatInteger)} />
         <KpiCard label="Parafarmacie" value={valueOrMissing(sanita?.n_parafarmacie, formatInteger)} />
         <KpiCard label="Ospedali" value="dato non disponibile" unavailable={ospedali == null && sanita?.n_ospedali == null} />
@@ -1020,7 +1021,7 @@ function Sanita({ kpi }: { kpi: Kpi }) {
 
       {loading ? <LoadingBlock /> : null}
 
-      <div className="mb-4 grid gap-4 lg:grid-cols-2">
+      <div className="mb-4 grid gap-3 sm:gap-4 lg:grid-cols-2">
         {mix ? (
           <div className="panel">
             <h3>Mix sezioni RUNTS</h3>
@@ -1041,7 +1042,7 @@ function Sanita({ kpi }: { kpi: Kpi }) {
       {(farmacie.length > 0 || para.length > 0) ? (
         <div className="mb-4 panel">
           <h3>Farmacie e parafarmacie</h3>
-          <ul className="space-y-2 text-sm">
+          <ul className="space-y-2 text-xs sm:text-sm">
             {[...farmacie, ...para].map((p) => (
               <li key={String(p.nome)}>
                 <strong>{String(p.nome)}</strong>
@@ -1056,25 +1057,25 @@ function Sanita({ kpi }: { kpi: Kpi }) {
 
       {enti.length > 0 ? (
         <div className="overflow-x-auto panel p-0">
-          <h3 className="px-4 pt-4">Elenco enti RUNTS</h3>
-          <table className="min-w-full text-left text-sm">
+          <h3 className="px-3 pt-3 sm:px-4 sm:pt-4">Elenco enti RUNTS</h3>
+          <table className="min-w-full text-left text-xs sm:text-sm">
             <thead className="bg-[#e8f2fc] text-[#17324d]">
               <tr>
-                <th className="px-3 py-2">Denominazione</th>
-                <th className="px-3 py-2">Sezione</th>
-                <th className="px-3 py-2">Rappresentante</th>
-                <th className="px-3 py-2">5x1000</th>
-                <th className="px-3 py-2">Iscrizione</th>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Denominazione</th>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Sezione</th>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Rappresentante</th>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">5x1000</th>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Iscrizione</th>
               </tr>
             </thead>
             <tbody>
               {enti.map((e) => (
                 <tr key={e.denom} className="border-t border-[#eef2f5]">
-                  <td className="px-3 py-2">{e.denom}</td>
-                  <td className="px-3 py-2">{e.sez}</td>
-                  <td className="px-3 py-2">{e.rapp ?? "—"}</td>
-                  <td className="px-3 py-2">{e.x1000 ? "Sì" : "No"}</td>
-                  <td className="px-3 py-2">{e.data_iscr ?? "—"}</td>
+                  <td className="px-2 py-1.5 sm:px-3 sm:py-2">{e.denom}</td>
+                  <td className="px-2 py-1.5 sm:px-3 sm:py-2">{e.sez}</td>
+                  <td className="px-2 py-1.5 sm:px-3 sm:py-2">{e.rapp ?? "—"}</td>
+                  <td className="px-2 py-1.5 sm:px-3 sm:py-2">{e.x1000 ? "Sì" : "No"}</td>
+                  <td className="px-2 py-1.5 sm:px-3 sm:py-2">{e.data_iscr ?? "—"}</td>
                 </tr>
               ))}
             </tbody>
@@ -1157,21 +1158,21 @@ function Meteo({ kpi }: { kpi: Kpi }) {
         title="Meteo"
         description="Condizioni live (ItaliaMeteo/Cineca + Open-Meteo), previsioni orarie/giornaliere e radar precipitazioni RainViewer su mappa."
       />
-      <div className="mb-3 flex items-center gap-3">
+      <div className="mb-3 flex flex-wrap items-center gap-2 sm:gap-3">
         <button
           type="button"
           onClick={() => void load()}
-          className="rounded-full bg-[#0066CC] px-4 py-2 text-sm font-semibold text-white"
+          className="rounded-full bg-[#0066CC] px-3 py-1.5 text-xs font-semibold text-white sm:px-4 sm:py-2 sm:text-sm"
         >
           Aggiorna ora
         </button>
         {loading ? (
-          <span className="text-sm text-[#5b6f82]">Aggiornamento…</span>
+          <span className="text-xs text-[#5b6f82] sm:text-sm">Aggiornamento…</span>
         ) : null}
       </div>
       {error ? <DataUnavailable message={error} /> : null}
 
-      <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
         <KpiCard
           label="Temperatura"
           value={valueOrMissing(
@@ -1245,7 +1246,7 @@ function Meteo({ kpi }: { kpi: Kpi }) {
       </div>
 
       {hourlyLabels.length > 0 ? (
-        <div className="mb-4 grid gap-4 lg:grid-cols-2">
+        <div className="mb-4 grid gap-3 sm:gap-4 lg:grid-cols-2">
           <div className="panel">
             <h3>Temperatura prossime 48 ore</h3>
             <LineChart
@@ -1301,23 +1302,23 @@ function Meteo({ kpi }: { kpi: Kpi }) {
             />
           </div>
           <div className="overflow-x-auto">
-            <table className="min-w-full text-left text-sm">
+            <table className="min-w-full text-left text-xs sm:text-sm">
               <thead className="bg-[#e8f2fc] text-[#17324d]">
                 <tr>
-                  <th className="px-3 py-2">Giorno</th>
-                  <th className="px-3 py-2">Condizioni</th>
-                  <th className="px-3 py-2">Min/Max</th>
-                  <th className="px-3 py-2">Pioggia</th>
-                  <th className="px-3 py-2">Prob.</th>
-                  <th className="px-3 py-2">Vento max</th>
+                  <th className="px-2 py-1.5 sm:px-3 sm:py-2">Giorno</th>
+                  <th className="px-2 py-1.5 sm:px-3 sm:py-2">Condizioni</th>
+                  <th className="px-2 py-1.5 sm:px-3 sm:py-2">Min/Max</th>
+                  <th className="px-2 py-1.5 sm:px-3 sm:py-2">Pioggia</th>
+                  <th className="px-2 py-1.5 sm:px-3 sm:py-2">Prob.</th>
+                  <th className="px-2 py-1.5 sm:px-3 sm:py-2">Vento max</th>
                 </tr>
               </thead>
               <tbody>
                 {dailyLabels.map((label, i) => (
                   <tr key={label} className="border-t border-[#eef2f5]">
-                    <td className="px-3 py-2 font-semibold">{label}</td>
-                    <td className="px-3 py-2">{dailyDesc[i] ?? "—"}</td>
-                    <td className="px-3 py-2">
+                    <td className="px-2 py-1.5 font-semibold sm:px-3 sm:py-2">{label}</td>
+                    <td className="px-2 py-1.5 sm:px-3 sm:py-2">{dailyDesc[i] ?? "—"}</td>
+                    <td className="px-2 py-1.5 sm:px-3 sm:py-2">
                       {formatDecimal(
                         num((daily?.temperature_2m_min as number[])?.[i]),
                         1,
@@ -1329,14 +1330,14 @@ function Meteo({ kpi }: { kpi: Kpi }) {
                       )}{" "}
                       °C
                     </td>
-                    <td className="px-3 py-2">
+                    <td className="px-2 py-1.5 sm:px-3 sm:py-2">
                       {formatDecimal(
                         num((daily?.precipitation_sum as number[])?.[i]),
                         1,
                       )}{" "}
                       mm
                     </td>
-                    <td className="px-3 py-2">
+                    <td className="px-2 py-1.5 sm:px-3 sm:py-2">
                       {formatPercent(
                         num(
                           (daily?.precipitation_probability_max as number[])?.[
@@ -1345,7 +1346,7 @@ function Meteo({ kpi }: { kpi: Kpi }) {
                         ),
                       )}
                     </td>
-                    <td className="px-3 py-2">
+                    <td className="px-2 py-1.5 sm:px-3 sm:py-2">
                       {formatDecimal(
                         num((daily?.wind_speed_10m_max as number[])?.[i]),
                         0,
@@ -1362,7 +1363,7 @@ function Meteo({ kpi }: { kpi: Kpi }) {
         <LoadingBlock label="Caricamento previsioni Open-Meteo…" />
       ) : null}
 
-      <p className="mt-2 text-xs text-[#5b6f82]">
+      <p className="mt-2 text-[11px] text-[#5b6f82] sm:text-xs">
         Fonti aggiuntive:{" "}
         <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer" className="underline">
           Open-Meteo
