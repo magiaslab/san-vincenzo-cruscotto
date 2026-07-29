@@ -1,9 +1,20 @@
+import type { Metadata } from "next";
 import { DashboardTabs } from "@/components/DashboardTabs";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { getCachedKpi } from "@/lib/dashboard";
+import { SITE_DESCRIPTION, SITE_TITLE_DEFAULT, absoluteUrl } from "@/lib/seo";
 
 export const revalidate = 86400;
+
+export const metadata: Metadata = {
+  title: { absolute: SITE_TITLE_DEFAULT },
+  description: SITE_DESCRIPTION,
+  alternates: { canonical: "/" },
+  openGraph: {
+    url: absoluteUrl("/"),
+  },
+};
 
 export default async function Home() {
   let kpi: Record<string, unknown> = {};
