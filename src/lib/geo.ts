@@ -197,5 +197,41 @@ export function buildMapLayers(
     };
   }
 
+  const carburanti = dashboard.carburanti as
+    | {
+        punti?: Array<{
+          lat?: number;
+          lon?: number;
+          name?: string;
+          brand?: string;
+          tipo?: string;
+          indirizzo?: string;
+          prezzi?: Record<string, unknown>;
+          ultimo_aggiornamento?: string;
+        }>;
+      }
+    | undefined;
+
+  if (carburanti?.punti?.length) {
+    const features = carburanti.punti
+      .map((p) =>
+        pointFeature(p.lon as number, p.lat as number, {
+          layer: "carburanti",
+          nome: p.name,
+          brand: p.brand,
+          tipo: p.tipo,
+          indirizzo: p.indirizzo,
+          prezzi: p.prezzi,
+          aggiornato: p.ultimo_aggiornamento,
+        }),
+      )
+      .filter(Boolean) as GeoFeature[];
+    layers.carburanti = {
+      type: "FeatureCollection",
+      features,
+      meta: { total: features.length },
+    };
+  }
+
   return layers;
 }

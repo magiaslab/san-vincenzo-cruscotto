@@ -90,11 +90,19 @@ const PunIdrMap = dynamic(
   },
 );
 
-const BandaUltralargaMap = dynamic(
-  () => import("@/components/InfraExtras").then((m) => m.BandaUltralargaMap),
+const CarburantiMap = dynamic(
+  () => import("@/components/InfraExtras").then((m) => m.CarburantiMap),
   {
     ssr: false,
-    loading: () => <LoadingBlock label="Caricamento mappa fibra…" />,
+    loading: () => <LoadingBlock label="Caricamento mappa carburanti…" />,
+  },
+);
+
+const BandaUltralargaPanel = dynamic(
+  () => import("@/components/InfraExtras").then((m) => m.BandaUltralargaPanel),
+  {
+    ssr: false,
+    loading: () => <LoadingBlock label="Caricamento copertura FTTH…" />,
   },
 );
 
@@ -1399,6 +1407,96 @@ function Infra({ kpi }: { kpi: Kpi }) {
         <KpiCard label="Impianti carburanti" value={valueOrMissing(carbKpi?.n_impianti ?? asRecord(kpi.carburanti_mimit)?.n_impianti, formatInteger)} />
       </div>
 
+      <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
+        <KpiCard
+          label="Benzina self media"
+          value={valueOrMissing(
+            prezzoMedio?.benzina_self ??
+              asRecord(kpi.carburanti_mimit)?.prezzo_medio_benzina_self,
+            (v) => `${formatDecimal(v, 3)} €/L`,
+          )}
+          icon={Car}
+        />
+        <KpiCard
+          label="Gasolio self media"
+          value={valueOrMissing(prezzoMedio?.gasolio_self, (v) => `${formatDecimal(v, 3)} €/L`)}
+          icon={Car}
+        />
+        <KpiCard
+          label="Miglior benzina self"
+          value={valueOrMissing(bestBenzina, (v) => `${formatDecimal(v, 3)} €/L`)}
+          hint="Prezzo più basso nel comune"
+          variant="success"
+        />
+        <KpiCard
+          label="Miglior gasolio self"
+          value={valueOrMissing(bestGasolio, (v) => `${formatDecimal(v, 3)} €/L`)}
+          hint="Prezzo più basso nel comune"
+          variant="success"
+        />
+      </div>
+
+      {impiantiOrdinati.length > 0 ? (
+        <div className="mb-4 overflow-x-auto panel p-0">
+          <div className="flex flex-wrap items-end justify-between gap-2 px-3 pt-3 sm:px-4 sm:pt-4">
+            <div>
+              <h3 className="m-0">Impianti carburanti</h3>
+              <p className="mb-0 mt-1 text-xs text-[#5b6f82] sm:text-sm">
+                Ordinati per benzina self crescente. Badge verde = prezzo migliore
+                tra gli impianti del comune.
+              </p>
+            </div>
+          </div>
+          <table className="mt-2 min-w-full text-left text-xs sm:text-sm">
+            <thead className="bg-[#e8f2fc]">
+              <tr>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Impianto</th>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Bandiera</th>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Benzina self</th>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Gasolio self</th>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Aggiornato</th>
+              </tr>
+            </thead>
+            <tbody>
+              {impiantiOrdinati.map((p) => {
+                const prezzi = asRecord(p.prezzi);
+                const benzina = num(prezzi?.benzina_self);
+                const gasolio = num(prezzi?.gasolio_self);
+                const isBestBenzina =
+                  benzina != null && bestBenzina != null && benzina === bestBenzina;
+                const isBestGasolio =
+                  gasolio != null && bestGasolio != null && gasolio === bestGasolio;
+                return (
+                  <tr
+                    key={String(p.name)}
+                    className={`border-t border-[#eef2f5] ${
+                      isBestBenzina || isBestGasolio ? "bg-[#f0faf4]" : ""
+                    }`}
+                  >
+                    <td className="px-2 py-1.5 sm:px-3 sm:py-2">
+                      <strong>{String(p.name)}</strong>
+                      <br />
+                      <span className="text-[#5b6f82]">{String(p.indirizzo ?? "")}</span>
+                    </td>
+                    <td className="px-2 py-1.5 sm:px-3 sm:py-2">{String(p.brand ?? "")}</td>
+                    <td className="px-2 py-1.5 sm:px-3 sm:py-2">
+                      <FuelPriceCell value={benzina} isBest={isBestBenzina} />
+                    </td>
+                    <td className="px-2 py-1.5 sm:px-3 sm:py-2">
+                      <FuelPriceCell value={gasolio} isBest={isBestGasolio} />
+                    </td>
+                    <td className="px-2 py-1.5 sm:px-3 sm:py-2">{String(p.ultimo_aggiornamento ?? "—")}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          <p className="m-0 border-t border-[#eef2f5] px-3 py-2 text-xs text-[#5b6f82] sm:px-4">
+            Fonte prezzi: MIMIT / Osservatorio carburanti via Cruscotto Italia.
+          </p>
+        </div>
+      ) : null}
+
       {loading ? <LoadingBlock /> : null}
 
       <div className="mb-4 grid gap-3 sm:gap-4 lg:grid-cols-2">
@@ -1471,98 +1569,19 @@ function Infra({ kpi }: { kpi: Kpi }) {
       </div>
 
       <div className="mb-4">
-        <BandaUltralargaMap />
+        <CarburantiMap />
       </div>
 
-      <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
-        <KpiCard
-          label="Benzina self media"
-          value={valueOrMissing(
-            prezzoMedio?.benzina_self ??
-              asRecord(kpi.carburanti_mimit)?.prezzo_medio_benzina_self,
-            (v) => `${formatDecimal(v, 3)} €/L`,
+      <div className="mb-4">
+        <BandaUltralargaPanel
+          ftthPct={num(
+            banda?.copertura_ftth_pct ?? asRecord(agcom?.kpi)?.copertura_ftth_desi_pct,
           )}
-          icon={Car}
-        />
-        <KpiCard
-          label="Gasolio self media"
-          value={valueOrMissing(prezzoMedio?.gasolio_self, (v) => `${formatDecimal(v, 3)} €/L`)}
-          icon={Car}
-        />
-        <KpiCard
-          label="Miglior benzina self"
-          value={valueOrMissing(bestBenzina, (v) => `${formatDecimal(v, 3)} €/L`)}
-          hint="Prezzo più basso nel comune"
-          variant="success"
-        />
-        <KpiCard
-          label="Miglior gasolio self"
-          value={valueOrMissing(bestGasolio, (v) => `${formatDecimal(v, 3)} €/L`)}
-          hint="Prezzo più basso nel comune"
-          variant="success"
+          ftth20mPct={num(
+            banda?.copertura_ftth_20m_pct ?? asRecord(agcom?.kpi)?.copertura_ftth_20m_pct,
+          )}
         />
       </div>
-
-      {impiantiOrdinati.length > 0 ? (
-        <div className="overflow-x-auto panel p-0">
-          <div className="flex flex-wrap items-end justify-between gap-2 px-3 pt-3 sm:px-4 sm:pt-4">
-            <div>
-              <h3 className="m-0">Impianti carburanti</h3>
-              <p className="mb-0 mt-1 text-xs text-[#5b6f82] sm:text-sm">
-                Ordinati per benzina self crescente. Badge verde = prezzo migliore
-                tra gli impianti del comune.
-              </p>
-            </div>
-          </div>
-          <table className="mt-2 min-w-full text-left text-xs sm:text-sm">
-            <thead className="bg-[#e8f2fc]">
-              <tr>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Impianto</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Bandiera</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Benzina self</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Gasolio self</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Aggiornato</th>
-              </tr>
-            </thead>
-            <tbody>
-              {impiantiOrdinati.map((p) => {
-                const prezzi = asRecord(p.prezzi);
-                const benzina = num(prezzi?.benzina_self);
-                const gasolio = num(prezzi?.gasolio_self);
-                const isBestBenzina =
-                  benzina != null && bestBenzina != null && benzina === bestBenzina;
-                const isBestGasolio =
-                  gasolio != null && bestGasolio != null && gasolio === bestGasolio;
-                return (
-                  <tr
-                    key={String(p.name)}
-                    className={`border-t border-[#eef2f5] ${
-                      isBestBenzina || isBestGasolio ? "bg-[#f0faf4]" : ""
-                    }`}
-                  >
-                    <td className="px-2 py-1.5 sm:px-3 sm:py-2">
-                      <strong>{String(p.name)}</strong>
-                      <br />
-                      <span className="text-[#5b6f82]">{String(p.indirizzo ?? "")}</span>
-                    </td>
-                    <td className="px-2 py-1.5 sm:px-3 sm:py-2">{String(p.brand ?? "")}</td>
-                    <td className="px-2 py-1.5 sm:px-3 sm:py-2">
-                      <FuelPriceCell value={benzina} isBest={isBestBenzina} />
-                    </td>
-                    <td className="px-2 py-1.5 sm:px-3 sm:py-2">
-                      <FuelPriceCell value={gasolio} isBest={isBestGasolio} />
-                    </td>
-                    <td className="px-2 py-1.5 sm:px-3 sm:py-2">{String(p.ultimo_aggiornamento ?? "—")}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-          <p className="m-0 border-t border-[#eef2f5] px-3 py-2 text-xs text-[#5b6f82] sm:px-4">
-            Fonte prezzi: MIMIT / Osservatorio carburanti via Cruscotto Italia.
-          </p>
-        </div>
-      ) : null}
     </section>
   );
 }
