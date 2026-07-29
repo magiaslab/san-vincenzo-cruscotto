@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { LoadingBlock, SectionIntro, SolidButton } from "@/components/ui";
+import { LoadingBlock, SectionIntro } from "@/components/ui";
 
 type Source = {
   title?: string;
@@ -145,12 +145,14 @@ export default function AssistenteChat() {
               disabled={loading}
             />
           </label>
-          <SolidButton
-            onClick={() => void ask(input)}
+          <button
+            type="submit"
             disabled={loading || !input.trim()}
+            className="inline-flex min-h-11 items-center justify-center rounded-lg bg-[var(--pa-primary)] px-4 text-sm font-semibold text-white hover:bg-[var(--pa-primary-hover)] disabled:opacity-50"
+            style={{ color: "#ffffff" }}
           >
             Chiedi
-          </SolidButton>
+          </button>
         </form>
       </div>
 
