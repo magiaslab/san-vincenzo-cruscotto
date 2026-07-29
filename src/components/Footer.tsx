@@ -1,9 +1,16 @@
 import {
+  ARPAT_BALNEAZIONE_URL,
+  ARPAT_OPENDATA_URL,
   AUTHOR,
+  CARTO_ATTRIBUTION_URL,
   COMUNE_NOME,
   COMUNE_PROVINCIA,
   CRUSCOTTO_ITALIA_URL,
+  MINISTERO_CULTURA_URL,
+  OPEN_METEO_ATTRIBUTION_URL,
   OSM_COPYRIGHT_URL,
+  RAINVIEWER_ATTRIBUTION_URL,
+  REGIONE_TOSCANA_OPENDATA_URL,
   STEMMA,
 } from "@/lib/constants";
 
@@ -26,8 +33,8 @@ export function Footer() {
                   rel="noopener noreferrer"
                 >
                   Cruscotto Italia (AgID)
-                </a>
-                .
+                </a>{" "}
+                e altre fonti open data regionali e nazionali.
               </p>
               <p className="mb-0 text-sm">
                 Realizzato da{" "}
@@ -40,7 +47,9 @@ export function Footer() {
               </p>
             </div>
             <div>
-              <h3 className="mb-3 text-base font-bold text-white sm:text-lg">Attribuzioni</h3>
+              <h3 className="mb-3 text-base font-bold text-white sm:text-lg">
+                Attribuzioni
+              </h3>
               <ul className="list-none space-y-2 p-0 text-sm opacity-90">
                 <li>
                   ©{" "}
@@ -51,6 +60,16 @@ export function Footer() {
                     rel="noopener noreferrer"
                   >
                     OpenStreetMap contributors
+                  </a>
+                  {" · "}
+                  Basemap{" "}
+                  <a
+                    className="text-white text-decoration-underline"
+                    href={CARTO_ATTRIBUTION_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    CARTO
                   </a>
                 </li>
                 <li>
@@ -68,7 +87,7 @@ export function Footer() {
                   Previsioni:{" "}
                   <a
                     className="text-white text-decoration-underline"
-                    href="https://open-meteo.com/"
+                    href={OPEN_METEO_ATTRIBUTION_URL}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -78,14 +97,51 @@ export function Footer() {
                   Radar:{" "}
                   <a
                     className="text-white text-decoration-underline"
-                    href="https://www.rainviewer.com/"
+                    href={RAINVIEWER_ATTRIBUTION_URL}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
                     RainViewer
                   </a>
                 </li>
-                <li>Licenza contenuti dati: CC-BY 4.0 (ove non diversamente indicato).</li>
+                <li>
+                  Ambiente:{" "}
+                  <a
+                    className="text-white text-decoration-underline"
+                    href={ARPAT_OPENDATA_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    ARPAT
+                  </a>{" "}
+                  (balneazione, aria)
+                </li>
+                <li>
+                  Eventi e portualità:{" "}
+                  <a
+                    className="text-white text-decoration-underline"
+                    href={REGIONE_TOSCANA_OPENDATA_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Regione Toscana Open Data
+                  </a>
+                </li>
+                <li>
+                  Cultura:{" "}
+                  <a
+                    className="text-white text-decoration-underline"
+                    href={MINISTERO_CULTURA_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Ministero della Cultura
+                  </a>
+                </li>
+                <li>
+                  Licenza contenuti dati: CC-BY 4.0 (ove non diversamente
+                  indicato).
+                </li>
               </ul>
             </div>
           </div>
@@ -95,7 +151,7 @@ export function Footer() {
       <div className="it-footer-small-prints bg-[#00264d] text-white">
         <div className="mx-auto max-w-7xl space-y-3 px-4 py-4 text-sm opacity-90 sm:px-6">
           <p className="mb-0">
-            <strong>Dati:</strong> Cruscotto Italia (AgID) — fonti ANAC, BDAP-MOP,
+            <strong>Dati Cruscotto Italia (AgID):</strong> fonti ANAC, BDAP-MOP,
             SIOPE, Italia Domani, ISTAT, ISPRA, MIUR, ACI, MEF, GSE/MASE, AGCOM,
             MIMIT, Ministero del Lavoro, Ministero della Salute, Agenzia delle
             Entrate, Protezione Civile, ItaliaMeteo/Cineca. Licenza contenuti
@@ -108,6 +164,54 @@ export function Footer() {
             >
               cruscotto-italia.dati.gov.it
             </a>
+          </p>
+          <p className="mb-0">
+            <strong>Fonti aggiuntive:</strong>{" "}
+            <a
+              className="text-white text-decoration-underline"
+              href={ARPAT_BALNEAZIONE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              ARPAT
+            </a>{" "}
+            — acque di balneazione e qualità dell&apos;aria;{" "}
+            <a
+              className="text-white text-decoration-underline"
+              href={REGIONE_TOSCANA_OPENDATA_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Regione Toscana Open Data
+            </a>{" "}
+            — eventi culturali e portualità turistica;{" "}
+            <a
+              className="text-white text-decoration-underline"
+              href={MINISTERO_CULTURA_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Ministero della Cultura
+            </a>{" "}
+            — luoghi e beni culturali;{" "}
+            <a
+              className="text-white text-decoration-underline"
+              href={OPEN_METEO_ATTRIBUTION_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Open-Meteo
+            </a>{" "}
+            — previsioni;{" "}
+            <a
+              className="text-white text-decoration-underline"
+              href={RAINVIEWER_ATTRIBUTION_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              RainViewer
+            </a>{" "}
+            — radar precipitazioni; OpenStreetMap/CARTO — cartografia di base.
           </p>
           <p className="mb-0">
             <strong>Cruscotto Italia:</strong> Progettato e sviluppato da{" "}
@@ -134,7 +238,7 @@ export function Footer() {
             <strong>Progetto non ufficiale:</strong> Questo sito è un progetto
             indipendente, non affiliato ad AgID, al Governo italiano o al Comune
             di San Vincenzo. Utilizza dati pubblici aperti riaggregati dal
-            progetto Cruscotto Italia.
+            progetto Cruscotto Italia e dalle fonti citate.
           </p>
           <p className="mb-0">
             <strong>Accuratezza dei dati:</strong> I dati sono riportati così

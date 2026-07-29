@@ -79,8 +79,13 @@ export const COMUNI_LOOKUP: Record<string, string> = {
 export const SAN_VINCENZO_OPENDATA_URL = "https://cloud.ldpgis.it/sanvincenzoopen/";
 export const ARPAT_BASE_URL = "https://www.arpat.toscana.it";
 export const ARPAT_OPENDATA_URL = "https://www.arpat.toscana.it/opendata";
+export const ARPAT_BALNEAZIONE_URL =
+  "https://www.arpat.toscana.it/tema-ambientale/balneazione/";
+export const REGIONE_TOSCANA_OPENDATA_URL = "https://dati.toscana.it/";
 export const REGIONE_TOSCANA_CKAN_API = "https://dati.toscana.it/api/3/action";
+export const MINISTERO_CULTURA_URL = "https://dati.beniculturali.it/";
 export const MINISTERO_CULTURA_API = "https://opendata.beniculturali.it";
+export const CARTO_ATTRIBUTION_URL = "https://carto.com/";
 
 /** Codice comune per API Ministero Cultura */
 export const COMUNE_ISTAT_CULTURA = "049018";
