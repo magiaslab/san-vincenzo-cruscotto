@@ -2,8 +2,13 @@ import type { Metadata } from "next";
 import { DashboardTabs } from "@/components/DashboardTabs";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { JsonLd } from "@/components/JsonLd";
 import { getCachedKpi } from "@/lib/dashboard";
-import { SITE_DESCRIPTION, SITE_TITLE_DEFAULT, absoluteUrl } from "@/lib/seo";
+import {
+  SITE_DESCRIPTION,
+  SITE_TITLE_DEFAULT,
+  buildHomeJsonLd,
+} from "@/lib/seo";
 
 export const revalidate = 86400;
 
@@ -11,9 +16,8 @@ export const metadata: Metadata = {
   title: { absolute: SITE_TITLE_DEFAULT },
   description: SITE_DESCRIPTION,
   alternates: { canonical: "/" },
-  openGraph: {
-    url: absoluteUrl("/"),
-  },
+  // Non ridefinire openGraph qui: in Next.js sostituisce interamente
+  // quello del layout e fa sparire og:image (critico per i social).
 };
 
 export default async function Home() {
@@ -30,10 +34,12 @@ export default async function Home() {
 
   const generatedAt =
     typeof kpi._generated_at === "string" ? kpi._generated_at : null;
+  const homeJsonLd = <JsonLd data={buildHomeJsonLd()} />;
 
   if (error) {
     return (
       <>
+        {homeJsonLd}
         <Header generatedAt={generatedAt} />
         <main className="flex-1">
           <div className="mx-auto max-w-3xl px-4 py-8">
@@ -47,5 +53,10 @@ export default async function Home() {
     );
   }
 
-  return <DashboardTabs kpi={kpi} generatedAt={generatedAt} />;
+  return (
+    <>
+      {homeJsonLd}
+      <DashboardTabs kpi={kpi} generatedAt={generatedAt} />
+    </>
+  );
 }

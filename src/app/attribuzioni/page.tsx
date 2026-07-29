@@ -25,6 +25,7 @@ import {
   SITE_NAME,
   absoluteUrl,
   buildBreadcrumbJsonLd,
+  buildOgImages,
 } from "@/lib/seo";
 
 const ATTRIBUZIONI_DESCRIPTION =
@@ -41,11 +42,15 @@ export const metadata: Metadata = {
     description: ATTRIBUZIONI_DESCRIPTION,
     url: absoluteUrl("/attribuzioni"),
     type: "article",
+    siteName: SITE_NAME,
+    locale: "it_IT",
+    images: buildOgImages(`${SITE_NAME} — attribuzioni e regole`),
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: `Attribuzioni e regole | ${SITE_NAME}`,
     description: ATTRIBUZIONI_DESCRIPTION,
+    images: [absoluteUrl("/og-image.jpg")],
   },
   robots: {
     index: true,

@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Titillium_Web } from "next/font/google";
 import { CookieBanner } from "@/components/CookieBanner";
 import { InstallPrompt } from "@/components/InstallPrompt";
-import { JsonLd } from "@/components/JsonLd";
 import { Providers } from "@/components/Providers";
 import { PwaRegister } from "@/components/PwaRegister";
 import { AUTHOR, COMUNE_NOME } from "@/lib/constants";
@@ -12,7 +11,7 @@ import {
   SITE_NAME,
   SITE_TITLE_DEFAULT,
   absoluteUrl,
-  buildHomeJsonLd,
+  buildOgImages,
   getSiteUrl,
 } from "@/lib/seo";
 import "./globals.css";
@@ -68,20 +67,13 @@ export const metadata: Metadata = {
     locale: "it_IT",
     siteName: SITE_NAME,
     url: absoluteUrl("/"),
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: `${SITE_NAME} — dati aperti ${COMUNE_NOME}`,
-      },
-    ],
+    images: buildOgImages(`${SITE_NAME} — dati aperti ${COMUNE_NOME}`),
   },
   twitter: {
     card: "summary_large_image",
     title: SITE_TITLE_DEFAULT,
     description: SITE_DESCRIPTION,
-    images: ["/og-image.png"],
+    images: [absoluteUrl("/og-image.jpg")],
   },
   icons: {
     icon: [
@@ -116,7 +108,6 @@ export default function RootLayout({
         className={`${titillium.variable} flex min-h-screen flex-col antialiased`}
       >
         <Providers>
-          <JsonLd data={buildHomeJsonLd()} />
           {children}
           <CookieBanner />
           <InstallPrompt />
