@@ -16,6 +16,29 @@ export const metadata: Metadata = {
   description:
     "Dashboard indipendente dei dati aperti del Comune di San Vincenzo (LI), alimentata da Cruscotto Italia (AgID).",
   authors: [{ name: AUTHOR.name, url: `mailto:${AUTHOR.email}` }],
+  openGraph: {
+    title: `Cruscotto ${COMUNE_NOME} | Dati aperti`,
+    description:
+      "Dashboard indipendente dei dati aperti del Comune di San Vincenzo (LI), alimentata da Cruscotto Italia (AgID).",
+    type: "website",
+    locale: "it_IT",
+    siteName: `Cruscotto ${COMUNE_NOME}`,
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: `Cruscotto ${COMUNE_NOME} - Dati Aperti`,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `Cruscotto ${COMUNE_NOME} | Dati aperti`,
+    description:
+      "Dashboard indipendente dei dati aperti del Comune di San Vincenzo (LI), alimentata da Cruscotto Italia (AgID).",
+    images: ["/og-image.png"],
+  },
   other: {
     author: AUTHOR.name,
   },
