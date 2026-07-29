@@ -89,3 +89,9 @@ export const CARTO_ATTRIBUTION_URL = "https://carto.com/";
 
 /** Codice comune per API Ministero Cultura */
 export const COMUNE_ISTAT_CULTURA = "049018";
+
+/** Farmacie di turno (San Vincenzo) — codice farmaciediturno.org = ISTAT senza lo 0 iniziale. */
+export const FARMACIE_DI_TURNO_COD = "49018" as const;
+export const FARMACIE_DI_TURNO_URL =
+  `https://www.farmaciediturno.org/ricercaditurno.asp?cod=${FARMACIE_DI_TURNO_COD}` as const;
+export const FARMACIE_DI_TURNO_BASE = "https://www.farmaciediturno.org";
