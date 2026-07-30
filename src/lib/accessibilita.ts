@@ -167,6 +167,7 @@ function toPoint(el: OverpassElement): AccessPoint | null {
 
 async function fetchOverpass(query: string): Promise<OverpassElement[]> {
   let lastErr: unknown;
+  let emptyOk = false;
   for (const endpoint of OVERPASS_ENDPOINTS) {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), OVERPASS_FETCH_MS);
@@ -181,17 +182,25 @@ async function fetchOverpass(query: string): Promise<OverpassElement[]> {
         },
         body: `data=${encodeURIComponent(query)}`,
         signal: ctrl.signal,
-        next: { revalidate: 21600 },
+        // Non cachare a lungo risposte Overpass vuote/transitorie
+        cache: "no-store",
       });
       if (!res.ok) throw new Error(`overpass_http_${res.status}`);
       const json = (await res.json()) as { elements?: OverpassElement[] };
-      return Array.isArray(json.elements) ? json.elements : [];
+      const elements = Array.isArray(json.elements) ? json.elements : [];
+      // Lista vuota: prova il mirror successivo (overload/geo filter flaky)
+      if (elements.length === 0) {
+        emptyOk = true;
+        continue;
+      }
+      return elements;
     } catch (err) {
       lastErr = err;
     } finally {
       clearTimeout(timer);
     }
   }
+  if (emptyOk) return [];
   throw lastErr instanceof Error ? lastErr : new Error("overpass_failed");
 }
 
