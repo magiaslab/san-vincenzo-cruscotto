@@ -25,7 +25,12 @@ import {
   STEMMA,
   VERCEL_DEPLOY_URL,
 } from "@/lib/constants";
+import { AccessibilitaCompliance } from "@/components/AccessibilitaCompliance";
 import { GitHubMark, VercelMark } from "@/components/BrandMarks";
+import {
+  CcByNcNd30ItBadge,
+  CreativeCommonsBadgeRow,
+} from "@/components/CreativeCommonsBadges";
 import { SectionIntro } from "@/components/ui";
 
 function Section({
@@ -446,14 +451,36 @@ export function AttribuzioniPanel() {
             </a>
             .
           </p>
+          <div className="pt-1">
+            <CcByNcNd30ItBadge />
+          </div>
         </Section>
 
         <Section title="Licenza dati">
           <p>
             I contenuti dati sono prevalentemente in licenza{" "}
-            <strong>CC-BY 4.0</strong>, salvo diversa indicazione della fonte
-            primaria. Questo cruscotto non sostituisce i portali ufficiali.
+            <strong>CC BY 4.0</strong>, salvo diversa indicazione della fonte
+            primaria. Lo stemma comunale è in{" "}
+            <strong>CC BY-NC-ND 3.0 IT</strong>. Questo cruscotto non sostituisce
+            i portali ufficiali.
           </p>
+          <CreativeCommonsBadgeRow />
+          <p className="text-xs text-[var(--pa-muted)] sm:text-sm">
+            Loghi ufficiali{" "}
+            <a
+              className="underline"
+              href="https://creativecommons.org/about/downloads/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Creative Commons
+            </a>{" "}
+            (licensebuttons.net).
+          </p>
+        </Section>
+
+        <Section title="Accessibilità del sito">
+          <AccessibilitaCompliance className="mb-0" />
         </Section>
       </div>
     </section>
