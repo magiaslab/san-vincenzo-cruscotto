@@ -47,6 +47,12 @@ export function Footer() {
             className="flex flex-wrap gap-x-5 gap-y-1 text-sm"
           >
             <Link
+              href="/come-funziona"
+              className="inline-flex min-h-11 items-center font-semibold text-white underline underline-offset-2"
+            >
+              {t("Come funziona")}
+            </Link>
+            <Link
               href="/attribuzioni"
               className="inline-flex min-h-11 items-center font-semibold text-white underline underline-offset-2"
             >

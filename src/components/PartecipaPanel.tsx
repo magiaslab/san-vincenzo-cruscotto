@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import {
   ArrowLeft,
   ArrowRight,
@@ -245,6 +246,14 @@ export function PartecipaPanel() {
               {t("Altre fonti: Regione Toscana, ARPAT, MIUR, open data comunale")}
             </li>
           </ul>
+          <p className="mb-0 mt-3 text-sm">
+            <Link
+              href="/come-funziona"
+              className="font-semibold underline underline-offset-2"
+            >
+              {t("Come funziona lo stack e l’architettura")}
+            </Link>
+          </p>
         </article>
 
         <article className="panel p-4 sm:p-5">
