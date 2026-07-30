@@ -111,7 +111,7 @@ export function DaeMap() {
         {loading ? <LoadingBlock label={t("Caricamento mappa DAE…")} /> : null}
         {error ? (
           <div className="p-4">
-            <DataUnavailable message={error} />
+            <DataUnavailable message={t(error)} />
           </div>
         ) : null}
         {!loading && !error && data && data.features.length === 0 ? (
