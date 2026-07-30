@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import {
   useEffect,
   useId,
@@ -106,10 +105,16 @@ export function AppShell({
     scrollToTopSmooth();
   }
 
+  function goHome() {
+    go("panoramica");
+  }
+
   const brandBlock = (
-    <Link
-      href="/"
-      className="flex h-[var(--shell-topbar-h)] items-center gap-3 px-4 no-underline"
+    <button
+      type="button"
+      onClick={goHome}
+      className="flex h-[var(--shell-topbar-h)] w-full items-center gap-3 px-4 text-left no-underline"
+      aria-label={t("Torna alla home")}
     >
       <Image
         src={STEMMA.src}
@@ -127,7 +132,7 @@ export function AppShell({
           {COMUNE_PROVINCIA} · {t("dati aperti")}
         </p>
       </div>
-    </Link>
+    </button>
   );
 
   const nav = (
@@ -229,8 +234,9 @@ export function AppShell({
                 <Menu size={22} />
               </button>
 
-              <Link
-                href="/"
+              <button
+                type="button"
+                onClick={goHome}
                 className="inline-flex h-9 shrink-0 items-center lg:hidden"
                 aria-label={t("Home Cruscotto San Vincenzo")}
               >
@@ -242,14 +248,21 @@ export function AppShell({
                   className="h-8 w-auto"
                   priority
                 />
-              </Link>
+              </button>
 
               <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5 lg:max-w-[14rem] xl:max-w-none">
                 <h1
                   id={titleId}
                   className="m-0 truncate text-base font-bold leading-tight text-[var(--pa-ink)]"
                 >
-                  <span className="lg:hidden">Cruscotto {COMUNE_NOME}</span>
+                  <button
+                    type="button"
+                    onClick={goHome}
+                    className="m-0 truncate bg-transparent p-0 text-left text-base font-bold leading-tight text-[var(--pa-ink)] lg:hidden"
+                    aria-label={t("Torna alla home")}
+                  >
+                    Cruscotto {COMUNE_NOME}
+                  </button>
                   <span className="hidden lg:inline">
                     {active?.label ?? `Cruscotto ${COMUNE_NOME}`}
                   </span>
