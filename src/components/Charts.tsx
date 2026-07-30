@@ -43,7 +43,8 @@ type SeriesProps = {
   datasets: Array<{
     label: string;
     data: number[];
-    color?: string;
+    /** Colore unico o palette per barra. */
+    color?: string | string[];
   }>;
 };
 
@@ -68,28 +69,42 @@ export function LineChart({ labels, datasets }: SeriesProps) {
         }}
         data={{
           labels,
-          datasets: datasets.map((d, i) => ({
-            label: d.label,
-            data: d.data,
-            borderColor: d.color ?? CHART_COLORS[i % CHART_COLORS.length],
-            backgroundColor: `${d.color ?? CHART_COLORS[i % CHART_COLORS.length]}33`,
-            tension: 0.25,
-            fill: true,
-            pointRadius: 2,
-          })),
+          datasets: datasets.map((d, i) => {
+            const fallback = CHART_COLORS[i % CHART_COLORS.length];
+            const stroke = Array.isArray(d.color) ? (d.color[0] ?? fallback) : (d.color ?? fallback);
+            return {
+              label: d.label,
+              data: d.data,
+              borderColor: stroke,
+              backgroundColor: `${stroke}33`,
+              tension: 0.25,
+              fill: true,
+              pointRadius: 2,
+            };
+          }),
         }}
       />
     </div>
   );
 }
 
-export function BarChart({ labels, datasets }: SeriesProps) {
+export function BarChart({
+  labels,
+  datasets,
+  stacked = false,
+}: SeriesProps & { stacked?: boolean }) {
   return (
     <div className="h-64 w-full sm:h-72">
       <Bar
         options={{
           ...baseOptions,
-          indexAxis: labels.length > 6 ? ("y" as const) : ("x" as const),
+          indexAxis: !stacked && labels.length > 6 ? ("y" as const) : ("x" as const),
+          scales: stacked
+            ? {
+                x: { stacked: true },
+                y: { stacked: true, beginAtZero: true },
+              }
+            : undefined,
         }}
         data={{
           labels,
@@ -97,7 +112,7 @@ export function BarChart({ labels, datasets }: SeriesProps) {
             label: d.label,
             data: d.data,
             backgroundColor: d.color ?? CHART_COLORS[i % CHART_COLORS.length],
-            borderRadius: 4,
+            borderRadius: stacked ? 0 : 4,
           })),
         }}
       />

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
-import { openDataEmpty } from "@/lib/opendata";
+import { openDataEmpty, openDataOk } from "@/lib/opendata";
 import {
+  buildRischioData,
+  hasRischioPayload,
   RISCHIO_FONTE,
   RISCHIO_REVALIDATE_SECONDS,
   type RischioData,
@@ -10,18 +12,32 @@ export const revalidate = RISCHIO_REVALIDATE_SECONDS;
 
 const CACHE_CONTROL = `public, s-maxage=${RISCHIO_REVALIDATE_SECONDS}, stale-while-revalidate=${RISCHIO_REVALIDATE_SECONDS * 2}`;
 
+export type { RischioData };
+
 /**
- * Stub IdroGEO: contratto OpenDataResult pronto.
- * Follow-up: fetch ISPRA e popolare `RischioData` (stesso scheletro di turismo).
+ * Proxy/cache sottile IdroGEO (PIR + dinamica litoranea).
+ * Sempre HTTP 200: sezioni indipendenti; fallimento → empty-state.
  */
 export async function GET() {
   try {
+    const data = await buildRischioData();
+
+    if (!hasRischioPayload(data)) {
+      return NextResponse.json(
+        openDataEmpty<RischioData>({
+          fonte: RISCHIO_FONTE,
+          note:
+            "Nessun indicatore IdroGEO disponibile al momento per il comune.",
+          error: null,
+        }),
+        { status: 200, headers: { "Cache-Control": CACHE_CONTROL } },
+      );
+    }
+
     return NextResponse.json(
-      openDataEmpty<RischioData>({
+      openDataOk(data, {
         fonte: RISCHIO_FONTE,
-        note:
-          "Integrazione IdroGEO (ISPRA) in arrivo. I KPI rischio già in Territorio restano da Cruscotto Italia.",
-        error: null,
+        edizione: "PIR IdroGEO / dinamica litoranea ISPRA",
       }),
       { status: 200, headers: { "Cache-Control": CACHE_CONTROL } },
     );
