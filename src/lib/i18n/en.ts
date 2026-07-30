@@ -818,6 +818,7 @@ export const en: Record<string, string> = {
   "Confronto territoriale (frane P3+P4)": "Territorial comparison (landslides P3+P4)",
   "Livello": "Level",
   "% territorio": "% of territory",
+  "Regione": "Region",
   "Italia": "Italy",
   "ISPRA — Piattaforma IdroGEO / Rapporto Dissesto idrogeologico in Italia (CC BY)":
     "ISPRA — IdroGEO platform / Hydrogeological hazard report for Italy (CC BY)",
