@@ -40,6 +40,9 @@ import {
   Accessibility,
   Zap,
   MessageSquarePlus,
+  Info,
+  GitFork,
+  Scale,
 } from "lucide-react";
 import { AppShell, type NavGroup } from "@/components/AppShell";
 import { EventiComunePanel } from "@/components/EventiComunePanel";
@@ -49,6 +52,9 @@ import { ScuoleMiurPanel } from "@/components/ScuoleMiurPanel";
 import { AllerteMeteoPanel } from "@/components/AllerteMeteoPanel";
 import { TrasportiPanel } from "@/components/TrasportiPanel";
 import { PartecipaPanel } from "@/components/PartecipaPanel";
+import { ComeFunzionaPanel } from "@/components/ComeFunzionaPanel";
+import { RiusaPanel } from "@/components/RiusaPanel";
+import { AttribuzioniPanel } from "@/components/AttribuzioniPanel";
 import { TurismoFlussiPanel } from "@/components/TurismoFlussiPanel";
 import { RischioPanel } from "@/components/RischioPanel";
 import { OmiPanel } from "@/components/OmiPanel";
@@ -192,7 +198,10 @@ type TabId =
   | "sanita"
   | "meteo"
   | "mappa"
-  | "partecipa";
+  | "partecipa"
+  | "come-funziona"
+  | "riusa"
+  | "attribuzioni";
 
 const NAV_GROUPS: NavGroup[] = [
   {
@@ -203,7 +212,6 @@ const NAV_GROUPS: NavGroup[] = [
       { id: "disabilita", label: "Disabilità", Icon: Accessibility },
       { id: "infra", label: "Mobilità", Icon: Train },
       { id: "meteo", label: "Meteo", Icon: CloudSun },
-      { id: "partecipa", label: "Partecipa", Icon: MessageSquarePlus },
     ],
   },
   {
@@ -223,6 +231,15 @@ const NAV_GROUPS: NavGroup[] = [
       { id: "istruzione", label: "Istruzione", Icon: School },
       { id: "societa", label: "Società", Icon: Handshake },
       { id: "finanza", label: "Finanza", Icon: Landmark },
+    ],
+  },
+  {
+    label: "Progetto",
+    items: [
+      { id: "partecipa", label: "Partecipa", Icon: MessageSquarePlus },
+      { id: "come-funziona", label: "Come funziona", Icon: Info },
+      { id: "riusa", label: "Riusa / fork", Icon: GitFork },
+      { id: "attribuzioni", label: "Attribuzioni e regole", Icon: Scale },
     ],
   },
 ];
@@ -340,6 +357,9 @@ export function DashboardTabs({
         {tab === "meteo" && <Meteo kpi={kpi} />}
         {tab === "mappa" && <MapPanel kpi={kpi} />}
         {tab === "partecipa" && <PartecipaPanel />}
+        {tab === "come-funziona" && <ComeFunzionaPanel />}
+        {tab === "riusa" && <RiusaPanel />}
+        {tab === "attribuzioni" && <AttribuzioniPanel />}
       </div>
       <AssistenteFab />
     </AppShell>

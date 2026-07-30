@@ -47,19 +47,19 @@ export function Footer() {
             className="flex flex-wrap gap-x-5 gap-y-1 text-sm"
           >
             <Link
-              href="/come-funziona"
+              href="/#come-funziona"
               className="inline-flex min-h-11 items-center font-semibold text-white underline underline-offset-2"
             >
               {t("Come funziona")}
             </Link>
             <Link
-              href="/riusa"
+              href="/#riusa"
               className="inline-flex min-h-11 items-center font-semibold text-white underline underline-offset-2"
             >
               {t("Riusa / fork")}
             </Link>
             <Link
-              href="/attribuzioni"
+              href="/#attribuzioni"
               className="inline-flex min-h-11 items-center font-semibold text-white underline underline-offset-2"
             >
               {t("Attribuzioni e regole")}
