@@ -7,10 +7,32 @@ import {
 
 export const WHEELMAP_URL =
   "https://wheelmap.org/it/map#/?lat=43.085&lng=10.54&zoom=14" as const;
+export const WHEELMAP_WIDGET_INFO_URL =
+  "https://news.wheelmap.org/wheelmap-widget/" as const;
 export const ISTAT_DISABILITA_CIFRE_URL =
   "https://www.disabilitaincifre.istat.it/" as const;
 export const COMUNE_STALLI_DISABILI_URL =
   `${COMUNE_SAN_VINCENZO_URL}Servizi/Disciplina-delle-riserve-di-stalli-di-sosta-personali-per-disabili-e-istituzione-sosta-gratuita-su-stalli-a-pagamento-per-disabili` as const;
+
+/** URL iframe ufficiale Wheelmap (richiede embedToken da accessibility.cloud / Sozialhelden). */
+export function buildWheelmapEmbedSrc(embedToken: string): string {
+  const [lat, lon] = MAP_CENTER;
+  const url = new URL("https://wheelmap.org/");
+  url.searchParams.set("embedded", "true");
+  url.searchParams.set("embedToken", embedToken);
+  url.searchParams.set("lat", String(lat));
+  url.searchParams.set("lon", String(lon));
+  url.searchParams.set("zoom", "14");
+  return url.toString();
+}
+
+export function getWheelmapEmbedToken(): string | null {
+  const token =
+    process.env.NEXT_PUBLIC_WHEELMAP_EMBED_TOKEN?.trim() ||
+    process.env.WHEELMAP_EMBED_TOKEN?.trim() ||
+    "";
+  return token || null;
+}
 
 export type AccessPoint = {
   id: string;
