@@ -115,46 +115,46 @@ function pickNum(
 
 async function fetchJson(
   url: string,
-  init?: RequestInit,
+  init?: RequestInit & { next?: { revalidate?: number | false } },
 ): Promise<unknown | null> {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), FETCH_TIMEOUT_MS);
   try {
+    const { next: nextOpt, ...rest } = init ?? {};
     const res = await fetch(url, {
-      ...init,
+      ...rest,
       signal: ctrl.signal,
       headers: {
         Accept: "application/json",
         "User-Agent": USER_AGENT,
-        ...(init?.headers ?? {}),
+        ...(rest.headers ?? {}),
       },
-      next: { revalidate: RISCHIO_REVALIDATE_SECONDS },
+      // Default ISR cache; callers can override (es. WFS voluminoso).
+      next: nextOpt ?? { revalidate: RISCHIO_REVALIDATE_SECONDS },
     });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      console.warn("rischio fetch HTTP", res.status, url.slice(0, 120));
+      return null;
+    }
     return (await res.json()) as unknown;
   } catch (err) {
-    console.warn("rischio fetch failed", url, err);
+    console.warn("rischio fetch failed", url.slice(0, 120), err);
     return null;
   } finally {
     clearTimeout(timer);
   }
 }
 
-/** Codifica WFS IdroGEO: `cod_reg` + `pro_com` (es. 9 + 49018 → 9049018). */
+/** Codifica WFS IdroGEO: `cod_reg` + ISTAT a 6 cifre (es. 9 + 049018 → 9049018). */
 export function buildWfsCodIstat(
   codReg: number | null,
-  proCom: number | null,
+  _proCom: number | null = null,
   istatCode = RISCHIO_ISTAT_CODE,
 ): number | null {
-  const pro =
-    proCom ??
-    (() => {
-      const n = Number(istatCode);
-      return Number.isFinite(n) ? n : null;
-    })();
   const reg = codReg ?? 9;
-  if (pro == null) return null;
-  const combined = Number(`${reg}${pro}`);
+  const istat = String(istatCode).replace(/\D/g, "").padStart(6, "0").slice(-6);
+  if (!istat) return null;
+  const combined = Number(`${reg}${istat}`);
   return Number.isFinite(combined) ? combined : null;
 }
 
@@ -226,8 +226,9 @@ function classifyCosta(label: string): "erosione" | "avanzamento" | "stabile" | 
   const s = label.trim().toLowerCase();
   if (!s) return null;
   if (s.includes("eros")) return "erosione";
-  if (s.includes("avanc")) return "avanzamento";
-  if (s.includes("stabil") || s.includes("stabili")) return "stabile";
+  // IT: "avanzamento" (z), non "avanc…"
+  if (s.includes("avanz") || s.includes("avanc")) return "avanzamento";
+  if (s.includes("stabil")) return "stabile";
   return null;
 }
 
@@ -267,12 +268,27 @@ export async function fetchErosioneCostiera(
     request: "GetFeature",
     typeName: IDROGEO_WFS_LAYER,
     outputFormat: "application/json",
+    // Solo attributi: riduce il payload (geometrie MultiLineString molto pesanti).
+    propertyName: "modifica_2,modifica_o,shape_leng,descrizion",
     CQL_FILTER: `cod_istat=${wfsCodIstat}`,
   });
-  const raw = await fetchJson(`${IDROGEO_WFS_URL}?${params.toString()}`);
+  const raw = await fetchJson(`${IDROGEO_WFS_URL}?${params.toString()}`, {
+    // Evita cache Next su risposte WFS grandi/variabili.
+    cache: "no-store",
+    next: { revalidate: 0 },
+  });
   const fc = asRecord(raw);
-  const features = Array.isArray(fc?.features) ? fc.features : [];
-  if (features.length === 0) return null;
+  if (!fc) return null;
+  // GeoServer può rispondere XML/ExceptionReport se propertyName non è valido.
+  if (typeof fc.type === "string" && fc.type !== "FeatureCollection") {
+    console.warn("rischio erosione: risposta non FeatureCollection", fc.type);
+    return null;
+  }
+  const features = Array.isArray(fc.features) ? fc.features : [];
+  if (features.length === 0) {
+    console.warn("rischio erosione: 0 feature per cod_istat", wfsCodIstat);
+    return null;
+  }
 
   let kmErosione = 0;
   let kmAvanzamento = 0;
@@ -295,7 +311,14 @@ export async function fetchErosioneCostiera(
     else kmStabile += km;
   }
 
-  if (matched === 0) return null;
+  if (matched === 0) {
+    console.warn(
+      "rischio erosione: nessuna classe riconosciuta su",
+      features.length,
+      "feature",
+    );
+    return null;
+  }
   return {
     kmErosione: round3(kmErosione),
     kmAvanzamento: round3(kmAvanzamento),
@@ -334,10 +357,22 @@ export async function buildRischioData(
     // cod_prov in PIR comune è la provincia (es. 49 → /pir/province/49)
     const provId = pickNum(comune, "cod_prov");
 
-    const [provincia, regione, italia] = await Promise.all([
-      provId != null ? fetchPirByPath(`/pir/province/${provId}`) : Promise.resolve(null),
-      codReg != null ? fetchPirByPath(`/pir/regioni/${codReg}`) : Promise.resolve(null),
+    const wfsCode = buildWfsCodIstat(codReg, proCom, istatCode);
+
+    const [provincia, regione, italia, erosione] = await Promise.all([
+      provId != null
+        ? fetchPirByPath(`/pir/province/${provId}`)
+        : Promise.resolve(null),
+      codReg != null
+        ? fetchPirByPath(`/pir/regioni/${codReg}`)
+        : Promise.resolve(null),
       fetchPirByPath("/pir/italia"),
+      wfsCode != null
+        ? fetchErosioneCostiera(wfsCode).catch((err) => {
+            console.warn("rischio erosione costiera fallita", err);
+            return null;
+          })
+        : Promise.resolve(null),
     ]);
 
     const cProv = mapConfronto(provincia);
@@ -350,15 +385,7 @@ export async function buildRischioData(
         italia: cIta,
       };
     }
-
-    const wfsCode = buildWfsCodIstat(codReg, proCom, istatCode);
-    if (wfsCode != null) {
-      try {
-        erosioneCostiera = await fetchErosioneCostiera(wfsCode);
-      } catch (err) {
-        console.warn("rischio erosione costiera fallita", err);
-      }
-    }
+    erosioneCostiera = erosione;
   } else {
     // Fallback: prova solo WFS con formula standard Toscana
     const wfsCode = buildWfsCodIstat(9, Number(istatCode), istatCode);
