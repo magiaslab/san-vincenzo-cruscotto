@@ -3,6 +3,22 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import {
+  Accessibility,
+  BookOpen,
+  Bot,
+  CloudSun,
+  FileCode2,
+  FileJson,
+  type LucideIcon,
+  Server,
+  Sparkles,
+} from "lucide-react";
+import {
+  GitHubMark,
+  TelegramMark,
+  VercelMark,
+} from "@/components/BrandMarks";
+import {
   AUTHOR,
   COMUNE_NOME,
   CRUSCOTTO_ITALIA_URL,
@@ -42,9 +58,11 @@ function Section({
 
 function DocLink({
   href,
+  icon,
   children,
 }: {
   href: string;
+  icon?: ReactNode;
   children: ReactNode;
 }) {
   return (
@@ -52,9 +70,10 @@ function DocLink({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex min-h-11 items-center rounded-lg border border-[var(--pa-border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--pa-ink)] no-underline transition hover:border-[var(--pa-primary)] hover:text-[var(--pa-primary)]"
+      className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-[var(--pa-border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--pa-ink)] no-underline transition hover:border-[var(--pa-primary)] hover:text-[var(--pa-primary)]"
     >
-      {children}
+      {icon}
+      <span>{children}</span>
     </a>
   );
 }
@@ -108,12 +127,17 @@ const CORE_FIELDS: { campo: string; esempio: string; dove: string }[] = [
   },
 ];
 
+type AccountIcon =
+  | { kind: "brand"; Brand: typeof GitHubMark }
+  | { kind: "lucide"; Icon: LucideIcon };
+
 const ACCOUNTS: {
   servizio: string;
   aCosa: string;
   obbligatorio: string;
   dove: string;
   href?: string;
+  icon: AccountIcon;
 }[] = [
   {
     servizio: "GitHub",
@@ -121,6 +145,7 @@ const ACCOUNTS: {
     obbligatorio: "Sì (fork/deploy)",
     dove: "github.com/signup",
     href: "https://github.com/signup",
+    icon: { kind: "brand", Brand: GitHubMark },
   },
   {
     servizio: "Vercel",
@@ -128,6 +153,7 @@ const ACCOUNTS: {
     obbligatorio: "Sì (online)",
     dove: "vercel.com — login con GitHub",
     href: "https://vercel.com/signup",
+    icon: { kind: "brand", Brand: VercelMark },
   },
   {
     servizio: "AgID Cruscotto Italia MCP",
@@ -135,6 +161,7 @@ const ACCOUNTS: {
     obbligatorio: "No account (pubblico)",
     dove: "cruscotto-italia-mcp.agid.workers.dev/mcp",
     href: "https://cruscotto-italia-mcp.agid.workers.dev/mcp",
+    icon: { kind: "lucide", Icon: Server },
   },
   {
     servizio: "OpenWeather",
@@ -142,6 +169,7 @@ const ACCOUNTS: {
     obbligatorio: "Opzionale",
     dove: "home.openweathermap.org/api_keys",
     href: "https://home.openweathermap.org/api_keys",
+    icon: { kind: "lucide", Icon: CloudSun },
   },
   {
     servizio: "Telegram + BotFather",
@@ -149,6 +177,7 @@ const ACCOUNTS: {
     obbligatorio: "Opzionale",
     dove: "t.me/BotFather",
     href: "https://t.me/BotFather",
+    icon: { kind: "brand", Brand: TelegramMark },
   },
   {
     servizio: "Modal",
@@ -156,6 +185,7 @@ const ACCOUNTS: {
     obbligatorio: "Opzionale (assistente)",
     dove: "modal.com → modal setup",
     href: "https://modal.com",
+    icon: { kind: "lucide", Icon: Sparkles },
   },
   {
     servizio: "Hugging Face",
@@ -163,6 +193,7 @@ const ACCOUNTS: {
     obbligatorio: "Di solito no token",
     dove: "huggingface.co",
     href: "https://huggingface.co",
+    icon: { kind: "lucide", Icon: Bot },
   },
   {
     servizio: "Wheelmap / Sozialhelden",
@@ -170,6 +201,7 @@ const ACCOUNTS: {
     obbligatorio: "Opzionale",
     dove: "info@sozialhelden.de",
     href: "https://news.wheelmap.org/wheelmap-widget/",
+    icon: { kind: "lucide", Icon: Accessibility },
   },
   {
     servizio: "Cursor / Claude",
@@ -177,8 +209,18 @@ const ACCOUNTS: {
     obbligatorio: "No",
     dove: "cursor.com · claude.ai",
     href: "https://cursor.com",
+    icon: { kind: "lucide", Icon: Sparkles },
   },
 ];
+
+function AccountIconMark({ icon }: { icon: AccountIcon }) {
+  if (icon.kind === "brand") {
+    const Brand = icon.Brand;
+    return <Brand size={18} className="shrink-0" />;
+  }
+  const Icon = icon.Icon;
+  return <Icon size={18} strokeWidth={2} className="shrink-0" aria-hidden />;
+}
 
 const ENV_ROWS: { name: string; quando: string }[] = [
   {
@@ -293,23 +335,38 @@ export function RiusaPanel() {
           </nav>
           <ul className="m-0 flex list-none flex-wrap gap-3 p-0">
             <li>
-              <DocLink href={GITHUB_FORK_URL}>Fork su GitHub</DocLink>
+              <DocLink href={GITHUB_FORK_URL} icon={<GitHubMark />}>
+                Fork su GitHub
+              </DocLink>
             </li>
             <li>
-              <DocLink href={GITHUB_DOCS_RIUSO_URL}>
+              <DocLink
+                href={GITHUB_DOCS_RIUSO_URL}
+                icon={<BookOpen size={20} strokeWidth={2} aria-hidden />}
+              >
                 Guida completa (docs/riuso-fork.md)
               </DocLink>
             </li>
             <li>
-              <DocLink href={GITHUB_CONFIG_EXAMPLE_URL}>
+              <DocLink
+                href={GITHUB_CONFIG_EXAMPLE_URL}
+                icon={<FileJson size={20} strokeWidth={2} aria-hidden />}
+              >
                 config/comune.example.json
               </DocLink>
             </li>
             <li>
-              <DocLink href={GITHUB_ENV_EXAMPLE_URL}>.env.example</DocLink>
+              <DocLink
+                href={GITHUB_ENV_EXAMPLE_URL}
+                icon={<FileCode2 size={20} strokeWidth={2} aria-hidden />}
+              >
+                .env.example
+              </DocLink>
             </li>
             <li>
-              <DocLink href={VERCEL_DEPLOY_URL}>Esempio deploy Vercel</DocLink>
+              <DocLink href={VERCEL_DEPLOY_URL} icon={<VercelMark />}>
+                Esempio deploy Vercel
+              </DocLink>
             </li>
           </ul>
         </Section>
@@ -366,21 +423,28 @@ export function RiusaPanel() {
                     className="border-b border-[var(--pa-border)] last:border-b-0"
                   >
                     <td className="px-3 py-2.5 align-top font-semibold">
-                      {row.href ? (
-                        <a
-                          className="underline"
-                          href={row.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          {row.servizio}
-                        </a>
-                      ) : (
-                        row.servizio
-                      )}
-                      <p className="mb-0 mt-1 text-xs font-normal text-[var(--pa-muted)]">
-                        {row.dove}
-                      </p>
+                      <span className="inline-flex items-start gap-2">
+                        <span className="mt-0.5 text-[var(--pa-ink)]">
+                          <AccountIconMark icon={row.icon} />
+                        </span>
+                        <span>
+                          {row.href ? (
+                            <a
+                              className="underline"
+                              href={row.href}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              {row.servizio}
+                            </a>
+                          ) : (
+                            row.servizio
+                          )}
+                          <p className="mb-0 mt-1 text-xs font-normal text-[var(--pa-muted)]">
+                            {row.dove}
+                          </p>
+                        </span>
+                      </span>
                     </td>
                     <td className="px-3 py-2.5 align-top text-[var(--pa-muted)]">
                       {row.aCosa}
@@ -586,8 +650,15 @@ git branch -M main && git push -u origin main`}
             ))}
           </ul>
           <p className="flex flex-wrap gap-3">
-            <DocLink href={GITHUB_DAE_DOCS_URL}>docs/dae-telegram-bot.md</DocLink>
-            <DocLink href={GITHUB_MODAL_RAG_URL}>modal_rag/README.md</DocLink>
+            <DocLink href={GITHUB_DAE_DOCS_URL} icon={<TelegramMark />}>
+              docs/dae-telegram-bot.md
+            </DocLink>
+            <DocLink
+              href={GITHUB_MODAL_RAG_URL}
+              icon={<Sparkles size={20} strokeWidth={2} aria-hidden />}
+            >
+              modal_rag/README.md
+            </DocLink>
           </p>
           <p>
             Un MVP utile è spesso «KPI nazionali + mappa + 1–2 fonti locali», non
