@@ -50,6 +50,8 @@ import { AllerteMeteoPanel } from "@/components/AllerteMeteoPanel";
 import { TrasportiPanel } from "@/components/TrasportiPanel";
 import { PartecipaPanel } from "@/components/PartecipaPanel";
 import { TurismoFlussiPanel } from "@/components/TurismoFlussiPanel";
+import { RischioPanel } from "@/components/RischioPanel";
+import { OmiPanel } from "@/components/OmiPanel";
 import {
   DataUnavailable,
   KpiCard,
@@ -1701,6 +1703,8 @@ function Finanza({ kpi }: { kpi: Kpi }) {
 
       {loading ? <LoadingBlock /> : null}
 
+      <OmiPanel />
+
       {siope?.disponibile ? (
         <div className="mb-4 panel">
           <h3 className={h3}>{siopeTitle}</h3>
@@ -2038,6 +2042,8 @@ function Territorio({ kpi }: { kpi: Kpi }) {
           </div>
         ) : null}
       </div>
+
+      <RischioPanel />
 
       <div className="mb-4 grid gap-3 sm:gap-4 lg:grid-cols-2">
         {aspect ? (

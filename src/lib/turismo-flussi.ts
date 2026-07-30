@@ -57,6 +57,20 @@ export type TurismoFlussiPayload = {
   error?: string | null;
 };
 
+/** Dati dominio per `OpenDataResult<TurismoData>` (senza meta HTTP). */
+export type TurismoData = {
+  anno: number | null;
+  annoPrecedente: number | null;
+  mensile: TurismoMese[];
+  annuale: TurismoAnnuale[];
+  provenienza: TurismoProvenienza;
+  residenti: number | null;
+  permanenzaMedia: number | null;
+  pressioneTuristica: number | null;
+  deltaPresenzePct: number | null;
+  dataset: string | null;
+};
+
 export function emptyTurismoPayload(
   extra?: Partial<TurismoFlussiPayload>,
 ): TurismoFlussiPayload {

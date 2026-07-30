@@ -1,15 +1,20 @@
 import { NextResponse } from "next/server";
 import { getCachedKpi } from "@/lib/dashboard";
+import { openDataEmpty, openDataOk } from "@/lib/opendata";
 import {
   buildTurismoFlussi,
   emptyTurismoPayload,
+  TURISMO_FONTE,
   TURISMO_REVALIDATE_SECONDS,
   TURISMO_RESIDENTI_FALLBACK,
+  type TurismoData,
 } from "@/lib/turismo-flussi";
 
 export const revalidate = TURISMO_REVALIDATE_SECONDS;
 
 const CACHE_CONTROL = `public, s-maxage=${TURISMO_REVALIDATE_SECONDS}, stale-while-revalidate=${TURISMO_REVALIDATE_SECONDS * 2}`;
+
+export type { TurismoData };
 
 function readResidenti(kpi: Record<string, unknown>): number | null {
   const demo = kpi.demografia;
@@ -18,6 +23,23 @@ function readResidenti(kpi: Record<string, unknown>): number | null {
     if (typeof pop === "number" && pop > 0) return pop;
   }
   return null;
+}
+
+function toData(
+  p: ReturnType<typeof emptyTurismoPayload>,
+): TurismoData {
+  return {
+    anno: p.anno,
+    annoPrecedente: p.annoPrecedente,
+    mensile: p.mensile,
+    annuale: p.annuale,
+    provenienza: p.provenienza,
+    residenti: p.residenti,
+    permanenzaMedia: p.permanenzaMedia,
+    pressioneTuristica: p.pressioneTuristica,
+    deltaPresenzePct: p.deltaPresenzePct,
+    dataset: p.dataset ?? null,
+  };
 }
 
 export async function GET() {
@@ -31,16 +53,37 @@ export async function GET() {
     }
 
     const payload = await buildTurismoFlussi(residenti);
-    return NextResponse.json(payload, {
-      status: 200,
-      headers: { "Cache-Control": CACHE_CONTROL },
-    });
+    const data = toData(payload);
+    const edizione = payload.anno != null ? String(payload.anno) : undefined;
+
+    if (!payload.disponibile) {
+      return NextResponse.json(
+        openDataEmpty<TurismoData>({
+          fonte: payload.fonte || TURISMO_FONTE,
+          aggiornato: payload.aggiornato,
+          edizione,
+          note: payload.note,
+          error: payload.error,
+        }),
+        { status: 200, headers: { "Cache-Control": CACHE_CONTROL } },
+      );
+    }
+
+    return NextResponse.json(
+      openDataOk(data, {
+        fonte: payload.fonte || TURISMO_FONTE,
+        aggiornato: payload.aggiornato,
+        edizione,
+        note: payload.note,
+      }),
+      { status: 200, headers: { "Cache-Control": CACHE_CONTROL } },
+    );
   } catch (err) {
     console.error("API /api/turismo error", err);
     return NextResponse.json(
-      emptyTurismoPayload({
+      openDataEmpty<TurismoData>({
+        fonte: TURISMO_FONTE,
         error: "Impossibile recuperare i flussi turistici",
-        residenti: TURISMO_RESIDENTI_FALLBACK,
       }),
       {
         status: 200,
