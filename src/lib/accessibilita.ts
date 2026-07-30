@@ -75,11 +75,15 @@ export type AccessibilitaPayload = {
 const DISCLAIMER =
   "Dati OpenStreetMap / Wheelmap basati su contributi volontari: possono essere incompleti o non aggiornati. Non sostituiscono i servizi ufficiali del Comune, della SDS o dell’Azienda USL. Segnala correzioni su OpenStreetMap o Wheelmap.";
 
-/** Endpoint Overpass in ordine di affidabilità (kumi spesso timeout). */
+/**
+ * Solo mirror overpass-api.de (e varianti lz4/z).
+ * Evitare overpass.osm.ch: può rispondere 200 con `elements: []` anche quando
+ * i dati esistono (su Vercel mascherava il timeout del primario → mappa vuota).
+ */
 const OVERPASS_ENDPOINTS = [
   "https://overpass-api.de/api/interpreter",
-  "https://overpass.osm.ch/api/interpreter",
-  "https://overpass.kumi.systems/api/interpreter",
+  "https://lz4.overpass-api.de/api/interpreter",
+  "https://z.overpass-api.de/api/interpreter",
 ] as const;
 
 const OVERPASS_FETCH_MS = 22_000;
@@ -167,7 +171,6 @@ function toPoint(el: OverpassElement): AccessPoint | null {
 
 async function fetchOverpass(query: string): Promise<OverpassElement[]> {
   let lastErr: unknown;
-  let emptyOk = false;
   for (const endpoint of OVERPASS_ENDPOINTS) {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), OVERPASS_FETCH_MS);
@@ -182,15 +185,15 @@ async function fetchOverpass(query: string): Promise<OverpassElement[]> {
         },
         body: `data=${encodeURIComponent(query)}`,
         signal: ctrl.signal,
-        // Non cachare a lungo risposte Overpass vuote/transitorie
         cache: "no-store",
       });
       if (!res.ok) throw new Error(`overpass_http_${res.status}`);
       const json = (await res.json()) as { elements?: OverpassElement[] };
       const elements = Array.isArray(json.elements) ? json.elements : [];
-      // Lista vuota: prova il mirror successivo (overload/geo filter flaky)
+      // Lista vuota su questi mirror = territorio senza tag (ok) oppure
+      // overload: riprova solo se tutti i mirror restano vuoti.
       if (elements.length === 0) {
-        emptyOk = true;
+        lastErr = new Error(`overpass_empty:${endpoint}`);
         continue;
       }
       return elements;
@@ -200,7 +203,13 @@ async function fetchOverpass(query: string): Promise<OverpassElement[]> {
       clearTimeout(timer);
     }
   }
-  if (emptyOk) return [];
+  // Tutti i mirror vuoti → area davvero senza punti (non errore di rete)
+  if (
+    lastErr instanceof Error &&
+    String(lastErr.message).startsWith("overpass_empty:")
+  ) {
+    return [];
+  }
   throw lastErr instanceof Error ? lastErr : new Error("overpass_failed");
 }
 

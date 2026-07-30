@@ -8,7 +8,7 @@ export const revalidate = 21600;
 
 const getCachedPayload = unstable_cache(
   async () => buildAccessibilitaPayload(6),
-  ["accessibilita-overpass-v3"],
+  ["accessibilita-overpass-v4"],
   { revalidate: 21600 },
 );
 
