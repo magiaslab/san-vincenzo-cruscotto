@@ -143,4 +143,80 @@ export async function createFeedbackIssue(
   return { ok: true, url: json.html_url, number: json.number };
 }
 
+export type PublicFeedbackIssue = {
+  number: number;
+  title: string;
+  url: string;
+  state: "open" | "closed";
+  createdAt: string;
+  updatedAt: string;
+  labels: string[];
+};
+
+/**
+ * Elenco issue pubbliche create dal form Partecipa (titolo [Suggerimento]).
+ * Usa token se presente; altrimenti API pubblica GitHub (rate limit più basso).
+ */
+export async function listFeedbackIssues(
+  limit = 12,
+): Promise<
+  | { ok: true; issues: PublicFeedbackIssue[]; repo: string }
+  | { ok: false; error: string }
+> {
+  const slug = repoSlug();
+  const headers: Record<string, string> = {
+    Accept: "application/vnd.github+json",
+    "User-Agent": "Cruscotto-San-Vincenzo-Feedback",
+    "X-GitHub-Api-Version": "2022-11-28",
+  };
+  const t = token();
+  if (t) headers.Authorization = `Bearer ${t}`;
+
+  const u = new URL(`https://api.github.com/repos/${slug}/issues`);
+  u.searchParams.set("state", "all");
+  u.searchParams.set("per_page", String(Math.min(30, Math.max(limit * 2, 20))));
+  u.searchParams.set("sort", "created");
+  u.searchParams.set("direction", "desc");
+
+  const res = await fetch(u.toString(), {
+    headers,
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    console.error("GitHub list issues failed", res.status, text);
+    return { ok: false, error: `GitHub HTTP ${res.status}` };
+  }
+
+  const json = (await res.json()) as Array<{
+    number: number;
+    title: string;
+    html_url: string;
+    state: "open" | "closed";
+    created_at: string;
+    updated_at: string;
+    pull_request?: unknown;
+    labels?: Array<string | { name?: string }>;
+  }>;
+
+  const issues = json
+    .filter((i) => !i.pull_request)
+    .filter((i) => i.title.startsWith("[Suggerimento]"))
+    .slice(0, limit)
+    .map((i) => ({
+      number: i.number,
+      title: i.title.replace(/^\[Suggerimento\]\s*/i, "").trim() || i.title,
+      url: i.html_url,
+      state: i.state,
+      createdAt: i.created_at,
+      updatedAt: i.updated_at,
+      labels: (i.labels ?? [])
+        .map((l) => (typeof l === "string" ? l : l.name || ""))
+        .filter(Boolean),
+    }));
+
+  return { ok: true, issues, repo: slug };
+}
+
 export { TIPO_LABEL };

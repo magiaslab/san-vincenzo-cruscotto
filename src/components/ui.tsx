@@ -147,10 +147,17 @@ export function KpiCard({
 export function SectionIntro({
   title,
   description,
+  updatedAt,
+  sourceNote,
 }: {
   title: string;
   description?: string;
+  /** ISO o testo già formattato sulla freschezza dei dati della sezione. */
+  updatedAt?: string | null;
+  /** Nota breve sulla fonte o sul perché un dato manca. */
+  sourceNote?: string | null;
 }) {
+  const t = useT();
   return (
     <div className="mb-4 sm:mb-5">
       <h2 className="m-0 text-lg font-bold text-[var(--pa-ink)] sm:text-xl">
@@ -159,6 +166,20 @@ export function SectionIntro({
       {description ? (
         <p className="m-0 mt-1 max-w-prose text-xs text-[var(--pa-muted)] sm:text-sm">
           {description}
+        </p>
+      ) : null}
+      {updatedAt || sourceNote ? (
+        <p className="m-0 mt-2 max-w-prose text-xs text-[var(--pa-muted)]">
+          {updatedAt ? (
+            <span>
+              <span className="font-semibold text-[var(--pa-ink)]">
+                {t("Freschezza dati:")}
+              </span>{" "}
+              {updatedAt}
+            </span>
+          ) : null}
+          {updatedAt && sourceNote ? " · " : null}
+          {sourceNote ? <span>{sourceNote}</span> : null}
         </p>
       ) : null}
     </div>
@@ -284,11 +305,32 @@ export function SolidButton({
   );
 }
 
-export function DataUnavailable({ message }: { message?: string }) {
+export function DataUnavailable({
+  message,
+  hint,
+  action,
+}: {
+  message?: string;
+  hint?: string;
+  action?: ReactNode;
+}) {
   const t = useT();
   return (
-    <div className="rounded-lg border border-dashed border-[var(--pa-border)] bg-[var(--pa-surface-soft)] p-4 text-sm text-[var(--pa-muted)]">
-      {message ?? t("dato non disponibile")}
+    <div className="rounded-lg border border-dashed border-[var(--pa-border)] bg-[var(--pa-surface-soft)] p-4">
+      <p className="m-0 flex items-start gap-2 text-sm font-semibold text-[var(--pa-ink)]">
+        <AlertCircle
+          size={16}
+          className="mt-0.5 shrink-0 text-[var(--pa-muted)]"
+          aria-hidden
+        />
+        <span>{message ?? t("dato non disponibile")}</span>
+      </p>
+      {hint ? (
+        <p className="mb-0 mt-2 text-xs leading-relaxed text-[var(--pa-muted)] sm:text-sm">
+          {hint}
+        </p>
+      ) : null}
+      {action ? <div className="mt-3">{action}</div> : null}
     </div>
   );
 }
