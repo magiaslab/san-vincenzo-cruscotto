@@ -14,7 +14,6 @@ import "leaflet/dist/leaflet.css";
 import { Accessibility, ExternalLink, ParkingSquare, Toilet } from "lucide-react";
 import { useT } from "@/lib/i18n";
 import {
-  GITHUB_REPO_URL,
   MAP_CENTER,
   MAP_DEFAULT_ZOOM,
   OSM_COPYRIGHT_URL,
@@ -27,6 +26,7 @@ import {
   WHEELMAP_WIDGET_INFO_URL,
   isRuntsInclusione,
 } from "@/lib/accessibilita";
+import { AccessibilitaCompliance } from "@/components/AccessibilitaCompliance";
 import {
   DataUnavailable,
   KpiCard,
@@ -110,67 +110,6 @@ function FilterChip({
     >
       {children}
     </button>
-  );
-}
-
-/** Badge conformità del sito (non dei punti OSM). Onesto: parziale, non certificato. */
-function AccessibilitaCompliance() {
-  const t = useT();
-  return (
-    <aside
-      className="mb-4 panel"
-      aria-labelledby="a11y-compliance-title"
-    >
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <Accessibility
-              size={22}
-              strokeWidth={2}
-              className="shrink-0 text-[var(--pa-primary)]"
-              aria-hidden
-            />
-            <h3 id="a11y-compliance-title" className="m-0 text-base font-bold">
-              {t("Accessibilità di questo sito")}
-            </h3>
-          </div>
-          <p className="mb-0 mt-2 text-sm text-[var(--pa-muted)]">
-            {t(
-              "Obiettivo WCAG 2.1 livello AA sui flussi principali. Stato attuale: conformità parziale (in miglioramento). Non è ancora pubblicata una dichiarazione di accessibilità formale AGID: il cruscotto è un progetto indipendente.",
-            )}
-          </p>
-          <ul className="mb-0 mt-2 flex list-none flex-wrap gap-2 p-0">
-            <li>
-              <span className="inline-flex min-h-11 items-center rounded-lg bg-[var(--pa-surface-soft)] px-3 py-1.5 text-xs font-bold text-[var(--pa-ink)] sm:text-sm">
-                WCAG 2.1 AA
-              </span>
-            </li>
-            <li>
-              <span className="inline-flex min-h-11 items-center rounded-lg border border-[color-mix(in_srgb,var(--pa-warning)_45%,var(--pa-border))] bg-[color-mix(in_srgb,var(--pa-warning)_10%,white)] px-3 py-1.5 text-xs font-bold text-[var(--pa-ink)] sm:text-sm">
-                {t("Conformità parziale")}
-              </span>
-            </li>
-            <li>
-              <span className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-[var(--pa-border)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--pa-ink)] sm:text-sm">
-                <Accessibility size={16} strokeWidth={2} aria-hidden />
-                {t("Simbolo internazionale di accessibilità")}
-              </span>
-            </li>
-          </ul>
-        </div>
-        <div className="flex shrink-0 flex-col gap-2 sm:items-end">
-          <OutlineLink href="https://designers.italia.it/design-system/fondamenti/accessibilita/">
-            Designers Italia
-          </OutlineLink>
-          <OutlineLink href="https://www.w3.org/WAI/standards-guidelines/wcag/">
-            W3C WCAG 2.1
-          </OutlineLink>
-          <OutlineLink href={`${GITHUB_REPO_URL}/blob/master/docs/a11y-checklist.md`}>
-            {t("Checklist del progetto")}
-          </OutlineLink>
-        </div>
-      </div>
-    </aside>
   );
 }
 
@@ -347,6 +286,8 @@ export default function DisabilitaPanel({
         )}
       />
 
+      <AccessibilitaCompliance />
+
       {loading ? <LoadingBlock label={t("Caricamento accessibilità…")} /> : null}
       {error ? <DataUnavailable message={error} /> : null}
 
@@ -479,8 +420,6 @@ export default function DisabilitaPanel({
           </table>
         </div>
       ) : null}
-
-      {!loading ? <AccessibilitaCompliance /> : null}
 
       <div className="mb-4 grid gap-3 sm:gap-4 lg:grid-cols-2">
         <div className="panel">
