@@ -37,6 +37,7 @@ import {
   Eye,
   Sunrise,
   Leaf,
+  Accessibility,
 } from "lucide-react";
 import { AppShell, type NavGroup } from "@/components/AppShell";
 import { EventiComunePanel } from "@/components/EventiComunePanel";
@@ -161,6 +162,13 @@ const DaeMap = dynamic(
   },
 );
 
+const DisabilitaPanel = dynamic(() => import("@/components/DisabilitaPanel"), {
+  ssr: false,
+  loading: () => (
+    <LoadingBlock label={translate(getFormatLocale(), "Caricamento accessibilità…")} />
+  ),
+});
+
 type Kpi = Record<string, unknown>;
 
 type TabId =
@@ -170,6 +178,7 @@ type TabId =
   | "economia"
   | "istruzione"
   | "societa"
+  | "disabilita"
   | "finanza"
   | "territorio"
   | "ambiente"
@@ -204,6 +213,7 @@ const NAV_GROUPS: NavGroup[] = [
       { id: "economia", label: "Economia", Icon: Factory },
       { id: "istruzione", label: "Istruzione", Icon: School },
       { id: "societa", label: "Società", Icon: Handshake },
+      { id: "disabilita", label: "Disabilità", Icon: Accessibility },
       { id: "finanza", label: "Finanza", Icon: Landmark },
     ],
   },
@@ -313,6 +323,7 @@ export function DashboardTabs({
         {tab === "economia" && <Economia kpi={kpi} />}
         {tab === "istruzione" && <Istruzione kpi={kpi} />}
         {tab === "societa" && <Societa kpi={kpi} />}
+        {tab === "disabilita" && <DisabilitaTab />}
         {tab === "finanza" && <Finanza kpi={kpi} />}
         {tab === "territorio" && <Territorio kpi={kpi} />}
         {tab === "ambiente" && <Ambiente kpi={kpi} />}
@@ -574,6 +585,13 @@ function Panoramica({
             {...go("societa")}
           />
           <KpiCard
+            label={t("Accessibilità OSM")}
+            value={t("Mappa e stalli")}
+            hint={t("Disabilità e luoghi accessibili")}
+            icon={Accessibility}
+            {...go("disabilita")}
+          />
+          <KpiCard
             label={t("Civici ANNCSU")}
             value={valueOrMissing(civici?.n_civici, formatInteger)}
             {...go("mappa")}
@@ -654,6 +672,27 @@ function Istruzione({ kpi }: { kpi: Kpi }) {
 
       <ScuoleMiurPanel />
     </section>
+  );
+}
+
+function DisabilitaTab() {
+  const { detail, loading } = useDettaglio("runts");
+  const runts = asRecord(detail?.runts);
+  const enti = Array.isArray(runts?.enti)
+    ? (runts.enti as Array<{
+        denom?: string;
+        sez?: string;
+        x1000?: boolean;
+        data_iscr?: string;
+        rapp?: string;
+      }>)
+    : [];
+
+  return (
+    <>
+      {loading ? <LoadingBlock /> : null}
+      <DisabilitaPanel runtsEnti={enti} />
+    </>
   );
 }
 

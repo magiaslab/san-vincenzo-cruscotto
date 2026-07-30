@@ -432,6 +432,34 @@ export default function AttribuzioniPage() {
                 — farmacie di turno (orari e date) per San Vincenzo e comuni
                 vicini
               </li>
+              <li>
+                <a
+                  className="text-[#0066CC] underline"
+                  href="https://www.openstreetmap.org/copyright"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  OpenStreetMap
+                </a>{" "}
+                /{" "}
+                <a
+                  className="text-[#0066CC] underline"
+                  href="https://wheelmap.org/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Wheelmap
+                </a>{" "}
+                — accessibilità (wheelchair, stalli disabili, bagni);{" "}
+                <a
+                  className="text-[#0066CC] underline"
+                  href="https://www.disabilitaincifre.istat.it/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  ISTAT Disabilità in cifre
+                </a>
+              </li>
             </ul>
           </Section>
 

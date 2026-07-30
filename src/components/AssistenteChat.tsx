@@ -26,11 +26,11 @@ type Msg = {
 const SUGGESTIONS = [
   "Quanti abitanti ha San Vincenzo?",
   "Qual è la capienza del porto?",
+  "Dove trovo i luoghi accessibili?",
   "Quante colonnine EV ci sono?",
   "Dove trovo i prezzi dei carburanti?",
   "Quante strutture ricettive ci sono?",
   "Qual è la raccolta differenziata?",
-  "Come va il bilancio comunale?",
   "Dove sono le allerte Protezione Civile?",
 ];
 
