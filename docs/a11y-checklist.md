@@ -1,7 +1,8 @@
 # Checklist accessibilità (manuale, leggera)
 
 Allineata ai fondamenti [Designers Italia — Accessibilità](https://designers.italia.it/design-system/fondamenti/accessibilita/) e al floor in `DESIGN.md`.
-Obiettivo operativo: WCAG 2.1 A/AA sui flussi principali, senza audit formale completo.
+
+**Livello dichiarato in-app:** obiettivo **WCAG 2.1 AA**, stato **conformità parziale** (in miglioramento). Non esiste ancora una dichiarazione di accessibilità formale AGID (progetto indipendente, non PA obbligatoria).
 
 Eseguire dopo cambi UI rilevanti (shell, dialog, form, tabelle).
 

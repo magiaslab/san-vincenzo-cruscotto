@@ -40,4 +40,5 @@ Preferire `var(--pa-*)` o classi Tailwind che le referenziano rispetto a hex rip
 - Un `h1` per vista; skip link; `aria-modal` + focus trap su dialog/drawer
 - Touch target min ~44px; `prefers-reduced-motion` rispettato
 - Contrasto AA su testo muted e primary
+- Dichiarazione in-app (tab Disabilità): obiettivo **WCAG 2.1 AA**, stato **conformità parziale**
 - Checklist manuale: `docs/a11y-checklist.md` · CI: `npm run lint` (jsx-a11y)

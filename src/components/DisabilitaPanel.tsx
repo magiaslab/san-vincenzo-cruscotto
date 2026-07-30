@@ -14,6 +14,7 @@ import "leaflet/dist/leaflet.css";
 import { Accessibility, ExternalLink, ParkingSquare, Toilet } from "lucide-react";
 import { useT } from "@/lib/i18n";
 import {
+  GITHUB_REPO_URL,
   MAP_CENTER,
   MAP_DEFAULT_ZOOM,
   OSM_COPYRIGHT_URL,
@@ -46,15 +47,26 @@ type RuntsEnte = {
   rapp?: string;
 };
 
+function MapReady() {
+  const map = useMap();
+  useEffect(() => {
+    const id = window.setTimeout(() => map.invalidateSize(), 80);
+    return () => window.clearTimeout(id);
+  }, [map]);
+  return null;
+}
+
 function FitPoints({ points }: { points: [number, number][] }) {
   const map = useMap();
   useEffect(() => {
     if (points.length === 0) return;
     if (points.length === 1) {
       map.setView(points[0], 15);
+      window.setTimeout(() => map.invalidateSize(), 100);
       return;
     }
     map.fitBounds(L.latLngBounds(points), { padding: [28, 28], maxZoom: 15 });
+    window.setTimeout(() => map.invalidateSize(), 100);
   }, [map, points]);
   return null;
 }
@@ -101,6 +113,67 @@ function FilterChip({
   );
 }
 
+/** Badge conformità del sito (non dei punti OSM). Onesto: parziale, non certificato. */
+function AccessibilitaCompliance() {
+  const t = useT();
+  return (
+    <aside
+      className="mb-4 panel"
+      aria-labelledby="a11y-compliance-title"
+    >
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <Accessibility
+              size={22}
+              strokeWidth={2}
+              className="shrink-0 text-[var(--pa-primary)]"
+              aria-hidden
+            />
+            <h3 id="a11y-compliance-title" className="m-0 text-base font-bold">
+              {t("Accessibilità di questo sito")}
+            </h3>
+          </div>
+          <p className="mb-0 mt-2 text-sm text-[var(--pa-muted)]">
+            {t(
+              "Obiettivo WCAG 2.1 livello AA sui flussi principali. Stato attuale: conformità parziale (in miglioramento). Non è ancora pubblicata una dichiarazione di accessibilità formale AGID: il cruscotto è un progetto indipendente.",
+            )}
+          </p>
+          <ul className="mb-0 mt-2 flex list-none flex-wrap gap-2 p-0">
+            <li>
+              <span className="inline-flex min-h-11 items-center rounded-lg bg-[var(--pa-surface-soft)] px-3 py-1.5 text-xs font-bold text-[var(--pa-ink)] sm:text-sm">
+                WCAG 2.1 AA
+              </span>
+            </li>
+            <li>
+              <span className="inline-flex min-h-11 items-center rounded-lg border border-[color-mix(in_srgb,var(--pa-warning)_45%,var(--pa-border))] bg-[color-mix(in_srgb,var(--pa-warning)_10%,white)] px-3 py-1.5 text-xs font-bold text-[var(--pa-ink)] sm:text-sm">
+                {t("Conformità parziale")}
+              </span>
+            </li>
+            <li>
+              <span className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-[var(--pa-border)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--pa-ink)] sm:text-sm">
+                <Accessibility size={16} strokeWidth={2} aria-hidden />
+                {t("Simbolo internazionale di accessibilità")}
+              </span>
+            </li>
+          </ul>
+        </div>
+        <div className="flex shrink-0 flex-col gap-2 sm:items-end">
+          <OutlineLink href="https://designers.italia.it/design-system/fondamenti/accessibilita/">
+            Designers Italia
+          </OutlineLink>
+          <OutlineLink href="https://www.w3.org/WAI/standards-guidelines/wcag/">
+            W3C WCAG 2.1
+          </OutlineLink>
+          <OutlineLink href={`${GITHUB_REPO_URL}/blob/master/docs/a11y-checklist.md`}>
+            {t("Checklist del progetto")}
+          </OutlineLink>
+        </div>
+      </div>
+    </aside>
+  );
+}
+
 export function AccessibilitaMap({
   punti,
 }: {
@@ -129,7 +202,7 @@ export function AccessibilitaMap({
           className="mb-0"
         />
       </div>
-      <div className="relative z-0 h-[360px] w-full overflow-hidden sm:h-[440px]">
+      <div className="relative isolate z-0 h-[360px] w-full overflow-hidden sm:h-[440px] [&_.leaflet-container]:h-full [&_.leaflet-container]:w-full [&_.leaflet-container]:z-0">
         <MapContainer
           center={MAP_CENTER}
           zoom={MAP_DEFAULT_ZOOM}
@@ -138,9 +211,10 @@ export function AccessibilitaMap({
           attributionControl
         >
           <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · &copy; <a href="https://carto.com/attributions">CARTO</a>'
+            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
           />
+          <MapReady />
           <FitPoints points={points} />
           {punti.map((p) => (
             <CircleMarker
@@ -359,7 +433,9 @@ export default function DisabilitaPanel({
             </p>
           </div>
           <table className="mt-2 min-w-full text-left text-xs sm:text-sm">
-            <caption className="sr-only">Tabella dati</caption>
+            <caption className="sr-only">
+              {t("Elenco punti di accessibilità")}
+            </caption>
             <thead className="bg-[#e8f2fc]">
               <tr>
                 <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Nome")}</th>
@@ -403,6 +479,8 @@ export default function DisabilitaPanel({
           </table>
         </div>
       ) : null}
+
+      {!loading ? <AccessibilitaCompliance /> : null}
 
       <div className="mb-4 grid gap-3 sm:gap-4 lg:grid-cols-2">
         <div className="panel">

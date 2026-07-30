@@ -75,13 +75,17 @@ export type AccessibilitaPayload = {
 const DISCLAIMER =
   "Dati OpenStreetMap / Wheelmap basati su contributi volontari: possono essere incompleti o non aggiornati. Non sostituiscono i servizi ufficiali del Comune, della SDS o dell’Azienda USL. Segnala correzioni su OpenStreetMap o Wheelmap.";
 
+/** Endpoint Overpass in ordine di affidabilità (kumi spesso timeout). */
 const OVERPASS_ENDPOINTS = [
-  "https://overpass.kumi.systems/api/interpreter",
   "https://overpass-api.de/api/interpreter",
+  "https://overpass.osm.ch/api/interpreter",
+  "https://overpass.kumi.systems/api/interpreter",
 ] as const;
 
+const OVERPASS_FETCH_MS = 22_000;
+
 function buildQuery(lat: number, lon: number, radiusM: number): string {
-  return `[out:json][timeout:60];
+  return `[out:json][timeout:25];
 (
   node["wheelchair"](around:${radiusM},${lat},${lon});
   way["wheelchair"](around:${radiusM},${lat},${lon});
@@ -164,6 +168,8 @@ function toPoint(el: OverpassElement): AccessPoint | null {
 async function fetchOverpass(query: string): Promise<OverpassElement[]> {
   let lastErr: unknown;
   for (const endpoint of OVERPASS_ENDPOINTS) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), OVERPASS_FETCH_MS);
     try {
       const res = await fetch(endpoint, {
         method: "POST",
@@ -174,6 +180,7 @@ async function fetchOverpass(query: string): Promise<OverpassElement[]> {
             "CruscottoSanVincenzo/1.0 (+https://www.cruscottosanvincenzo.it)",
         },
         body: `data=${encodeURIComponent(query)}`,
+        signal: ctrl.signal,
         next: { revalidate: 21600 },
       });
       if (!res.ok) throw new Error(`overpass_http_${res.status}`);
@@ -181,6 +188,8 @@ async function fetchOverpass(query: string): Promise<OverpassElement[]> {
       return Array.isArray(json.elements) ? json.elements : [];
     } catch (err) {
       lastErr = err;
+    } finally {
+      clearTimeout(timer);
     }
   }
   throw lastErr instanceof Error ? lastErr : new Error("overpass_failed");
