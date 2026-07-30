@@ -43,6 +43,7 @@ import { EventiComunePanel } from "@/components/EventiComunePanel";
 import { FarmacieTurno } from "@/components/FarmacieTurno";
 import { Footer } from "@/components/Footer";
 import { ScuoleMiurPanel } from "@/components/ScuoleMiurPanel";
+import { TrasportiPanel } from "@/components/TrasportiPanel";
 import {
   DataUnavailable,
   KpiCard,
@@ -2050,7 +2051,17 @@ function Infra({ kpi }: { kpi: Kpi }) {
 
   return (
     <section>
-      <SectionIntro title={t("Mobilità")} description={t("Banda larga, ricarica EV, veicoli, incidenti, pendolarismo e carburanti.")} />
+      <SectionIntro
+        title={t("Mobilità")}
+        description={t(
+          "Trasporto pubblico (GTFS Toscana), ciclabili e pedonali, banda larga, ricarica EV, veicoli, incidenti, pendolarismo e carburanti.",
+        )}
+      />
+
+      <div className="mb-6">
+        <TrasportiPanel embedded />
+      </div>
+
       <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
         <KpiCard label={t("Copertura FTTH")} value={valueOrMissing(banda?.copertura_ftth_pct ?? asRecord(agcom?.kpi)?.copertura_ftth_desi_pct, formatPercent)} hint={`FTTH 20m ${formatPercent(num(banda?.copertura_ftth_20m_pct ?? asRecord(agcom?.kpi)?.copertura_ftth_20m_pct))}`} />
         <KpiCard label={t("Punti ricarica EV")} value={valueOrMissing(punKpi?.n_totale, formatInteger)} hint={`${formatInteger(num(punKpi?.n_attivi))} attivi · ${formatDecimal(num(punKpi?.potenza_tot_kw ?? punKpi?.potenza_totale_kw), 0)} kW`} />

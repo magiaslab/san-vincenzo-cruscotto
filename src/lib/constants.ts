@@ -108,6 +108,28 @@ export const ARPAT_BALNEAZIONE_URL =
   "https://www.arpat.toscana.it/tema-ambientale/balneazione/";
 export const REGIONE_TOSCANA_OPENDATA_URL = "https://dati.toscana.it/";
 export const REGIONE_TOSCANA_CKAN_API = "https://dati.toscana.it/api/3/action";
+
+/** Orari TPL regionale (GTFS) — dataset Regione Toscana. */
+export const RT_ORARITB_DATASET_URL =
+  "https://dati.toscana.it/dataset/rt-oraritb" as const;
+export const RT_ORARITB_CKAN_ID = "rt-oraritb" as const;
+export const AUTOLINEE_GTFS_URL =
+  "https://regionetoscana.smartregion.toscana.it/mobility/artifacts/gtfs" as const;
+export const TRASPORTI_GTFS_SV_PATH = "/data/trasporti-gtfs-sv.json" as const;
+
+/** Aree ciclabili / pedonali (open data comunale via dati.toscana.it / ldpgis). */
+export const CICLABILI_DATASET_URL =
+  "https://dati.toscana.it/dataset/aree-di-circolazione-ciclabili28" as const;
+export const PEDONALI_DATASET_URL =
+  "https://dati.toscana.it/dataset/aree-di-circolazione-pedonale29" as const;
+export const CICLABILI_GEOJSON_LIVE_URL =
+  "https://sanvincenzo.ldpgis.it/metarepo2/api/datasets/area_di_circolazione_ciclabile/resources/139/GeoJSON" as const;
+export const PEDONALI_GEOJSON_LIVE_URL =
+  "https://sanvincenzo.ldpgis.it/metarepo2/api/datasets/area_di_circolazione_pedonale/resources/138/GeoJSON" as const;
+export const CICLABILI_GEOJSON_PATH =
+  "/data/ciclabili-san-vincenzo.geojson" as const;
+export const PEDONALI_GEOJSON_PATH =
+  "/data/pedonali-san-vincenzo.geojson" as const;
 export const MINISTERO_CULTURA_URL = "https://dati.beniculturali.it/";
 export const MINISTERO_CULTURA_API = "https://opendata.beniculturali.it";
 export const CARTO_ATTRIBUTION_URL = "https://carto.com/";

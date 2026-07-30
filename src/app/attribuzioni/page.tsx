@@ -267,7 +267,7 @@ export default function AttribuzioniPage() {
                 >
                   Regione Toscana Open Data
                 </a>{" "}
-                — eventi culturali e dataset territoriali
+                — eventi culturali, orari TPL (GTFS), aree ciclabili e pedonali
               </li>
               <li>
                 <a
