@@ -49,6 +49,7 @@ import { ScuoleMiurPanel } from "@/components/ScuoleMiurPanel";
 import { AllerteMeteoPanel } from "@/components/AllerteMeteoPanel";
 import { TrasportiPanel } from "@/components/TrasportiPanel";
 import { PartecipaPanel } from "@/components/PartecipaPanel";
+import { TurismoFlussiPanel } from "@/components/TurismoFlussiPanel";
 import {
   DataUnavailable,
   KpiCard,
@@ -989,7 +990,12 @@ function Turismo({
     <section>
       <SectionIntro
         title={t("Turismo")}
-        description={t("Ricettività ISTAT, calendario eventi comunale, biblioteca e cultura. I dati del porto sono nella sezione dedicata.")}
+        description={t(
+          "Ricettività ISTAT, flussi e stagionalità (Regione Toscana), calendario eventi comunale, biblioteca e cultura. I dati del porto sono nella sezione dedicata.",
+        )}
+        sourceNote={t(
+          "Flussi comunali: arrivi/presenze da open data Regione Toscana (fonte ISTAT).",
+        )}
       />
       <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
         <KpiCard label={t("Strutture")} value={valueOrMissing(capacita?.totale_strutture, formatInteger)} />
@@ -1005,7 +1011,9 @@ function Turismo({
         />
       </div>
 
-      <p className="mb-4 text-sm text-[var(--pa-muted)]">
+      <TurismoFlussiPanel />
+
+      <p className="mb-4 mt-4 text-sm text-[var(--pa-muted)]">
         {t("Cerchi posti barca, webcam o traffico AIS? Vai a")}{" "}
         <button
           type="button"
