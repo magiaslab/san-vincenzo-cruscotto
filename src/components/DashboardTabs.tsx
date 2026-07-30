@@ -200,6 +200,7 @@ const NAV_GROUPS: NavGroup[] = [
       { id: "disabilita", label: "Disabilità", Icon: Accessibility },
       { id: "infra", label: "Mobilità", Icon: Train },
       { id: "meteo", label: "Meteo", Icon: CloudSun },
+      { id: "partecipa", label: "Partecipa", Icon: MessageSquarePlus },
     ],
   },
   {
@@ -219,7 +220,6 @@ const NAV_GROUPS: NavGroup[] = [
       { id: "istruzione", label: "Istruzione", Icon: School },
       { id: "societa", label: "Società", Icon: Handshake },
       { id: "finanza", label: "Finanza", Icon: Landmark },
-      { id: "partecipa", label: "Partecipa", Icon: MessageSquarePlus },
     ],
   },
 ];

@@ -1,5 +1,5 @@
 /* Service worker minimo per installabilità PWA del Cruscotto San Vincenzo. */
-const CACHE = "sv-cruscotto-v1";
+const CACHE = "sv-cruscotto-v2";
 const PRECACHE = ["/", "/manifest.webmanifest", "/favicon.svg"];
 
 self.addEventListener("install", (event) => {
