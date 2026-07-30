@@ -486,4 +486,19 @@ export const en: Record<string, string> = {
   "Uso terzi": "Third-party use",
   "Verificare sempre il cartello turni fuori dalla farmacia.": "Always check the duty notice posted outside the pharmacy.",
 
+  "Calendario ufficiale su Visit San Vincenzo": "Official calendar on Visit San Vincenzo",
+  "Cerca": "Search",
+  "Evento": "Event",
+  "Filtra per testo, luogo o periodo.": "Filter by text, place or period.",
+  "Link": "Link",
+  "Luogo": "Place",
+  "Nessun evento corrisponde ai filtri selezionati.": "No events match the selected filters.",
+  "Periodo": "Period",
+  "risultati": "results",
+  "Sito / biglietti": "Website / tickets",
+  "Sito ufficiale": "Official website",
+  "Titolo, luogo, descrizione…": "Title, place, description…",
+  "Tutti i luoghi": "All places",
+  "Tutti i periodi": "All periods",
+
 };

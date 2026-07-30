@@ -35,6 +35,7 @@ import {
   Handshake,
 } from "lucide-react";
 import { AppShell, type NavGroup } from "@/components/AppShell";
+import { EventiComunePanel } from "@/components/EventiComunePanel";
 import { FarmacieTurno } from "@/components/FarmacieTurno";
 import { Footer } from "@/components/Footer";
 import { ScuoleMiurPanel } from "@/components/ScuoleMiurPanel";
@@ -882,7 +883,7 @@ function Turismo({
     ? (cultura.luoghi as Array<Record<string, unknown>>)
     : [];
   const listaEventiComune = Array.isArray(eventiComune?.eventi)
-    ? (eventiComune.eventi as Array<Record<string, unknown>>).slice(0, 24)
+    ? (eventiComune.eventi as Array<Record<string, unknown>>)
     : [];
   const listaEventiToscana = Array.isArray(eventiToscana?.eventi)
     ? (eventiToscana.eventi as Array<Record<string, unknown>>).slice(0, 12)
@@ -999,58 +1000,14 @@ function Turismo({
       ) : null}
 
       {listaEventiComune.length > 0 ? (
-        <div className="mt-4 panel">
-          <h3>{t("Eventi e manifestazioni (Comune)")}</h3>
-          <p className="mb-3 text-xs text-[#5b6f82] sm:text-sm">
-            Calendario ufficiale su Visit San Vincenzo — {formatInteger(num(eventiComune?.n_eventi))} voci.
-          </p>
-          <ul className="space-y-3 text-xs sm:text-sm">
-            {listaEventiComune.map((ev, i) => (
-              <li
-                key={`${String(ev.titolo)}-${String(ev.periodo)}-${i}`}
-                className="border-b border-[#eef2f5] pb-3 last:border-0 last:pb-0"
-              >
-                <strong className="text-sm sm:text-base">{String(ev.titolo)}</strong>
-                {ev.periodo ? (
-                  <>
-                    <br />
-                    <span className="font-semibold text-[var(--pa-primary)]">{String(ev.periodo)}</span>
-                  </>
-                ) : null}
-                <br />
-                <span className="text-[#5b6f82]">
-                  {[ev.orario, ev.luogo].filter(Boolean).map(String).join(" · ")}
-                </span>
-                {ev.descrizione ? (
-                  <>
-                    <br />
-                    <span className="text-xs text-[#5b6f82]">{String(ev.descrizione)}</span>
-                  </>
-                ) : null}
-              </li>
-            ))}
-          </ul>
-          <p className="mb-0 mt-3 text-xs text-[#5b6f82] sm:text-sm">
-            {t("Fonte:")}{" "}
-            <a
-              href={String(asRecord(eventiComune?.fonte)?.url ?? "https://visitsanvincenzo.it/it/calendario-eventi/")}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline"
-            >
-              Visit San Vincenzo
-            </a>
-            {" · "}
-            <a
-              href={String(asRecord(eventiComune?.fonte)?.comune_url ?? "https://www.comune.sanvincenzo.li.it/Vivere-il-comune/Eventi")}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline"
-            >
-              {t("pagina Eventi del Comune")}
-            </a>
-          </p>
-        </div>
+        <EventiComunePanel
+          eventi={listaEventiComune}
+          nEventi={num(eventiComune?.n_eventi) ?? listaEventiComune.length}
+          fonteUrl={String(asRecord(eventiComune?.fonte)?.url ?? "") || null}
+          comuneUrl={
+            String(asRecord(eventiComune?.fonte)?.comune_url ?? "") || null
+          }
+        />
       ) : eventiComune?.disponibile === false ? (
         <div className="mt-4">
           <DataUnavailable
@@ -1117,27 +1074,75 @@ function Turismo({
 
       {luoghiCultura.length > 0 ? (
         <div className="mt-4 panel">
-          <h3>{t("Luoghi di interesse culturale")}</h3>
-          <ul className="space-y-2 text-xs sm:text-sm">
-            {luoghiCultura.map((luogo) => (
-              <li key={String(luogo.nome)} className="border-b border-[#eef2f5] pb-2 last:border-0">
-                <strong className="text-sm sm:text-base">{String(luogo.nome)}</strong>
-                <br />
-                <span className="text-[#5b6f82]">
-                  {String(luogo.tipologia)} • {String(luogo.tipo)}
-                  {luogo.visitabile === true ? " • Visitabile" : ""}
-                </span>
-                {luogo.note ? (
-                  <>
-                    <br />
-                    <span className="text-xs text-[#5b6f82]">{String(luogo.note)}</span>
-                  </>
-                ) : null}
-              </li>
-            ))}
+          <h3 className="m-0 mb-3 text-base font-bold text-[var(--pa-ink)]">
+            {t("Luoghi di interesse culturale")}
+          </h3>
+          <ul className="m-0 list-none space-y-3 p-0 text-xs sm:text-sm">
+            {luoghiCultura.map((luogo) => {
+              const nome = String(luogo.nome ?? "");
+              const sito =
+                typeof luogo.sito === "string" && luogo.sito.trim()
+                  ? luogo.sito.trim()
+                  : null;
+              const maps =
+                typeof luogo.maps_url === "string" && luogo.maps_url.trim()
+                  ? luogo.maps_url.trim()
+                  : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                      `${nome}, San Vincenzo LI`,
+                    )}`;
+              const primary = sito || maps;
+              return (
+                <li
+                  key={nome}
+                  className="border-b border-[#eef2f5] pb-3 last:border-0 last:pb-0"
+                >
+                  <a
+                    href={primary}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-bold text-[var(--pa-primary)] underline-offset-2 hover:underline sm:text-base"
+                  >
+                    {nome}
+                  </a>
+                  <br />
+                  <span className="text-[#5b6f82]">
+                    {String(luogo.tipologia)} • {String(luogo.tipo)}
+                    {luogo.visitabile === true ? ` • ${t("Visitabile")}` : ""}
+                  </span>
+                  {luogo.note ? (
+                    <>
+                      <br />
+                      <span className="text-xs text-[#5b6f82]">
+                        {String(luogo.note)}
+                      </span>
+                    </>
+                  ) : null}
+                  <div className="mt-2 flex flex-wrap gap-3">
+                    {sito ? (
+                      <a
+                        href={sito}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-semibold text-[var(--pa-primary)] underline"
+                      >
+                        {t("Sito ufficiale")}
+                      </a>
+                    ) : null}
+                    <a
+                      href={maps}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-semibold text-[var(--pa-primary)] underline"
+                    >
+                      Google Maps
+                    </a>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
           <p className="mb-0 mt-2.5 text-xs text-[#5b6f82] sm:mt-3 sm:text-sm">
-            Fonte: Ministero della Cultura - Catalogo generale beni culturali
+            {t("Fonte: Ministero della Cultura - Catalogo generale beni culturali")}
           </p>
         </div>
       ) : null}
