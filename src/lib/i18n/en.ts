@@ -305,6 +305,8 @@ export const en: Record<string, string> = {
   "Imposta media €": "Average tax €",
   "in cerca": "job seekers",
   "In evidenza": "Highlights",
+  "Progetto": "Project",
+  "Riusa questo cruscotto": "Reuse this dashboard",
   "in Safari": "in Safari",
   "Incassi SIOPE": "SIOPE receipts",
   "Incidenti": "Accidents",
