@@ -4,7 +4,8 @@ Documento di analisi per integrare nel **Cruscotto San Vincenzo** un flusso
 cittadino che segnala / mappa defibrillatori (DAE) mancanti, accessibile dalla
 sezione Sanità e gestito via **Telegram**.
 
-Stato: **proposta tecnica** (non implementazione completa del bot).
+Stato: **MVP implementato** (webhook + overlay + CTA). Configurare env su Vercel
+e `TELEGRAM_ADMIN_CHAT_IDS` dopo il primo `/start`.
 
 ---
 
@@ -274,12 +275,12 @@ lon 10.48–10.58 · lat 43.02–43.12
 - CTA UI verso OpenAEDMap (+ placeholder deep-link Telegram).
 - Questo documento.
 
-### Fase 1 — Bot MVP
+### Fase 1 — Bot MVP ✅ (in codice)
 
-- Bot `@…` + webhook.
-- Store segnalazioni + canale admin.
-- Overlay sulla `DaeMap`.
-- CTA attiva nel cruscotto.
+- Bot `@DaesanvincenzoBot` + `POST /api/telegram/webhook`.
+- Store segnalazioni su `public/data/dae-segnalazioni.geojson` (+ opzionale GitHub API).
+- Overlay sulla `DaeMap` + CTA Telegram.
+- Polling locale: `npm run telegram:poll`.
 
 ### Fase 2 — Qualità
 

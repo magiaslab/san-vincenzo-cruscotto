@@ -259,6 +259,8 @@ export const en: Record<string, string> = {
   "Fonte:": "Source:",
   "{n} punti su OpenStreetMap nel territorio comunale. In emergenza chiama sempre il 118.": "{n} points on OpenStreetMap in the municipality. In an emergency always call 118.",
   "{n} defibrillatori georeferenziati nel territorio comunale. In emergenza chiama sempre il 118.": "{n} georeferenced defibrillators in the municipality. In an emergency always call 118.",
+  "{n} defibrillatori georeferenziati nel territorio comunale (+ {s} segnalazioni cittadine). In emergenza chiama sempre il 118.": "{n} georeferenced defibrillators in the municipality (+ {s} citizen reports). In an emergency always call 118.",
+  "Segnalazione cittadina (in attesa di OSM)": "Citizen report (pending OSM)",
   "Fonte: Ministero della Cultura - Catalogo generale beni culturali": "Source: Ministry of Culture — General catalogue of cultural heritage",
   "Fonte: Portale Unico dei Dati della Scuola.": "Source: Unified School Data Portal.",
   "Fonti sezione:": "Section sources:",

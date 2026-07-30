@@ -34,6 +34,8 @@ Apri [http://localhost:3000](http://localhost:3000).
 | `GET /api/meteo/radar` | Metadati frame radar RainViewer |
 | `GET /api/farmacie/turno` | Farmacie di turno (FarmacieDiTurno.org) |
 | `GET /api/dae` | DAE comunali da GeoJSON locale (OpenAEDMap / OSM) |
+| `GET /api/dae/segnalazioni` | Overlay segnalazioni Telegram approvate |
+| `POST /api/telegram/webhook` | Webhook bot @DaesanvincenzoBot |
 | `POST /api/assistente` | Proxy RAG su Modal (HF self-host) |
 
 ## Mappa DAE (defibrillatori)

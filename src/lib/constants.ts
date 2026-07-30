@@ -45,11 +45,15 @@ export const OPENAEDMAP_URL = "https://openaedmap.org/it/#map=14/43.085/10.54";
 export const DAE_GEOJSON_PATH = "/data/dae-san-vincenzo.geojson";
 
 /**
- * Deep-link bot Telegram per segnalare nuovi DAE (opzionale).
- * Vedi docs/dae-telegram-bot.md. Se assente, la CTA punta a OpenAEDMap.
+ * Deep-link bot Telegram per segnalare nuovi DAE.
+ * Vedi docs/dae-telegram-bot.md.
  */
 export const TELEGRAM_DAE_BOT_URL =
-  process.env.NEXT_PUBLIC_TELEGRAM_BOT_URL?.trim() || "";
+  process.env.NEXT_PUBLIC_TELEGRAM_BOT_URL?.trim() ||
+  "https://t.me/DaesanvincenzoBot";
+
+/** GeoJSON overlay segnalazioni cittadine (approvate). */
+export const DAE_SEGNALAZIONI_API = "/api/dae/segnalazioni";
 
 /** Coordinate meteo (centro comune) per Open-Meteo / overlay radar. */
 export const METEO_LAT = 43.085;

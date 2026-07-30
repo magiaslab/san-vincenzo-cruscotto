@@ -14,6 +14,7 @@ import "leaflet/dist/leaflet.css";
 import { HeartPulse } from "lucide-react";
 import {
   DAE_GEOJSON_PATH,
+  DAE_SEGNALAZIONI_API,
   MAP_CENTER,
   MAP_DEFAULT_ZOOM,
   OPENAEDMAP_URL,
@@ -52,24 +53,31 @@ function FitPoints({ points }: { points: [number, number][] }) {
   return null;
 }
 
-/** Mappa DAE (defibrillatori) da GeoJSON locale (export OpenAEDMap / OSM). */
+/** Mappa DAE (defibrillatori) da GeoJSON locale (export OpenAEDMap / OSM) + segnalazioni. */
 export function DaeMap() {
   const t = useT();
   const [data, setData] = useState<FeatureCollection | null>(null);
+  const [segnalazioni, setSegnalazioni] = useState<FeatureCollection | null>(
+    null,
+  );
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
-    // File statico in /public: niente Overpass, caricamento affidabile.
-    fetch(DAE_GEOJSON_PATH)
-      .then((r) => {
+    Promise.all([
+      fetch(DAE_GEOJSON_PATH).then((r) => {
         if (!r.ok) throw new Error("dae");
-        return r.json();
-      })
-      .then((json: FeatureCollection) => {
+        return r.json() as Promise<FeatureCollection>;
+      }),
+      fetch(DAE_SEGNALAZIONI_API)
+        .then((r) => (r.ok ? (r.json() as Promise<FeatureCollection>) : null))
+        .catch(() => null),
+    ])
+      .then(([json, seg]) => {
         if (cancelled) return;
         setData(json);
+        if (seg) setSegnalazioni(seg);
       })
       .catch(() => {
         if (!cancelled) setError("Impossibile caricare la mappa DAE");
@@ -83,26 +91,40 @@ export function DaeMap() {
   }, []);
 
   const points = useMemo(() => {
-    if (!data?.features?.length) return [] as [number, number][];
     const pts: [number, number][] = [];
-    for (const f of data.features) {
+    for (const f of data?.features ?? []) {
+      if (f.geometry?.type !== "Point") continue;
+      const [lon, lat] = f.geometry.coordinates;
+      if (typeof lat === "number" && typeof lon === "number") pts.push([lat, lon]);
+    }
+    for (const f of segnalazioni?.features ?? []) {
       if (f.geometry?.type !== "Point") continue;
       const [lon, lat] = f.geometry.coordinates;
       if (typeof lat === "number" && typeof lon === "number") pts.push([lat, lon]);
     }
     return pts;
-  }, [data]);
+  }, [data, segnalazioni]);
 
   const count = data?.features.length ?? 0;
+  const segCount = segnalazioni?.features.length ?? 0;
+  const hasMap = points.length > 0;
 
   return (
     <div className="panel overflow-hidden p-0">
       <div className="border-b border-[var(--pa-border)] px-4 py-3">
         <PanelHeading
           title={t("Mappa DAE (defibrillatori)")}
-          description={t(
-            "{n} defibrillatori georeferenziati nel territorio comunale. In emergenza chiama sempre il 118.",
-          ).replace("{n}", String(count))}
+          description={
+            segCount > 0
+              ? t(
+                  "{n} defibrillatori georeferenziati nel territorio comunale (+ {s} segnalazioni cittadine). In emergenza chiama sempre il 118.",
+                )
+                  .replace("{n}", String(count))
+                  .replace("{s}", String(segCount))
+              : t(
+                  "{n} defibrillatori georeferenziati nel territorio comunale. In emergenza chiama sempre il 118.",
+                ).replace("{n}", String(count))
+          }
           icon={HeartPulse}
           actions={
             <SolidLink href={OPENAEDMAP_URL}>OpenAEDMap</SolidLink>
@@ -117,7 +139,7 @@ export function DaeMap() {
             <DataUnavailable message={t(error)} />
           </div>
         ) : null}
-        {!loading && !error && data && data.features.length === 0 ? (
+        {!loading && !error && !hasMap ? (
           <div className="p-4">
             <DataUnavailable
               message={t(
@@ -126,7 +148,7 @@ export function DaeMap() {
             />
           </div>
         ) : null}
-        {!loading && !error && data && data.features.length > 0 ? (
+        {!loading && !error && hasMap ? (
           <MapContainer
             center={MAP_CENTER}
             zoom={MAP_DEFAULT_ZOOM}
@@ -139,7 +161,7 @@ export function DaeMap() {
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             <FitPoints points={points} />
-            {data.features.map((f, i) => {
+            {(data?.features ?? []).map((f, i) => {
               const [lon, lat] = f.geometry.coordinates;
               const nome = String(f.properties.nome ?? "DAE");
               const ubicazione = String(f.properties.ubicazione ?? "");
@@ -208,6 +230,37 @@ export function DaeMap() {
                 </CircleMarker>
               );
             })}
+            {(segnalazioni?.features ?? []).map((f, i) => {
+              const [lon, lat] = f.geometry.coordinates;
+              const nome = String(f.properties.nome ?? "Segnalazione DAE");
+              const ubicazione = String(f.properties.ubicazione ?? "");
+              return (
+                <CircleMarker
+                  key={`seg-${String(f.properties.id ?? i)}`}
+                  center={[lat, lon]}
+                  radius={9}
+                  pathOptions={{
+                    color: "#0066CC",
+                    fillColor: "#0066CC",
+                    fillOpacity: 0.75,
+                    weight: 1,
+                    dashArray: "2 4",
+                  }}
+                >
+                  <Popup>
+                    <strong>{nome}</strong>
+                    <br />
+                    {t("Segnalazione cittadina (in attesa di OSM)")}
+                    {ubicazione ? (
+                      <>
+                        <br />
+                        {ubicazione}
+                      </>
+                    ) : null}
+                  </Popup>
+                </CircleMarker>
+              );
+            })}
           </MapContainer>
         ) : null}
       </div>
@@ -218,11 +271,9 @@ export function DaeMap() {
           )}
         </p>
         <div className="mt-2 flex flex-wrap gap-2">
-          {TELEGRAM_DAE_BOT_URL ? (
-            <SolidLink href={TELEGRAM_DAE_BOT_URL}>
-              {t("Segnala un DAE su Telegram")}
-            </SolidLink>
-          ) : null}
+          <SolidLink href={`${TELEGRAM_DAE_BOT_URL}?start=sanita`}>
+            {t("Segnala un DAE su Telegram")}
+          </SolidLink>
           <SolidLink href={OPENAEDMAP_URL}>
             {t("Aggiungi su OpenAEDMap")}
           </SolidLink>
@@ -248,9 +299,15 @@ export function DaeMap() {
           >
             OpenStreetMap
           </a>
-          {TELEGRAM_DAE_BOT_URL
-            ? null
-            : ` · ${t("Bot Telegram in preparazione (vedi documentazione tecnica).")}`}
+          {" · "}
+          <a
+            href={TELEGRAM_DAE_BOT_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold underline"
+          >
+            @DaesanvincenzoBot
+          </a>
         </p>
       </div>
     </div>
