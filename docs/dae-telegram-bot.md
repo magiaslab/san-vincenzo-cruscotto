@@ -278,7 +278,10 @@ lon 10.48–10.58 · lat 43.02–43.12
 ### Fase 1 — Bot MVP ✅ (in codice)
 
 - Bot `@DaesanvincenzoBot` + `POST /api/telegram/webhook`.
-- Store segnalazioni su `public/data/dae-segnalazioni.geojson` (+ opzionale GitHub API).
+- Store segnalazioni: GeoJSON `public/data/dae-segnalazioni.geojson` in **locale**;
+  su **Vercel** la fonte di verità è lo stesso file via **GitHub Contents API**
+  (`GITHUB_TOKEN` con `contents:write`). Senza token, Approva fallisce con
+  «non trovata nello store» perché il filesystem del deploy non persiste.
 - Overlay sulla `DaeMap` + CTA Telegram.
 - Polling locale: `npm run telegram:poll`.
 
@@ -403,7 +406,8 @@ Nel progetto Vercel → **Settings → Environment Variables** (Production + Pre
 | `TELEGRAM_WEBHOOK_SECRET` | stringa lunga random | solo server |
 | `TELEGRAM_ADMIN_CHAT_IDS` | `-100123...,987654` | solo server |
 | `NEXT_PUBLIC_TELEGRAM_BOT_URL` | `https://t.me/DaeSanVincenzoBot` | pubblica (build) |
-| store Redis/KV | URL + token | solo server |
+| `GITHUB_TOKEN` | PAT/fine-grained con **contents:write** | solo server (obbligatorio su Vercel) |
+| `GITHUB_REPO` / `GITHUB_BRANCH` | default: repo del cruscotto / `master` | solo server |
 
 Poi **Redeploy** (obbligatorio per `NEXT_PUBLIC_*`).
 

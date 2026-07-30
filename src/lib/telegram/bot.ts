@@ -233,6 +233,28 @@ async function handleUbicazioneReply(msg: TelegramMessage) {
 
   const saved = await upsertSegnalazione(feature);
 
+  if (!saved.ok) {
+    console.error("upsertSegnalazione failed", id, saved.via);
+    await notifyAdmins(
+      [
+        "<b>⚠️ Segnalazione DAE NON salvata</b>",
+        `ID: <code>${id}</code>`,
+        `Ubicazione: ${ubicazione}`,
+        `Coord: <code>${coords.lat.toFixed(6)}, ${coords.lon.toFixed(6)}</code>`,
+        "Persistenza fallita (serve GITHUB_TOKEN con contents:write su Vercel).",
+      ].join("\n"),
+    );
+    await sendMessage(
+      msg.chat.id,
+      [
+        "Non sono riuscito a salvare la segnalazione sul server.",
+        "Riprova tra poco o contatta i moderatori. L’ID non è stato registrato.",
+      ].join("\n"),
+      { reply_markup: { remove_keyboard: true } },
+    );
+    return true;
+  }
+
   const adminText = [
     "<b>Nuova segnalazione DAE</b>",
     `ID: <code>${id}</code>`,
@@ -291,7 +313,11 @@ async function handleCallback(cq: TelegramCallbackQuery) {
     await answerCallbackQuery(cq.id, "Segnalazione non trovata");
     await sendMessage(
       chatId,
-      `Segnalazione <code>${id}</code> non trovata nello store.`,
+      [
+        `Segnalazione <code>${id}</code> non trovata nello store (o persistenza fallita).`,
+        "Su Vercel serve <code>GITHUB_TOKEN</code> con permesso <code>contents:write</code>;",
+        "senza token le segnalazioni non sopravvivono tra una richiesta e l’altra.",
+      ].join("\n"),
     );
     return;
   }
