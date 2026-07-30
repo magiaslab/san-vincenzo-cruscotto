@@ -2,12 +2,8 @@
 
 import { Accessibility } from "lucide-react";
 import { useT } from "@/lib/i18n";
-import {
-  WHEELMAP_URL,
-  WHEELMAP_WIDGET_INFO_URL,
-  buildWheelmapEmbedSrc,
-} from "@/lib/accessibilita";
-import { OutlineLink, PanelHeading, SolidLink } from "@/components/ui";
+import { WHEELMAP_URL, buildWheelmapEmbedSrc } from "@/lib/accessibilita";
+import { PanelHeading, SolidLink } from "@/components/ui";
 
 /**
  * Iframe ufficiale Wheelmap.
