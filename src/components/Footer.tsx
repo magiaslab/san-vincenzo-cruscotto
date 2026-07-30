@@ -52,6 +52,12 @@ export function Footer() {
             >
               {t("Attribuzioni e regole")}
             </Link>
+            <Link
+              href="/#partecipa"
+              className="inline-flex min-h-11 items-center font-semibold text-white underline underline-offset-2"
+            >
+              {t("Suggerimenti")}
+            </Link>
             <a
               href={`mailto:${AUTHOR.email}`}
               className="inline-flex min-h-11 items-center font-semibold text-white underline underline-offset-2"
