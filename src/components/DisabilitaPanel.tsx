@@ -314,13 +314,13 @@ export default function DisabilitaPanel({
         </p>
       ) : null}
 
-      <div className="mb-4">
-        <WheelmapEmbed
-          embedToken={
-            process.env.NEXT_PUBLIC_WHEELMAP_EMBED_TOKEN?.trim() || null
-          }
-        />
-      </div>
+      {process.env.NEXT_PUBLIC_WHEELMAP_EMBED_TOKEN?.trim() ? (
+        <div className="mb-4">
+          <WheelmapEmbed
+            embedToken={process.env.NEXT_PUBLIC_WHEELMAP_EMBED_TOKEN.trim()}
+          />
+        </div>
+      ) : null}
 
       <div className="mb-3 flex flex-wrap gap-2">
         <FilterChip active={filter === "tutti"} onClick={() => setFilter("tutti")}>

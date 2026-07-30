@@ -11,8 +11,8 @@ import { OutlineLink, PanelHeading, SolidLink } from "@/components/ui";
 
 /**
  * Iframe ufficiale Wheelmap.
- * Richiede NEXT_PUBLIC_WHEELMAP_EMBED_TOKEN (widget Sozialhelden / accessibility.cloud):
- * senza token il sito risponde con X-Frame-Options: SAMEORIGIN e l’embed non funziona.
+ * Visibile solo con NEXT_PUBLIC_WHEELMAP_EMBED_TOKEN (widget Sozialhelden).
+ * Senza token non renderizza nulla: resta la mappa OSM locale.
  */
 export default function WheelmapEmbed({
   embedToken,
@@ -21,40 +21,7 @@ export default function WheelmapEmbed({
 }) {
   const t = useT();
 
-  if (!embedToken) {
-    return (
-      <div className="panel overflow-hidden p-0">
-        <div className="border-b border-[var(--pa-border)] px-4 py-3">
-          <PanelHeading
-            title={t("Mappa Wheelmap")}
-            description={t(
-              "L’iframe ufficiale richiede un embedToken da Sozialhelden (Wheelmap Widget). Sotto trovi già la mappa OSM con gli stessi dati wheelchair.",
-            )}
-            icon={Accessibility}
-            actions={
-              <div className="flex flex-wrap gap-2">
-                <SolidLink href={WHEELMAP_URL}>Apri Wheelmap</SolidLink>
-                <OutlineLink href={WHEELMAP_WIDGET_INFO_URL}>
-                  {t("Info widget")}
-                </OutlineLink>
-              </div>
-            }
-            className="mb-0"
-          />
-        </div>
-        <div className="space-y-2 px-4 py-3 text-xs text-[var(--pa-muted)] sm:text-sm">
-          <p className="m-0">
-            {t(
-              "Per attivare l’embed: richiedi il widget a info@sozialhelden.de, poi imposta su Vercel la variabile NEXT_PUBLIC_WHEELMAP_EMBED_TOKEN.",
-            )}
-          </p>
-          <p className="m-0 font-mono text-[11px] text-[var(--pa-ink)]">
-            NEXT_PUBLIC_WHEELMAP_EMBED_TOKEN=…
-          </p>
-        </div>
-      </div>
-    );
-  }
+  if (!embedToken) return null;
 
   const src = buildWheelmapEmbedSrc(embedToken);
 
