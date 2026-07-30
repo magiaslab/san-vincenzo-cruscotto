@@ -151,6 +151,17 @@ export const CARTO_ATTRIBUTION_URL = "https://carto.com/";
 /** Codice comune per API Ministero Cultura */
 export const COMUNE_ISTAT_CULTURA = "049018";
 
+/**
+ * Prezzi colonnine EV aggregati (OpenChargeMap + OSM) via PienoFurbo.
+ * Non c’è un obbligo nazionale tipo MIMIT: i prezzi sono parziali e indicativi.
+ */
+export const PIENOFURBO_COLONNINE_URL =
+  "https://www.pienofurbo.it/colonnine" as const;
+export const PIENOFURBO_COLONNINE_SEARCH_URL =
+  "https://www.pienofurbo.it/colonnine/search" as const;
+export const OPENCHARGEMAP_URL = "https://openchargemap.org/" as const;
+export const PUN_IDR_URL = "https://www.piattaformaunicanazionale.it/idr" as const;
+
 /** Farmacie di turno (San Vincenzo) — codice farmaciediturno.org = ISTAT senza lo 0 iniziale. */
 export const FARMACIE_DI_TURNO_COD = "49018" as const;
 export const FARMACIE_DI_TURNO_URL =

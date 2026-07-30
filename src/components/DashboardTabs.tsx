@@ -119,6 +119,11 @@ const PunIdrMap = dynamic(
   },
 );
 
+const EvPrezziPanel = dynamic(() => import("@/components/EvPrezziPanel"), {
+  ssr: false,
+  loading: () => <LoadingBlock label={translate(getFormatLocale(), "Caricamento colonnine…")} />,
+});
+
 const CarburantiMap = dynamic(
   () => import("@/components/InfraExtras").then((m) => m.CarburantiMap),
   {
@@ -2237,6 +2242,10 @@ function Infra({ kpi }: { kpi: Kpi }) {
             />
           </div>
         ) : null}
+      </div>
+
+      <div className="mb-4">
+        <EvPrezziPanel />
       </div>
 
       <div className="mb-4">

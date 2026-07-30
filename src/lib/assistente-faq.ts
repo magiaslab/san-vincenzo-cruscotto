@@ -61,10 +61,19 @@ const RULES: Rule[] = [
       /colonnin|ricarica\s*ev|\bev\b|punti\s*di\s*ricarica|pun\/idr|auto\s*elettric|veicol[ei]\s*elettric/i,
     ],
     answer:
-      "Punti di ricarica EV: 38 totali (33 attivi), potenza complessiva circa 1.408 kW (OpenChargeMap). Mappa e KPI in Mobilità.",
+      "Punti di ricarica EV: 38 totali (33 attivi), potenza complessiva circa 1.408 kW. Gestori e prezzi indicativi (€/kWh) sono nella sezione Mobilità: verifica sempre sull’app del gestore.",
     href: "/#infra",
     label: "Apri sezione Mobilità",
     title: "Colonnine EV",
+  },
+  {
+    id: "ev-prezzi",
+    patterns: [/prezzo.*ricaric|costo.*ricaric|tariffa.*colonnin|€\s*\/\s*kwh|euro\s*kwh|prezzi\s*ev|gestore.*colonnin/i],
+    answer:
+      "I prezzi €/kWh delle colonnine sono parziali e indicativi (PienoFurbo / OpenChargeMap). In Mobilità trovi la tabella gestori/prezzi: conferma sempre su fonti ufficiali o app del gestore.",
+    href: "/#infra",
+    label: "Apri sezione Mobilità",
+    title: "Prezzi ricarica EV",
   },
   {
     id: "ftth",
