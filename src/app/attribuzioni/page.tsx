@@ -375,6 +375,15 @@ export default function AttribuzioniPage() {
                 — punti ricarica EV;{" "}
                 <a
                   className="text-[#0066CC] underline"
+                  href="https://www.pienofurbo.it/colonnine"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  PienoFurbo
+                </a>{" "}
+                (OpenChargeMap + OpenStreetMap) — prezzi indicativi €/kWh;{" "}
+                <a
+                  className="text-[#0066CC] underline"
                   href="https://www.mimit.gov.it/it/open-data/elenco-dataset/osservatorio-prezzi-carburanti"
                   target="_blank"
                   rel="noopener noreferrer"
