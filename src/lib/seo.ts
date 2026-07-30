@@ -67,6 +67,9 @@ export const SITE_KEYWORDS = [
   "carburanti",
   "FTTH",
   "balneazione ARPAT",
+  "accessibilità",
+  "disabilità",
+  "Wheelmap",
 ] as const;
 
 export const OG_IMAGE = {

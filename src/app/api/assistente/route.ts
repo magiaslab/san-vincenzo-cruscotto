@@ -109,6 +109,7 @@ function linkFromSources(
     [/finanz|siope/i, "/#finanza", "Apri sezione Finanza"],
     [/scuol|istruz|miur/i, "/#istruzione", "Apri sezione Istruzione"],
     [/societ|welfare/i, "/#societa", "Apri sezione Società"],
+    [/disabil|accessib|wheelchair|barriere|peba/i, "/#disabilita", "Apri sezione Disabilità"],
     [/popolaz|demograf|panoramic/i, "/#panoramica", "Apri sezione Panoramica"],
     [/territor/i, "/#territorio", "Apri sezione Territorio"],
     [/mappa|catasto|civici/i, "/#mappa", "Apri sezione Mappa"],

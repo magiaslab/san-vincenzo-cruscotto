@@ -292,11 +292,22 @@ const RULES: Rule[] = [
   },
   {
     id: "societa",
-    patterns: [/societ[aà]|servizi\s*sociali|disabilit|anziani|welfare|assegno/i],
+    patterns: [/societ[aà]|servizi\s*sociali|anziani|welfare|assegno/i],
     answer: "Indicatori sociali e welfare sono nella sezione Società.",
     href: "/#societa",
     label: "Apri sezione Società",
     title: "Società",
+  },
+  {
+    id: "disabilita",
+    patterns: [
+      /disabilit|accessibilit[aà]|barriere|wheelchair|stalli\s*disabil|bagno\s*accessibil|peba|carrozzin|inclusione/i,
+    ],
+    answer:
+      "Luoghi accessibili, stalli e bagni (OpenStreetMap/Wheelmap) e enti del terzo settore sono nella sezione Disabilità. I dati OSM sono volontari: verifica sempre sulle fonti ufficiali.",
+    href: "/#disabilita",
+    label: "Apri sezione Disabilità",
+    title: "Disabilità",
   },
 
   // —— Territorio / Mappa ——

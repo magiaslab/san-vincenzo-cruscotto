@@ -1,6 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import {
   Activity,
+  Accessibility,
   AlertTriangle,
   ArrowLeftRight,
   BadgeCheck,
@@ -79,6 +80,7 @@ export const KPI_ICONS: Record<string, LucideIcon> = {
   "Opere BDAP": HardHat,
   "Contratti ANAC": ScrollText,
   "Enti RUNTS": Handshake,
+  "Accessibilità OSM": Accessibility,
   "Civici ANNCSU": MapPinned,
   "Impianti carburanti": Fuel,
   "Pendolarismo netto": ArrowLeftRight,
