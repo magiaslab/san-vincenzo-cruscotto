@@ -10,7 +10,7 @@ export const VIAGGIATRENO_BASE =
 export const FS_STAZIONE_SAN_VINCENZO = "S06030" as const;
 
 export const VIAGGIATRENO_ATTRIBUTION_URL =
-  "http://www.viaggiatreno.it/" as const;
+  "https://www.viaggiatreno.it/" as const;
 
 export type TreniBoardKind = "partenze" | "arrivi";
 
