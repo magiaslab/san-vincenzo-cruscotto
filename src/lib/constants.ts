@@ -54,6 +54,10 @@ export const RAINVIEWER_MAPS_URL =
   "https://api.rainviewer.com/public/weather-maps.json";
 export const RAINVIEWER_ATTRIBUTION_URL = "https://www.rainviewer.com/";
 
+/** OpenWeather (piano free): current, forecast 5d/3h, air pollution. */
+export const OPENWEATHER_BASE_URL = "https://api.openweathermap.org/data/2.5";
+export const OPENWEATHER_ATTRIBUTION_URL = "https://openweathermap.org/";
+
 /** Limite punti civici inviati al client (paginazione server-side). */
 export const CIVICI_MAP_LIMIT = 1500;
 

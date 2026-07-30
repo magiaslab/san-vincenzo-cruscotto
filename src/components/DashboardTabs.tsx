@@ -33,6 +33,10 @@ import {
   Pill,
   School,
   Handshake,
+  Gauge,
+  Eye,
+  Sunrise,
+  Leaf,
 } from "lucide-react";
 import { AppShell, type NavGroup } from "@/components/AppShell";
 import { EventiComunePanel } from "@/components/EventiComunePanel";
@@ -2530,10 +2534,25 @@ function Ambiente({ kpi }: { kpi: Kpi }) {
   );
 }
 
+function formatClock(iso: unknown): string | null {
+  if (typeof iso !== "string" || !iso) return null;
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return null;
+  return d.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
+}
+
+function owIconUrl(icon: unknown): string | null {
+  if (typeof icon !== "string" || !icon) return null;
+  return `https://openweathermap.org/img/wn/${icon}@2x.png`;
+}
+
 function Meteo({ kpi }: { kpi: Kpi }) {
   const t = useT();
   const [live, setLive] = useState<Record<string, unknown> | null>(null);
   const [forecast, setForecast] = useState<Record<string, unknown> | null>(null);
+  const [openWeather, setOpenWeather] = useState<Record<string, unknown> | null>(
+    null,
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const fallback = asRecord(kpi.meteo_italiameteo);
@@ -2542,9 +2561,11 @@ function Meteo({ kpi }: { kpi: Kpi }) {
     setLoading(true);
     setError(null);
     try {
-      const [kpiRes, fcRes] = await Promise.all([
-        fetch(`/api/meteo?_=${Date.now()}`, { cache: "no-store" }),
-        fetch(`/api/meteo/forecast?_=${Date.now()}`, { cache: "no-store" }),
+      const stamp = Date.now();
+      const [kpiRes, fcRes, owRes] = await Promise.all([
+        fetch(`/api/meteo?_=${stamp}`, { cache: "no-store" }),
+        fetch(`/api/meteo/forecast?_=${stamp}`, { cache: "no-store" }),
+        fetch(`/api/meteo/openweather?_=${stamp}`, { cache: "no-store" }),
       ]);
       if (kpiRes.ok) {
         const data = await kpiRes.json();
@@ -2552,7 +2573,11 @@ function Meteo({ kpi }: { kpi: Kpi }) {
       }
       if (fcRes.ok) {
         setForecast(await fcRes.json());
-      } else if (!kpiRes.ok) {
+      }
+      if (owRes.ok) {
+        setOpenWeather(await owRes.json());
+      }
+      if (!kpiRes.ok && !fcRes.ok && !owRes.ok) {
         throw new Error("fetch failed");
       }
     } catch {
@@ -2573,6 +2598,15 @@ function Meteo({ kpi }: { kpi: Kpi }) {
     if (!meteo) return null;
     return asRecord(meteo.osservazione) ?? asRecord(meteo.corrente) ?? meteo;
   }, [meteo]);
+
+  const owCurrent = asRecord(openWeather?.current);
+  const owAir = asRecord(openWeather?.air);
+  const owDaily = Array.isArray(openWeather?.daily)
+    ? (openWeather.daily as Record<string, unknown>[])
+    : [];
+  const owSlots = Array.isArray(openWeather?.forecast_3h)
+    ? (openWeather.forecast_3h as Record<string, unknown>[])
+    : [];
 
   const currentOm = asRecord(forecast?.current);
   const hourly = asRecord(forecast?.hourly);
@@ -2597,17 +2631,40 @@ function Meteo({ kpi }: { kpi: Kpi }) {
     ? (daily.weather_desc as string[])
     : [];
 
+  const weatherHint =
+    String(
+      owCurrent?.description ??
+        currentOm?.weather_desc ??
+        stats?.ww_desc ??
+        "",
+    ) || undefined;
+
+  const aqi = num(owAir?.aqi);
+  const aqiVariant: "default" | "success" | "info" | "danger" =
+    aqi == null
+      ? "default"
+      : aqi <= 2
+        ? "success"
+        : aqi === 3
+          ? "info"
+          : "danger";
+
   return (
     <section>
       <SectionIntro
         title={t("Meteo")}
-        description={t("Condizioni live (ItaliaMeteo/Cineca + Open-Meteo), previsioni orarie/giornaliere e radar precipitazioni RainViewer su mappa.")}
+        description={t("Condizioni live (OpenWeather + ItaliaMeteo/Cineca + Open-Meteo), qualità dell’aria, previsioni e radar precipitazioni RainViewer su mappa.")}
       />
       <div className="mb-3 flex flex-wrap items-center gap-2 sm:gap-3">
         <SolidButton onClick={() => void load()}>{t("Aggiorna ora")}</SolidButton>
         {loading ? (
           <span className="text-xs text-[var(--pa-muted)] sm:text-sm">
             {t("Aggiornamento…")}
+          </span>
+        ) : null}
+        {owCurrent?.dt ? (
+          <span className="text-xs text-[var(--pa-muted)] sm:text-sm">
+            {t("OpenWeather")}: {formatClock(owCurrent.dt)}
           </span>
         ) : null}
       </div>
@@ -2617,33 +2674,41 @@ function Meteo({ kpi }: { kpi: Kpi }) {
         <KpiCard
           label={t("Temperatura")}
           value={valueOrMissing(
-            currentOm?.temperature_2m ?? stats?.t2m_c ?? stats?.temp_c,
+            owCurrent?.temp_c ??
+              currentOm?.temperature_2m ??
+              stats?.t2m_c ??
+              stats?.temp_c,
             (v) => `${formatDecimal(v, 1)} °C`,
           )}
-          hint={
-            String(
-              currentOm?.weather_desc ?? stats?.ww_desc ?? "",
-            ) || undefined
-          }
+          hint={weatherHint}
           icon={Thermometer}
           variant="info"
         />
         <KpiCard
           label={t("Percepita")}
-          value={valueOrMissing(currentOm?.apparent_temperature, (v) =>
-            `${formatDecimal(v, 1)} °C`,
+          value={valueOrMissing(
+            owCurrent?.feels_like_c ?? currentOm?.apparent_temperature,
+            (v) => `${formatDecimal(v, 1)} °C`,
           )}
           icon={Thermometer}
         />
         <KpiCard
           label={t("Min / Max 24h (KPI)")}
-          value={`${valueOrMissing(stats?.t2m_min24h_c, (v) => formatDecimal(v, 1))} / ${valueOrMissing(stats?.t2m_max24h_c, (v) => formatDecimal(v, 1))} °C`}
+          value={`${valueOrMissing(
+            owCurrent?.temp_min_c ?? stats?.t2m_min24h_c,
+            (v) => formatDecimal(v, 1),
+          )} / ${valueOrMissing(
+            owCurrent?.temp_max_c ?? stats?.t2m_max24h_c,
+            (v) => formatDecimal(v, 1),
+          )} °C`}
           icon={Thermometer}
         />
         <KpiCard
           label={t("Umidità")}
           value={valueOrMissing(
-            currentOm?.relative_humidity_2m ?? stats?.umidita_pct,
+            owCurrent?.humidity_pct ??
+              currentOm?.relative_humidity_2m ??
+              stats?.umidita_pct,
             formatPercent,
           )}
           icon={Droplets}
@@ -2652,22 +2717,28 @@ function Meteo({ kpi }: { kpi: Kpi }) {
         <KpiCard
           label={t("Vento")}
           value={valueOrMissing(
-            currentOm?.wind_speed_10m ?? stats?.vento_kmh,
+            owCurrent?.wind_kmh ??
+              currentOm?.wind_speed_10m ??
+              stats?.vento_kmh,
             (v) => `${formatDecimal(v, 1)} km/h`,
           )}
           hint={
-            currentOm?.wind_gusts_10m != null
-              ? `Raffiche ${formatDecimal(num(currentOm.wind_gusts_10m), 1)} km/h`
-              : stats?.raffica_max24h_kmh != null
-                ? `Raffiche max ${formatDecimal(num(stats.raffica_max24h_kmh), 1)} km/h`
-                : undefined
+            owCurrent?.wind_gust_kmh != null
+              ? `Raffiche ${formatDecimal(num(owCurrent.wind_gust_kmh), 1)} km/h`
+              : currentOm?.wind_gusts_10m != null
+                ? `Raffiche ${formatDecimal(num(currentOm.wind_gusts_10m), 1)} km/h`
+                : stats?.raffica_max24h_kmh != null
+                  ? `Raffiche max ${formatDecimal(num(stats.raffica_max24h_kmh), 1)} km/h`
+                  : undefined
           }
           icon={Wind}
         />
         <KpiCard
           label={t("Nuvolosità")}
           value={valueOrMissing(
-            currentOm?.cloud_cover ?? stats?.nuvolosita_pct,
+            owCurrent?.clouds_pct ??
+              currentOm?.cloud_cover ??
+              stats?.nuvolosita_pct,
             formatPercent,
           )}
           icon={CloudRain}
@@ -2675,23 +2746,193 @@ function Meteo({ kpi }: { kpi: Kpi }) {
         <KpiCard
           label={t("Precipitazioni")}
           value={valueOrMissing(
-            currentOm?.precipitation ?? stats?.prec_24h_mm,
+            owCurrent?.rain_1h_mm ??
+              currentOm?.precipitation ??
+              stats?.prec_24h_mm,
             (v) => `${formatDecimal(v, 1)} mm`,
           )}
-          hint={stats?.prec_24h_mm != null ? "KPI: cumulate 24h se da ItaliaMeteo" : undefined}
+          hint={
+            owCurrent?.rain_1h_mm != null
+              ? t("Ultima ora (OpenWeather)")
+              : stats?.prec_24h_mm != null
+                ? "KPI: cumulate 24h se da ItaliaMeteo"
+                : undefined
+          }
           icon={Umbrella}
-          variant={(num(currentOm?.precipitation ?? stats?.prec_24h_mm) ?? 0) > 5 ? "info" : "default"}
+          variant={
+            (num(
+              owCurrent?.rain_1h_mm ??
+                currentOm?.precipitation ??
+                stats?.prec_24h_mm,
+            ) ?? 0) > 5
+              ? "info"
+              : "default"
+          }
         />
         <KpiCard
           label={t("Direzione vento")}
           value={
-            currentOm?.wind_direction_10m != null || stats?.vento_dir_deg != null
-              ? `${formatInteger(num(currentOm?.wind_direction_10m ?? stats?.vento_dir_deg))}°`
+            owCurrent?.wind_deg != null ||
+            currentOm?.wind_direction_10m != null ||
+            stats?.vento_dir_deg != null
+              ? `${formatInteger(
+                  num(
+                    owCurrent?.wind_deg ??
+                      currentOm?.wind_direction_10m ??
+                      stats?.vento_dir_deg,
+                  ),
+                )}°`
               : "n.d."
           }
           icon={Wind}
         />
+        <KpiCard
+          label={t("Pressione")}
+          value={valueOrMissing(owCurrent?.pressure_hpa, (v) =>
+            `${formatInteger(v)} hPa`,
+          )}
+          icon={Gauge}
+        />
+        <KpiCard
+          label={t("Visibilità")}
+          value={valueOrMissing(owCurrent?.visibility_m, (v) =>
+            v >= 1000
+              ? `${formatDecimal(v / 1000, 1)} km`
+              : `${formatInteger(v)} m`,
+          )}
+          icon={Eye}
+        />
+        <KpiCard
+          label={t("Qualità aria (AQI)")}
+          value={
+            aqi != null
+              ? `${formatInteger(aqi)} · ${String(owAir?.aqi_label ?? "")}`
+              : "n.d."
+          }
+          hint={
+            owAir?.components
+              ? `PM2.5 ${formatDecimal(num(asRecord(owAir.components)?.pm2_5), 1)} · PM10 ${formatDecimal(num(asRecord(owAir.components)?.pm10), 1)} µg/m³`
+              : undefined
+          }
+          icon={Leaf}
+          variant={aqiVariant}
+        />
+        <KpiCard
+          label={t("Alba / Tramonto")}
+          value={
+            formatClock(owCurrent?.sunrise) && formatClock(owCurrent?.sunset)
+              ? `${formatClock(owCurrent?.sunrise)} / ${formatClock(owCurrent?.sunset)}`
+              : "n.d."
+          }
+          icon={Sunrise}
+        />
       </div>
+
+      {owSlots.length > 0 ? (
+        <div className="mb-4 panel">
+          <h3>{t("Prossime 24 ore (OpenWeather)")}</h3>
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {owSlots.map((slot, i) => {
+              const icon = owIconUrl(slot.icon);
+              return (
+                <div
+                  key={String(slot.dt ?? i)}
+                  className="min-w-[4.75rem] shrink-0 rounded-lg border border-[#e6eef5] bg-[#f8fbfe] px-2 py-2 text-center"
+                >
+                  <div className="text-[11px] font-semibold text-[#17324d]">
+                    {formatClock(slot.dt) ?? "—"}
+                  </div>
+                  {icon ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={icon}
+                      alt={String(slot.description ?? "")}
+                      width={48}
+                      height={48}
+                      className="mx-auto -my-1 h-12 w-12"
+                    />
+                  ) : (
+                    <CloudSun className="mx-auto my-2 h-6 w-6 text-[#0066CC]" />
+                  )}
+                  <div className="text-sm font-bold text-[#17324d]">
+                    {valueOrMissing(slot.temp_c, (v) => `${formatDecimal(v, 0)}°`)}
+                  </div>
+                  <div className="text-[10px] text-[#5b6f82]">
+                    {slot.pop_pct != null
+                      ? `${formatInteger(num(slot.pop_pct))}%`
+                      : "—"}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
+
+      {owDaily.length > 0 ? (
+        <div className="mb-4 panel">
+          <h3>{t("Previsione 5 giorni (OpenWeather)")}</h3>
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-left text-xs sm:text-sm">
+              <thead className="bg-[#e8f2fc] text-[#17324d]">
+                <tr>
+                  <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Giorno")}</th>
+                  <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Condizioni")}</th>
+                  <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Min/Max")}</th>
+                  <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Pioggia")}</th>
+                  <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Prob.")}</th>
+                  <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Vento max")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {owDaily.map((day) => {
+                  const icon = owIconUrl(day.icon);
+                  return (
+                    <tr key={String(day.date)} className="border-t border-[#eef2f5]">
+                      <td className="px-2 py-1.5 font-semibold sm:px-3 sm:py-2">
+                        {String(day.label ?? day.date ?? "—")}
+                      </td>
+                      <td className="px-2 py-1.5 sm:px-3 sm:py-2">
+                        <span className="inline-flex items-center gap-1">
+                          {icon ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={icon}
+                              alt=""
+                              width={28}
+                              height={28}
+                              className="h-7 w-7"
+                            />
+                          ) : null}
+                          {String(day.description ?? "—")}
+                        </span>
+                      </td>
+                      <td className="px-2 py-1.5 sm:px-3 sm:py-2">
+                        {formatDecimal(num(day.temp_min_c), 1)}
+                        {" / "}
+                        {formatDecimal(num(day.temp_max_c), 1)} °C
+                      </td>
+                      <td className="px-2 py-1.5 sm:px-3 sm:py-2">
+                        {formatDecimal(num(day.rain_mm), 1)} mm
+                      </td>
+                      <td className="px-2 py-1.5 sm:px-3 sm:py-2">
+                        {day.pop_max != null
+                          ? formatPercent(num(day.pop_max))
+                          : "—"}
+                      </td>
+                      <td className="px-2 py-1.5 sm:px-3 sm:py-2">
+                        {day.wind_max_kmh != null
+                          ? `${formatDecimal(num(day.wind_max_kmh), 0)} km/h`
+                          : "—"}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : null}
 
       <div className="mb-4">
         <MeteoRadarMap />
@@ -2816,11 +3057,20 @@ function Meteo({ kpi }: { kpi: Kpi }) {
       ) : null}
 
       <p className="mt-2 text-[11px] text-[#5b6f82] sm:text-xs">
-        Fonti aggiuntive:{" "}
+        Fonti:{" "}
+        <a
+          href="https://openweathermap.org/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline"
+        >
+          OpenWeather
+        </a>{" "}
+        (condizioni, previsione 5 giorni, qualità aria) ·{" "}
         <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer" className="underline">
           Open-Meteo
         </a>{" "}
-        (previsioni) ·{" "}
+        (grafici orari/giornalieri) ·{" "}
         <a href="https://www.rainviewer.com/" target="_blank" rel="noopener noreferrer" className="underline">
           RainViewer
         </a>{" "}
