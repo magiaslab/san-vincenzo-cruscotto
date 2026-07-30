@@ -39,6 +39,7 @@ import {
   Leaf,
   Accessibility,
   Zap,
+  MessageSquarePlus,
 } from "lucide-react";
 import { AppShell, type NavGroup } from "@/components/AppShell";
 import { EventiComunePanel } from "@/components/EventiComunePanel";
@@ -47,6 +48,7 @@ import { Footer } from "@/components/Footer";
 import { ScuoleMiurPanel } from "@/components/ScuoleMiurPanel";
 import { AllerteMeteoPanel } from "@/components/AllerteMeteoPanel";
 import { TrasportiPanel } from "@/components/TrasportiPanel";
+import { PartecipaPanel } from "@/components/PartecipaPanel";
 import {
   DataUnavailable,
   KpiCard,
@@ -186,7 +188,8 @@ type TabId =
   | "infra"
   | "sanita"
   | "meteo"
-  | "mappa";
+  | "mappa"
+  | "partecipa";
 
 const NAV_GROUPS: NavGroup[] = [
   {
@@ -216,6 +219,7 @@ const NAV_GROUPS: NavGroup[] = [
       { id: "istruzione", label: "Istruzione", Icon: School },
       { id: "societa", label: "Società", Icon: Handshake },
       { id: "finanza", label: "Finanza", Icon: Landmark },
+      { id: "partecipa", label: "Partecipa", Icon: MessageSquarePlus },
     ],
   },
 ];
@@ -332,6 +336,7 @@ export function DashboardTabs({
         {tab === "sanita" && <Sanita kpi={kpi} />}
         {tab === "meteo" && <Meteo kpi={kpi} />}
         {tab === "mappa" && <MapPanel kpi={kpi} />}
+        {tab === "partecipa" && <PartecipaPanel />}
       </div>
       <AssistenteFab />
     </AppShell>
@@ -440,6 +445,12 @@ function Panoramica({
               title: t("Eventi e biblioteca"),
               hint: t("Calendario Visit SV e Biblioteca Calandra"),
               Icon: Palmtree,
+            },
+            {
+              id: "partecipa" as const,
+              title: t("Suggerimenti"),
+              hint: t("Proponi miglioramenti: diventano issue su GitHub"),
+              Icon: MessageSquarePlus,
             },
           ] as const
         ).map(({ id, title, hint, Icon }, i) => (

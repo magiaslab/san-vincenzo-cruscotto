@@ -309,6 +309,17 @@ const RULES: Rule[] = [
     label: "Apri sezione Disabilità",
     title: "Disabilità",
   },
+  {
+    id: "partecipa",
+    patterns: [
+      /suggeriment|feedback|segnala(re)?\s*(un\s*)?(problema|bug|migliorament)|partecip|github\s*issue|proposta/i,
+    ],
+    answer:
+      "Puoi proporre miglioramenti nella sezione Partecipa: il form apre una issue su GitHub.",
+    href: "/#partecipa",
+    label: "Apri sezione Partecipa",
+    title: "Partecipa",
+  },
 
   // —— Territorio / Mappa ——
   {
