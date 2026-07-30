@@ -15,7 +15,7 @@ import { SkipLink } from "@/components/SkipLink";
 import {
   AUTHOR,
   COMUNE_NOME,
-  COMUNE_PROVINCIA,
+  COMUNE_REGIONE,
   STEMMA,
 } from "@/lib/constants";
 import { formatDateTime } from "@/lib/format";
@@ -129,7 +129,7 @@ export function AppShell({
           Cruscotto {COMUNE_NOME}
         </p>
         <p className="m-0 mt-0.5 text-xs leading-tight text-[var(--pa-muted)]">
-          {COMUNE_PROVINCIA} · {t("dati aperti")}
+          {COMUNE_REGIONE} · {t("dati aperti")}
         </p>
       </div>
     </button>
