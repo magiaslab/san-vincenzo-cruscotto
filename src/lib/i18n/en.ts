@@ -52,6 +52,7 @@ export const en: Record<string, string> = {
   "Trasporto pubblico e mobilità dolce": "Public transport and active mobility",
   "Orari TPL (GTFS Regione Toscana), fermate e linee Autolinee Toscane, partenze FS da S.Vincenzo, aree ciclabili e pedonali comunali.": "Public transport schedules (Tuscany Region GTFS), Autolinee Toscane stops and lines, train departures from S.Vincenzo, municipal cycling and pedestrian areas.",
   "Fermate bus (8 km)": "Bus stops (8 km)",
+  "Linea": "Line",
   "Linee bus": "Bus lines",
   "Stazioni FS vicine": "Nearby train stations",
   "Partenze campione da S.Vincenzo": "Sample departures from S.Vincenzo",
