@@ -6,8 +6,12 @@ Progetto **indipendente e non ufficiale**, realizzato da [Alessandro Cipriani](m
 
 ## Riuso / fork
 
-Per duplicare il cruscotto su un altro comune: guida in-app [`/riusa`](https://www.cruscottosanvincenzo.it/riusa),
-documento [`docs/riuso-fork.md`](docs/riuso-fork.md) e checklist [`config/comune.example.json`](config/comune.example.json).
+Guida completa (GitHub → Vercel → dominio, account esterni, Telegram, Modal/HF,
+env, Cursor/Claude/MCP): [`docs/riuso-fork.md`](docs/riuso-fork.md).
+
+In-app: tab **Progetto → Riusa / fork** (`/#riusa`). Checklist:
+[`config/comune.example.json`](config/comune.example.json). Env:
+[`.env.example`](.env.example).
 
 ## Stack
 
