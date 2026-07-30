@@ -48,10 +48,10 @@ export async function GET() {
         features,
         meta: {
           ...(json.meta ?? {}),
-          fonte: "OpenStreetMap / OpenAEDMap (file locale)",
+          fonte: "OpenStreetMap / OpenAEDMap (file locale; aggiornare con npm run dae:sync)",
           mappa_globale: OPENAEDMAP_URL,
           fetched_at: new Date().toISOString(),
-          nota: "Dati volontari OSM: possono essere incompleti rispetto al censimento ufficiale 118.",
+          nota: "Dati volontari OSM: possono essere incompleti rispetto al censimento ufficiale 118. Studio bot Telegram: docs/dae-telegram-bot.md",
         },
       },
       {

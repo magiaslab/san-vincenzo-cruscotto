@@ -12,7 +12,8 @@
     "lint": "eslint",
     "rag:corpus": "node modal_rag/build_corpus.mjs",
     "rag:deploy": "modal deploy modal_rag/app.py",
-    "trasporti:gtfs": "node scripts/build-trasporti-gtfs.mjs"
+    "trasporti:gtfs": "node scripts/build-trasporti-gtfs.mjs",
+    "dae:sync": "node scripts/sync-dae-geojson.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0",

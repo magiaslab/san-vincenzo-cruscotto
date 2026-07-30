@@ -18,6 +18,7 @@ import {
   MAP_DEFAULT_ZOOM,
   OPENAEDMAP_URL,
   OSM_COPYRIGHT_URL,
+  TELEGRAM_DAE_BOT_URL,
 } from "@/lib/constants";
 import {
   DataUnavailable,
@@ -210,28 +211,48 @@ export function DaeMap() {
           </MapContainer>
         ) : null}
       </div>
-      <p className="m-0 border-t border-[var(--pa-border)] bg-[var(--pa-surface-soft)] px-4 py-2 text-xs text-[var(--pa-muted)]">
-        {t(
-          "Fonte volontaria OpenStreetMap (può essere incompleta rispetto al censimento 118). Mappa globale:",
-        )}{" "}
-        <a
-          href={OPENAEDMAP_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-semibold underline"
-        >
-          OpenAEDMap
-        </a>
-        {" · "}
-        <a
-          href={OSM_COPYRIGHT_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-semibold underline"
-        >
-          OpenStreetMap
-        </a>
-      </p>
+      <div className="border-t border-[var(--pa-border)] bg-[var(--pa-surface-soft)] px-4 py-3">
+        <p className="m-0 text-sm text-[var(--pa-ink)]">
+          {t(
+            "Manca un defibrillatore sulla mappa? Puoi segnalarlo: i dati finiscono su OpenStreetMap e aggiornano anche OpenAEDMap.",
+          )}
+        </p>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {TELEGRAM_DAE_BOT_URL ? (
+            <SolidLink href={TELEGRAM_DAE_BOT_URL}>
+              {t("Segnala un DAE su Telegram")}
+            </SolidLink>
+          ) : null}
+          <SolidLink href={OPENAEDMAP_URL}>
+            {t("Aggiungi su OpenAEDMap")}
+          </SolidLink>
+        </div>
+        <p className="m-0 mt-2 text-xs text-[var(--pa-muted)]">
+          {t(
+            "Fonte volontaria OpenStreetMap (può essere incompleta rispetto al censimento 118). Mappa globale:",
+          )}{" "}
+          <a
+            href={OPENAEDMAP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold underline"
+          >
+            OpenAEDMap
+          </a>
+          {" · "}
+          <a
+            href={OSM_COPYRIGHT_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold underline"
+          >
+            OpenStreetMap
+          </a>
+          {TELEGRAM_DAE_BOT_URL
+            ? null
+            : ` · ${t("Bot Telegram in preparazione (vedi documentazione tecnica).")}`}
+        </p>
+      </div>
     </div>
   );
 }
