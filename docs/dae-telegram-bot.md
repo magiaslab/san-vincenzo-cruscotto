@@ -322,6 +322,146 @@ Ordine pratico: aggiornare i dati OSM già mancanti → CTA OpenAEDMap → bot M
 
 ---
 
+## 13. Procedura passo passo (configurazione)
+
+> **Stato codice:** oggi (PR studio) hai sync DAE + CTA sul sito.  
+> Il **runtime del bot** (webhook, wizard, store, overlay segnalazioni) va ancora
+> implementato (Fase 1). Qui sotto la procedura completa: cosa fare **ora** su
+> Telegram/Vercel, e cosa attivare **dopo** che il codice MVP è deployato.
+
+### A. Cosa puoi fare subito (senza bot)
+
+1. Aggiorna i DAE OSM locali:
+   ```bash
+   npm run dae:sync
+   git add public/data/dae-san-vincenzo.geojson
+   git commit -m "Aggiorna DAE da OpenAEDMap"
+   git push
+   ```
+2. Sul sito, in **Sanità**, usa già **Aggiungi su OpenAEDMap** (richiede account OSM).
+
+### B. Crea il bot su Telegram
+
+1. Apri Telegram e cerca **@BotFather**.
+2. Invia `/newbot`.
+3. Scegli un nome visualizzato, es. `DAE San Vincenzo`.
+4. Scegli uno username che finisca con `bot`, es. `DaeSanVincenzoBot`.
+5. Salva il **token** che BotFather ti dà (`123456:ABC-DEF...`). **Non** committarlo.
+6. Opzionale ma utile:
+   - `/setdescription` — es. «Segnala defibrillatori (DAE) a San Vincenzo per il cruscotto open data.»
+   - `/setabouttext` — breve about
+   - `/setuserpic` — icona (cuore/DAE)
+   - `/setcommands` con:
+     ```
+     start - Avvia e leggi le istruzioni
+     nuovo - Segnala un nuovo DAE
+     vicini - DAE già mappati vicino a te
+     stato - Stato di una segnalazione
+     aiuto - Guida
+     annulla - Annulla la procedura in corso
+     ```
+7. Annota l’URL pubblico del bot: `https://t.me/DaeSanVincenzoBot`  
+   (sostituisci con il tuo username).
+
+### C. Prepara la chat moderatori
+
+1. Crea un **gruppo** Telegram (es. `DAE SV — moderazione`) oppure usa chat privata.
+2. Aggiungi il bot al gruppo.
+3. Per i gruppi: BotFather → `/setprivacy` → **Disable** (così il bot legge i comandi nel gruppo), oppure usa solo bottoni inline.
+4. Scrivi qualcosa nel gruppo, poi apri in browser (con il token):
+   ```
+   https://api.telegram.org/bot<TOKEN>/getUpdates
+   ```
+5. Cerca `"chat":{"id": ...}` del gruppo/admin: è il valore per `TELEGRAM_ADMIN_CHAT_IDS`  
+   (più id separati da virgola se servono più moderatori).
+
+### D. Scegli dove gira il bot
+
+Due strade allineate allo stack:
+
+| Opzione | Quando usarla |
+| --- | --- |
+| **Vercel** (`POST /api/telegram/webhook`) + **Upstash Redis / Vercel KV** | Preferita se vuoi tutto sul dominio del cruscotto |
+| **Modal** (come il RAG) | Se preferisci process dedicato Python e Dict persistente |
+
+Serve comunque uno **store** (le Function Vercel sono stateless).
+
+### E. Provisioning store (esempio Upstash)
+
+1. Crea un database Redis su [Upstash](https://upstash.com/) (o Vercel KV dal marketplace).
+2. Copia `UPSTASH_REDIS_REST_URL` e `UPSTASH_REDIS_REST_TOKEN` (o equivalenti).
+3. Queste variabili andranno su Vercel insieme al token Telegram.
+
+### F. Variabili d’ambiente sul sito (Vercel)
+
+Nel progetto Vercel → **Settings → Environment Variables** (Production + Preview):
+
+| Variabile | Esempio | Visibilità |
+| --- | --- | --- |
+| `TELEGRAM_BOT_TOKEN` | token BotFather | solo server |
+| `TELEGRAM_WEBHOOK_SECRET` | stringa lunga random | solo server |
+| `TELEGRAM_ADMIN_CHAT_IDS` | `-100123...,987654` | solo server |
+| `NEXT_PUBLIC_TELEGRAM_BOT_URL` | `https://t.me/DaeSanVincenzoBot` | pubblica (build) |
+| store Redis/KV | URL + token | solo server |
+
+Poi **Redeploy** (obbligatorio per `NEXT_PUBLIC_*`).
+
+In locale, copia in `.env.local` da `.env.example` e riempi gli stessi campi.
+
+### G. Collega il webhook Telegram (dopo il deploy del codice MVP)
+
+1. Assicurati che l’app sia online in HTTPS, es. `https://www.cruscottosanvincenzo.it`.
+2. Imposta il webhook (una tantum):
+   ```bash
+   curl -X POST "https://api.telegram.org/bot<TOKEN>/setWebhook" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "url": "https://www.cruscottosanvincenzo.it/api/telegram/webhook",
+       "secret_token": "<TELEGRAM_WEBHOOK_SECRET>",
+       "allowed_updates": ["message", "callback_query"]
+     }'
+   ```
+3. Verifica:
+   ```bash
+   curl "https://api.telegram.org/bot<TOKEN>/getWebhookInfo"
+   ```
+4. Apri `t.me/<BOT>` → `/start` → deve rispondere.
+
+Per rimuovere il webhook in debug:
+```bash
+curl "https://api.telegram.org/bot<TOKEN>/deleteWebhook"
+```
+
+### H. Configurazione sul sito (UI già predisposta)
+
+1. Con `NEXT_PUBLIC_TELEGRAM_BOT_URL` valorizzata e redeploy fatto, in **Sanità → Mappa DAE** compare il pulsante **Segnala un DAE su Telegram**.
+2. Senza quella variabile resta solo **Aggiungi su OpenAEDMap**.
+3. Deep link consigliato dalla CTA:
+   `https://t.me/<BOT_USERNAME>?start=sanita`  
+   (il payload `sanita` permette analytics / messaggio contestuale).
+
+### I. Checklist di collaudo end-to-end
+
+1. Da smartphone: apri il cruscotto → Sanità → **Segnala un DAE su Telegram**.
+2. `/nuovo` → invia posizione GPS → ubicazione → foto.
+3. Controlla che il gruppo moderatori riceva la scheda.
+4. Approva → il punto compare sull’overlay della mappa (quando il layer sarà implementato).
+5. Opzionale: pubblica su OSM da OpenAEDMap / iD → poi `npm run dae:sync` per portare il punto nel layer “confermati”.
+
+### J. Cosa manca ancora nel codice (prima che G–I funzionino del tutto)
+
+Implementare Fase 1:
+
+1. `POST /api/telegram/webhook` (verifica `X-Telegram-Bot-Api-Secret-Token`).
+2. Wizard conversazionale (`/start`, `/nuovo`, …).
+3. Persistenza segnalazioni sullo store.
+4. `GET /api/dae/segnalazioni` + layer sulla `DaeMap`.
+5. Pulsanti admin Approva / Rifiuta / Prepara OSM.
+
+Finché questi pezzi non sono mergiati, i passi B–F puoi già completarli (bot creato, secret e URL pronti); il webhook (G) va impostato solo dopo il deploy dell’endpoint.
+
+---
+
 ## Riferimenti
 
 - OpenAEDMap backend: https://github.com/openstreetmap-polska/openaedmap-backend  
