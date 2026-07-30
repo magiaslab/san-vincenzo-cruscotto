@@ -53,6 +53,12 @@ export function Footer() {
               {t("Come funziona")}
             </Link>
             <Link
+              href="/riusa"
+              className="inline-flex min-h-11 items-center font-semibold text-white underline underline-offset-2"
+            >
+              {t("Riusa / fork")}
+            </Link>
+            <Link
               href="/attribuzioni"
               className="inline-flex min-h-11 items-center font-semibold text-white underline underline-offset-2"
             >

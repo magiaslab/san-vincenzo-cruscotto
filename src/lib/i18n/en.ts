@@ -47,6 +47,7 @@ export const en: Record<string, string> = {
   "Attribuzioni e fonti": "Attributions and sources",
   "Attribuzioni e regole": "Attributions and rules",
   "Come funziona": "How it works",
+  "Riusa / fork": "Reuse / fork",
   "Balneazione ARPAT, aria, raccolta differenziata e consumo di suolo.": "ARPAT bathing water, air quality, separate collection and land consumption.",
   "Banda larga, ricarica EV, veicoli, incidenti, pendolarismo e carburanti.": "Broadband, EV charging, vehicles, accidents, commuting and fuel.",
   "Trasporto pubblico (GTFS Toscana), ciclabili e pedonali, banda larga, ricarica EV, veicoli, incidenti, pendolarismo e carburanti.": "Public transport (Tuscany GTFS), cycling and pedestrian areas, broadband, EV charging, vehicles, accidents, commuting and fuel.",

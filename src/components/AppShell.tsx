@@ -177,6 +177,13 @@ export function AppShell({
           {t("Come funziona")}
         </Link>
         <Link
+          href="/riusa"
+          className="inline-flex min-h-11 w-full items-center rounded-lg px-2 text-sm font-semibold text-[var(--pa-primary)] underline underline-offset-2 hover:bg-[var(--pa-surface-soft)]"
+          onClick={() => setOpen(false)}
+        >
+          {t("Riusa / fork")}
+        </Link>
+        <Link
           href="/attribuzioni"
           className="inline-flex min-h-11 w-full items-center rounded-lg px-2 text-sm font-semibold text-[var(--pa-primary)] underline underline-offset-2 hover:bg-[var(--pa-surface-soft)]"
           onClick={() => setOpen(false)}

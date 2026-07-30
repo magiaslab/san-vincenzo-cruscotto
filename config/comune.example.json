@@ -1,0 +1,33 @@
+{
+  "$schema_comment": "Esempio di identità comunale per un fork. Non è ancora caricato a runtime: copia i valori in src/lib/constants.ts (e asset correlati).",
+  "istat_code": "049018",
+  "nome": "San Vincenzo",
+  "provincia": "LI",
+  "regione": "Toscana",
+  "miur_codice_catastale": "I390",
+  "farmacie_di_turno_cod": "49018",
+  "geo": {
+    "map_center": [43.085, 10.54],
+    "meteo": [43.085, 10.54],
+    "map_default_zoom": 13
+  },
+  "ferrovie": {
+    "stazione_viaggiatreno": "S06030",
+    "nota": "Codice stazione FS su ViaggiaTreno (senza suffisso _1 del GTFS)."
+  },
+  "brand": {
+    "stemma_path": "/stemma-san-vincenzo.png",
+    "site_url": "https://www.cruscottosanvincenzo.it"
+  },
+  "moduli_locali": {
+    "nota": "Disattiva o sostituisci se non applicabili al tuo comune.",
+    "arpat_balneazione": true,
+    "allerte_toscana": true,
+    "gtfs_regione_toscana": true,
+    "porto_webcam": true,
+    "eventi_visit_comune": true,
+    "opendata_ldpgis": true,
+    "dae_telegram_bot": true,
+    "assistente_rag": true
+  }
+}

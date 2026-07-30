@@ -4,6 +4,11 @@ Dashboard Next.js dei dati aperti del **Comune di San Vincenzo (LI)** (ISTAT `04
 
 Progetto **indipendente e non ufficiale**, realizzato da [Alessandro Cipriani](mailto:cipriani.alessandro@gmail.com). Non è affiliato ad AgID, al Governo italiano o al Comune di San Vincenzo.
 
+## Riuso / fork
+
+Per duplicare il cruscotto su un altro comune: guida in-app [`/riusa`](https://www.cruscottosanvincenzo.it/riusa),
+documento [`docs/riuso-fork.md`](docs/riuso-fork.md) e checklist [`config/comune.example.json`](config/comune.example.json).
+
 ## Stack
 
 - Next.js 15 (App Router) + TypeScript

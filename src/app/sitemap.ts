@@ -17,6 +17,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.6,
     },
     {
+      url: absoluteUrl("/riusa"),
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.55,
+    },
+    {
       url: absoluteUrl("/attribuzioni"),
       lastModified: now,
       changeFrequency: "monthly",

@@ -406,6 +406,10 @@ export default function ComeFunzionaPage() {
               <Link href="/attribuzioni" className="underline">
                 Attribuzioni e regole
               </Link>
+              . Per duplicare lo stack su un altro comune vedi{" "}
+              <Link href="/riusa" className="underline">
+                Riusa / fork
+              </Link>
               .
             </p>
           </Section>
