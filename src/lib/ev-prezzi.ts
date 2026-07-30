@@ -194,7 +194,11 @@ function groupPunStations(punti: PunPoint[]): EvStationRow[] {
     }
   }
 
-  return [...map.values()].map(({ _potenze: _ignored, ...row }) => row);
+  return [...map.values()].map((row) => {
+    const copy: EvStationRow & { _potenze?: number[] } = { ...row };
+    delete copy._potenze;
+    return copy;
+  });
 }
 
 function enrichWithPrices(

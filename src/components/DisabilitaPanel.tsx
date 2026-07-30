@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, type ReactNode } from "react";
+import Link from "next/link";
 import {
   CircleMarker,
   MapContainer,
@@ -403,9 +404,9 @@ export default function DisabilitaPanel({
           {entiRilevanti.length === 0 ? (
             <p className="mb-0 text-sm text-[var(--pa-muted)]">
               {t("Nessun ente evidenziato con le parole chiave correnti.")}{" "}
-              <a href="/#societa" className="underline">
+              <Link href="/#societa" className="underline">
                 {t("Apri Società")}
-              </a>
+              </Link>
             </p>
           ) : (
             <ul className="m-0 list-none space-y-2 p-0">
