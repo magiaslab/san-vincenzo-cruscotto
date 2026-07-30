@@ -148,7 +148,6 @@ async function fetchJson(
 /** Codifica WFS IdroGEO: `cod_reg` + ISTAT a 6 cifre (es. 9 + 049018 → 9049018). */
 export function buildWfsCodIstat(
   codReg: number | null,
-  _proCom: number | null = null,
   istatCode = RISCHIO_ISTAT_CODE,
 ): number | null {
   const reg = codReg ?? 9;
@@ -353,11 +352,10 @@ export async function buildRischioData(
     alluvioni = mapAlluvioni(comune);
 
     const codReg = pickNum(comune, "cod_reg");
-    const proCom = pickNum(comune, "pro_com");
     // cod_prov in PIR comune è la provincia (es. 49 → /pir/province/49)
     const provId = pickNum(comune, "cod_prov");
 
-    const wfsCode = buildWfsCodIstat(codReg, proCom, istatCode);
+    const wfsCode = buildWfsCodIstat(codReg, istatCode);
 
     const [provincia, regione, italia, erosione] = await Promise.all([
       provId != null
@@ -388,7 +386,7 @@ export async function buildRischioData(
     erosioneCostiera = erosione;
   } else {
     // Fallback: prova solo WFS con formula standard Toscana
-    const wfsCode = buildWfsCodIstat(9, Number(istatCode), istatCode);
+    const wfsCode = buildWfsCodIstat(9, istatCode);
     if (wfsCode != null) {
       try {
         erosioneCostiera = await fetchErosioneCostiera(wfsCode);
