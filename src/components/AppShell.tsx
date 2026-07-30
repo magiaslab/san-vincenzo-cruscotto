@@ -26,6 +26,8 @@ export type NavItem = {
   id: string;
   label: string;
   Icon: LucideIcon;
+  /** Se presente, naviga a una pagina (Link) invece di cambiare tab. */
+  href?: string;
 };
 
 export type NavGroup = {
@@ -144,52 +146,40 @@ export function AppShell({
             <ul className="m-0 list-none space-y-0.5 p-0">
               {group.items.map((item) => {
                 const Icon = item.Icon;
-                const isActive = item.id === activeId;
+                const isActive = !item.href && item.id === activeId;
+                const className = `flex min-h-11 w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-semibold transition ${
+                  isActive
+                    ? "bg-[var(--pa-primary)] text-white"
+                    : "text-[var(--pa-ink)] hover:bg-[var(--pa-surface-soft)]"
+                }`;
                 return (
                   <li key={item.id}>
-                    <button
-                      type="button"
-                      onClick={() => go(item.id)}
-                      aria-current={isActive ? "page" : undefined}
-                      className={`flex min-h-11 w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-semibold transition ${
-                        isActive
-                          ? "bg-[var(--pa-primary)] text-white"
-                          : "text-[var(--pa-ink)] hover:bg-[var(--pa-surface-soft)]"
-                      }`}
-                    >
-                      <Icon size={18} strokeWidth={2} className="shrink-0" />
-                      <span>{t(item.label)}</span>
-                    </button>
+                    {item.href ? (
+                      <Link
+                        href={item.href}
+                        className={`${className} no-underline`}
+                        onClick={() => setOpen(false)}
+                      >
+                        <Icon size={18} strokeWidth={2} className="shrink-0" />
+                        <span>{t(item.label)}</span>
+                      </Link>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => go(item.id)}
+                        aria-current={isActive ? "page" : undefined}
+                        className={className}
+                      >
+                        <Icon size={18} strokeWidth={2} className="shrink-0" />
+                        <span>{t(item.label)}</span>
+                      </button>
+                    )}
                   </li>
                 );
               })}
             </ul>
           </div>
         ))}
-      </div>
-
-      <div className="shrink-0 space-y-1 border-t border-[var(--pa-border)] p-3">
-        <Link
-          href="/come-funziona"
-          className="inline-flex min-h-11 w-full items-center rounded-lg px-2 text-sm font-semibold text-[var(--pa-primary)] underline underline-offset-2 hover:bg-[var(--pa-surface-soft)]"
-          onClick={() => setOpen(false)}
-        >
-          {t("Come funziona")}
-        </Link>
-        <Link
-          href="/riusa"
-          className="inline-flex min-h-11 w-full items-center rounded-lg px-2 text-sm font-semibold text-[var(--pa-primary)] underline underline-offset-2 hover:bg-[var(--pa-surface-soft)]"
-          onClick={() => setOpen(false)}
-        >
-          {t("Riusa / fork")}
-        </Link>
-        <Link
-          href="/attribuzioni"
-          className="inline-flex min-h-11 w-full items-center rounded-lg px-2 text-sm font-semibold text-[var(--pa-primary)] underline underline-offset-2 hover:bg-[var(--pa-surface-soft)]"
-          onClick={() => setOpen(false)}
-        >
-          {t("Attribuzioni e regole")}
-        </Link>
       </div>
     </nav>
   );

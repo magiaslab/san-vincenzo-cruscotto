@@ -40,6 +40,9 @@ import {
   Accessibility,
   Zap,
   MessageSquarePlus,
+  Info,
+  GitFork,
+  Scale,
 } from "lucide-react";
 import { AppShell, type NavGroup } from "@/components/AppShell";
 import { EventiComunePanel } from "@/components/EventiComunePanel";
@@ -203,7 +206,6 @@ const NAV_GROUPS: NavGroup[] = [
       { id: "disabilita", label: "Disabilità", Icon: Accessibility },
       { id: "infra", label: "Mobilità", Icon: Train },
       { id: "meteo", label: "Meteo", Icon: CloudSun },
-      { id: "partecipa", label: "Partecipa", Icon: MessageSquarePlus },
     ],
   },
   {
@@ -225,10 +227,30 @@ const NAV_GROUPS: NavGroup[] = [
       { id: "finanza", label: "Finanza", Icon: Landmark },
     ],
   },
+  {
+    label: "Progetto",
+    items: [
+      { id: "partecipa", label: "Partecipa", Icon: MessageSquarePlus },
+      {
+        id: "come-funziona",
+        label: "Come funziona",
+        Icon: Info,
+        href: "/come-funziona",
+      },
+      { id: "riusa", label: "Riusa / fork", Icon: GitFork, href: "/riusa" },
+      {
+        id: "attribuzioni",
+        label: "Attribuzioni e regole",
+        Icon: Scale,
+        href: "/attribuzioni",
+      },
+    ],
+  },
 ];
 
-const TABS = NAV_GROUPS.flatMap((g) => [...g.items]);
-
+const TABS = NAV_GROUPS.flatMap((g) =>
+  g.items.filter((item) => !item.href),
+);
 const TAB_IDS = new Set<string>(TABS.map((t) => t.id));
 
 function isTabId(v: string): v is TabId {
