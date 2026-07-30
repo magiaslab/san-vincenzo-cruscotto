@@ -829,10 +829,35 @@ export const en: Record<string, string> = {
   "Area frane P3+P4": "Landslide area P3+P4",
   "Popolazione frane P3+P4": "Population in landslide P3+P4",
   "Quotazioni immobiliari (OMI)": "Property values (OMI)",
+  "Mercato immobiliare": "Real estate market",
+  "Quotazioni OMI (€/m²) per zona — Agenzia Entrate, Osservatorio Mercato Immobiliare.":
+    "OMI quotations (€/m²) by zone — Agenzia Entrate, Real Estate Market Observatory.",
   "Valori di mercato Agenzia delle Entrate per zone OMI — in integrazione.": "Agenzia delle Entrate market values by OMI zone — integration in progress.",
   "Quotazioni OMI non disponibili": "OMI values unavailable",
   "Il collegamento alle quotazioni OMI è previsto come follow-up. Nessun dato inventato.": "OMI values will be wired as a follow-up. No invented figures.",
+  "Lo snapshot locale delle quotazioni non è disponibile. Il resto del cruscotto resta consultabile.":
+    "The local OMI snapshot is unavailable. The rest of the dashboard remains available.",
   "Caricamento quotazioni OMI…": "Loading OMI values…",
   "Semestre": "Semester",
+  "Zona di riferimento": "Reference zone",
+  "€/m² abitazioni civili (compravendita)": "€/m² residential (sale)",
+  "Media min–max zona principale": "Min–max average of main zone",
+  "€/m²/mese locazione": "€/m²/month rent",
+  "Abitazioni civili — zona principale": "Residential — main zone",
+  "Zone OMI": "OMI zones",
+  "Delimitazioni nel comune": "Zones in the municipality",
+  "Zona OMI": "OMI zone",
+  "Compravendita (abitazioni civili)": "Sale (residential)",
+  "Locazione (abitazioni civili)": "Rent (residential)",
+  "Espandi una zona per vedere le altre tipologie e stati conservativi.":
+    "Expand a zone to see other property types and condition grades.",
+  "Tipologie e stati conservativi": "Types and condition grades",
+  "Nessuna tipologia in questa zona.": "No property types in this zone.",
+  "Trend €/m² abitazioni civili (min–max comunale)":
+    "€/m² residential trend (municipal min–max)",
+  "Min €/m²": "Min €/m²",
+  "Max €/m²": "Max €/m²",
+  "Agenzia Entrate – OMI (Osservatorio Mercato Immobiliare)":
+    "Agenzia Entrate – OMI (Real Estate Market Observatory)",
   "Nessuna zona OMI restituita per il comune.": "No OMI zones returned for the municipality.",
 };

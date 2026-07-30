@@ -14,7 +14,9 @@
     "rag:deploy": "modal deploy modal_rag/app.py",
     "trasporti:gtfs": "node scripts/build-trasporti-gtfs.mjs",
     "dae:sync": "node scripts/sync-dae-geojson.mjs",
-    "telegram:poll": "node --env-file=.env.local scripts/telegram-poll.mjs"
+    "telegram:poll": "node --env-file=.env.local scripts/telegram-poll.mjs",
+    "omi:update": "node --experimental-strip-types scripts/update-omi.ts",
+    "omi:update:all": "node --experimental-strip-types scripts/update-omi.ts --all"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0",

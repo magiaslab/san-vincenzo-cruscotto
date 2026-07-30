@@ -1,23 +1,45 @@
 import { NextResponse } from "next/server";
-import { openDataEmpty } from "@/lib/opendata";
-import { OMI_FONTE, OMI_REVALIDATE_SECONDS, type OmiData } from "@/lib/omi";
+import { openDataEmpty, openDataOk } from "@/lib/opendata";
+import {
+  hasOmiPayload,
+  loadOmiFromDisk,
+  OMI_FONTE,
+  OMI_REVALIDATE_SECONDS,
+  type OmiData,
+} from "@/lib/omi";
 
 export const revalidate = OMI_REVALIDATE_SECONDS;
 
 const CACHE_CONTROL = `public, s-maxage=${OMI_REVALIDATE_SECONDS}, stale-while-revalidate=${OMI_REVALIDATE_SECONDS * 2}`;
 
+export type { OmiData };
+
 /**
- * Stub OMI: contratto OpenDataResult pronto.
- * Follow-up: quotazioni Agenzia Entrate per San Vincenzo.
+ * Quotazioni OMI da snapshot locale (`src/data/omi`).
+ * Nessun login Agenzia Entrate: mirror ondata filtrato per 049018.
  */
 export async function GET() {
   try {
+    const data = loadOmiFromDisk();
+
+    if (!data || !hasOmiPayload(data)) {
+      return NextResponse.json(
+        openDataEmpty<OmiData>({
+          fonte: OMI_FONTE,
+          note:
+            "Snapshot OMI non presente. Esegui `npm run omi:update` (mirror ondata) e riprova.",
+          error: null,
+        }),
+        { status: 200, headers: { "Cache-Control": CACHE_CONTROL } },
+      );
+    }
+
     return NextResponse.json(
-      openDataEmpty<OmiData>({
+      openDataOk(data, {
         fonte: OMI_FONTE,
+        edizione: data.semestre ?? undefined,
         note:
-          "Integrazione quotazioni OMI in arrivo. Nessun dato immobiliare comunale esposto ancora.",
-        error: null,
+          "Valori di larga massima (OMI). Fonte: Agenzia Entrate – OMI via mirror ondata.",
       }),
       { status: 200, headers: { "Cache-Control": CACHE_CONTROL } },
     );
