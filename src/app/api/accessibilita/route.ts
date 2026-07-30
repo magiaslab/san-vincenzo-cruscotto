@@ -1,15 +1,22 @@
 import { NextResponse } from "next/server";
+import { unstable_cache } from "next/cache";
 import { buildAccessibilitaPayload } from "@/lib/accessibilita";
 
-export const dynamic = "force-dynamic";
+/** Cache server 6h: evita di battere Overpass a ogni visita tab. */
 export const revalidate = 21600;
+
+const getCachedPayload = unstable_cache(
+  async () => buildAccessibilitaPayload(6),
+  ["accessibilita-overpass-v2"],
+  { revalidate: 21600 },
+);
 
 export async function GET() {
   try {
-    const payload = await buildAccessibilitaPayload(6);
+    const payload = await getCachedPayload();
     return NextResponse.json(payload, {
       headers: {
-        "Cache-Control": "s-maxage=21600, stale-while-revalidate=3600",
+        "Cache-Control": "public, s-maxage=21600, stale-while-revalidate=3600",
       },
     });
   } catch (err) {
@@ -33,7 +40,12 @@ export async function GET() {
           n_con_nome: 0,
         },
       },
-      { status: 502 },
+      {
+        status: 502,
+        headers: {
+          "Cache-Control": "public, s-maxage=120, stale-while-revalidate=60",
+        },
+      },
     );
   }
 }
