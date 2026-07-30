@@ -33,7 +33,21 @@ Apri [http://localhost:3000](http://localhost:3000).
 | `GET /api/meteo/forecast` | Previsioni Open-Meteo (48h + 7 giorni) |
 | `GET /api/meteo/radar` | Metadati frame radar RainViewer |
 | `GET /api/farmacie/turno` | Farmacie di turno (FarmacieDiTurno.org) |
+| `GET /api/dae` | DAE comunali da GeoJSON locale (OpenAEDMap / OSM) |
+| `GET /api/dae/segnalazioni` | Overlay segnalazioni Telegram approvate |
+| `POST /api/telegram/webhook` | Webhook bot @DaesanvincenzoBot |
 | `POST /api/assistente` | Proxy RAG su Modal (HF self-host) |
+
+## Mappa DAE (defibrillatori)
+
+I punti arrivano da un export OpenStreetMap via [OpenAEDMap](https://openaedmap.org/).
+Per aggiornare il file locale:
+
+```bash
+npm run dae:sync
+```
+
+Studio per un bot Telegram di segnalazione cittadina: [`docs/dae-telegram-bot.md`](docs/dae-telegram-bot.md).
 
 ## Assistente RAG (Modal + Hugging Face)
 
