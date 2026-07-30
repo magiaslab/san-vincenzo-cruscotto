@@ -43,6 +43,7 @@ import { EventiComunePanel } from "@/components/EventiComunePanel";
 import { FarmacieTurno } from "@/components/FarmacieTurno";
 import { Footer } from "@/components/Footer";
 import { ScuoleMiurPanel } from "@/components/ScuoleMiurPanel";
+import { AllerteMeteoPanel } from "@/components/AllerteMeteoPanel";
 import { TrasportiPanel } from "@/components/TrasportiPanel";
 import {
   DataUnavailable,
@@ -2661,7 +2662,7 @@ function Meteo({ kpi }: { kpi: Kpi }) {
     <section>
       <SectionIntro
         title={t("Meteo")}
-        description={t("Condizioni live (OpenWeather + ItaliaMeteo/Cineca + Open-Meteo), qualità dell’aria, previsioni e radar precipitazioni RainViewer su mappa.")}
+        description={t("Allerte Protezione Civile, condizioni live (OpenWeather + ItaliaMeteo/Cineca + Open-Meteo), qualità dell’aria, previsioni e radar precipitazioni RainViewer su mappa.")}
       />
       <div className="mb-3 flex flex-wrap items-center gap-2 sm:gap-3">
         <SolidButton onClick={() => void load()}>{t("Aggiorna ora")}</SolidButton>
@@ -2677,6 +2678,8 @@ function Meteo({ kpi }: { kpi: Kpi }) {
         ) : null}
       </div>
       {error ? <DataUnavailable message={error} /> : null}
+
+      <AllerteMeteoPanel />
 
       <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
         <KpiCard
@@ -3066,6 +3069,24 @@ function Meteo({ kpi }: { kpi: Kpi }) {
 
       <p className="mt-2 text-[11px] text-[#5b6f82] sm:text-xs">
         Fonti:{" "}
+        <a
+          href="https://rischi.protezionecivile.gov.it/it/meteo-idro/allertamento/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline"
+        >
+          Protezione Civile
+        </a>
+        {" / "}
+        <a
+          href="https://www.regione.toscana.it/allertameteo"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline"
+        >
+          Allerta Toscana
+        </a>{" "}
+        (allerte) ·{" "}
         <a
           href="https://openweathermap.org/"
           target="_blank"

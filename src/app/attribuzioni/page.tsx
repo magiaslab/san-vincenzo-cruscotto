@@ -16,9 +16,13 @@ import {
   MINISTERO_CULTURA_URL,
   MIUR_ESPLORA_URL,
   MIUR_OPENDATA_URL,
+  ALLERTA_METEO_APP_URL,
+  CFR_TOSCANA_URL,
+  DPC_ALLERTAMENTO_URL,
   OPEN_METEO_ATTRIBUTION_URL,
   OSM_COPYRIGHT_URL,
   RAINVIEWER_ATTRIBUTION_URL,
+  REGIONE_TOSCANA_ALLERTA_URL,
   REGIONE_TOSCANA_OPENDATA_URL,
   STEMMA,
   VERCEL_DEPLOY_URL,
@@ -268,6 +272,44 @@ export default function AttribuzioniPage() {
                   Regione Toscana Open Data
                 </a>{" "}
                 — eventi culturali, orari TPL (GTFS), aree ciclabili e pedonali
+              </li>
+              <li>
+                <a
+                  className="text-[#0066CC] underline"
+                  href={DPC_ALLERTAMENTO_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Dipartimento della Protezione Civile
+                </a>
+                {" / "}
+                <a
+                  className="text-[#0066CC] underline"
+                  href={REGIONE_TOSCANA_ALLERTA_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Allerta Meteo Toscana
+                </a>
+                {" / "}
+                <a
+                  className="text-[#0066CC] underline"
+                  href={CFR_TOSCANA_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  CFR Toscana
+                </a>
+                {" — allerte meteo-idro (via "}
+                <a
+                  className="text-[#0066CC] underline"
+                  href={ALLERTA_METEO_APP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  allertameteo.app
+                </a>
+                )
               </li>
               <li>
                 <a

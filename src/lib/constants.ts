@@ -58,6 +58,20 @@ export const RAINVIEWER_ATTRIBUTION_URL = "https://www.rainviewer.com/";
 export const OPENWEATHER_BASE_URL = "https://api.openweathermap.org/data/2.5";
 export const OPENWEATHER_ATTRIBUTION_URL = "https://openweathermap.org/";
 
+/** Allerte meteo-idro Protezione Civile (San Vincenzo → zona Etruria-Costa Nord / E2). */
+export const ALLERTA_METEO_APP_URL = "https://allertameteo.app/" as const;
+export const ALLERTA_METEO_SV_PAGE_URL =
+  "https://allertameteo.app/toscana/livorno/san-vincenzo" as const;
+export const ALLERTA_METEO_SV_API_URL =
+  "https://allertameteo.app/api/alert/San%20Vincenzo" as const;
+export const CFR_TOSCANA_URL = "https://www.cfr.toscana.it/" as const;
+export const REGIONE_TOSCANA_ALLERTA_URL =
+  "https://www.regione.toscana.it/allertameteo" as const;
+export const DPC_CRITICITA_REPO_URL =
+  "https://github.com/pcm-dpc/DPC-Bollettini-Criticita-Idrogeologica-Idraulica" as const;
+export const DPC_ALLERTAMENTO_URL =
+  "https://rischi.protezionecivile.gov.it/it/meteo-idro/allertamento/" as const;
+
 /** Limite punti civici inviati al client (paginazione server-side). */
 export const CIVICI_MAP_LIMIT = 1500;
 
