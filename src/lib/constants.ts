@@ -134,6 +134,16 @@ export const ARPAT_BALNEAZIONE_URL =
 export const REGIONE_TOSCANA_OPENDATA_URL = "https://dati.toscana.it/";
 export const REGIONE_TOSCANA_CKAN_API = "https://dati.toscana.it/api/3/action";
 
+/**
+ * CSV/ODS opzionale più recente per flussi turistici comunali (mensile).
+ * Vuoto di default: la route scopre dinamicamente CKAN + pagina statistiche RT.
+ */
+export const TURISMO_CSV_FALLBACK_URL =
+  process.env.TURISMO_CSV_FALLBACK_URL?.trim() || "";
+
+export const REGIONE_TOSCANA_TURISMO_STATS_URL =
+  "https://www.regione.toscana.it/statistiche/dati-statistici/turismo" as const;
+
 /** Orari TPL regionale (GTFS) — dataset Regione Toscana. */
 export const RT_ORARITB_DATASET_URL =
   "https://dati.toscana.it/dataset/rt-oraritb" as const;
