@@ -13,6 +13,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { HeartPulse } from "lucide-react";
 import {
+  DAE_GEOJSON_PATH,
   MAP_CENTER,
   MAP_DEFAULT_ZOOM,
   OPENAEDMAP_URL,
@@ -50,7 +51,7 @@ function FitPoints({ points }: { points: [number, number][] }) {
   return null;
 }
 
-/** Mappa DAE (defibrillatori) da OpenStreetMap / OpenAEDMap. */
+/** Mappa DAE (defibrillatori) da GeoJSON locale (export OpenAEDMap / OSM). */
 export function DaeMap() {
   const t = useT();
   const [data, setData] = useState<FeatureCollection | null>(null);
@@ -59,7 +60,8 @@ export function DaeMap() {
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/dae")
+    // File statico in /public: niente Overpass, caricamento affidabile.
+    fetch(DAE_GEOJSON_PATH)
       .then((r) => {
         if (!r.ok) throw new Error("dae");
         return r.json();
@@ -98,7 +100,7 @@ export function DaeMap() {
         <PanelHeading
           title={t("Mappa DAE (defibrillatori)")}
           description={t(
-            "{n} punti su OpenStreetMap nel territorio comunale. In emergenza chiama sempre il 118.",
+            "{n} defibrillatori georeferenziati nel territorio comunale. In emergenza chiama sempre il 118.",
           ).replace("{n}", String(count))}
           icon={HeartPulse}
           actions={
@@ -142,6 +144,8 @@ export function DaeMap() {
               const ubicazione = String(f.properties.ubicazione ?? "");
               const orari = String(f.properties.orari ?? "");
               const accesso = String(f.properties.accesso ?? "");
+              const operatore = String(f.properties.operatore ?? "");
+              const immagine = String(f.properties.immagine ?? "");
               const osmUrl = String(f.properties.osm_url ?? "");
               return (
                 <CircleMarker
@@ -165,6 +169,12 @@ export function DaeMap() {
                         {ubicazione}
                       </>
                     ) : null}
+                    {operatore ? (
+                      <>
+                        <br />
+                        {operatore}
+                      </>
+                    ) : null}
                     {accesso ? (
                       <>
                         <br />
@@ -175,6 +185,14 @@ export function DaeMap() {
                       <>
                         <br />
                         {t("Orari")}: {orari}
+                      </>
+                    ) : null}
+                    {immagine ? (
+                      <>
+                        <br />
+                        <a href={immagine} target="_blank" rel="noopener noreferrer">
+                          Foto
+                        </a>
                       </>
                     ) : null}
                     {osmUrl ? (

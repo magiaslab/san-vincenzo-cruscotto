@@ -188,6 +188,7 @@ export const en: Record<string, string> = {
   "Fonte volontaria OpenStreetMap (può essere incompleta rispetto al censimento 118). Mappa globale:": "Volunteer OpenStreetMap source (may be incomplete vs the official 118 registry). Global map:",
   "Fonte:": "Source:",
   "{n} punti su OpenStreetMap nel territorio comunale. In emergenza chiama sempre il 118.": "{n} points on OpenStreetMap in the municipality. In an emergency always call 118.",
+  "{n} defibrillatori georeferenziati nel territorio comunale. In emergenza chiama sempre il 118.": "{n} georeferenced defibrillators in the municipality. In an emergency always call 118.",
   "Fonte: Ministero della Cultura - Catalogo generale beni culturali": "Source: Ministry of Culture — General catalogue of cultural heritage",
   "Fonte: Portale Unico dei Dati della Scuola.": "Source: Unified School Data Portal.",
   "Fonti sezione:": "Section sources:",
