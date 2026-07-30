@@ -38,6 +38,20 @@ export const VERCEL_DEPLOY_URL =
 export const MAP_CENTER: [number, number] = [43.085, 10.54];
 export const MAP_DEFAULT_ZOOM = 13;
 
+/**
+ * Bounding box Overpass per DAE nel territorio comunale
+ * (sud, ovest, nord, est — WGS84).
+ */
+export const DAE_BBOX = {
+  south: 43.04,
+  west: 10.47,
+  north: 43.14,
+  east: 10.62,
+} as const;
+
+export const OVERPASS_API_URL = "https://overpass-api.de/api/interpreter";
+export const OPENAEDMAP_URL = "https://openaedmap.org/it/#map=14/43.085/10.54";
+
 /** Coordinate meteo (centro comune) per Open-Meteo / overlay radar. */
 export const METEO_LAT = 43.085;
 export const METEO_LON = 10.54;

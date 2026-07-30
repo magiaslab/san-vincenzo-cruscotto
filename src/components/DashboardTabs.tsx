@@ -141,6 +141,14 @@ const FarmacieMap = dynamic(
   },
 );
 
+const DaeMap = dynamic(
+  () => import("@/components/DaeMap").then((m) => m.DaeMap),
+  {
+    ssr: false,
+    loading: () => <LoadingBlock label={translate(getFormatLocale(), "Caricamento mappa DAE…")} />,
+  },
+);
+
 type Kpi = Record<string, unknown>;
 
 type TabId =
@@ -1996,7 +2004,9 @@ function Sanita({ kpi }: { kpi: Kpi }) {
     <section>
       <SectionIntro
         title={t("Sanità")}
-        description={t("Farmacie di turno, mappa dei punti MDS e anagrafe Ministero della Salute. Il terzo settore è in Società.")}
+        description={t(
+          "Farmacie di turno, mappa MDS, defibrillatori DAE su OpenStreetMap e anagrafe Ministero della Salute. Il terzo settore è in Società.",
+        )}
       />
       <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3">
         <KpiCard label={t("Farmacie")} value={valueOrMissing(sanita?.n_farmacie, formatInteger)} icon={Heart} variant="info" />
@@ -2017,6 +2027,10 @@ function Sanita({ kpi }: { kpi: Kpi }) {
 
       <div className="mb-4">
         <FarmacieMap />
+      </div>
+
+      <div className="mb-4">
+        <DaeMap />
       </div>
 
       {(farmacie.length > 0 || para.length > 0) ? (
