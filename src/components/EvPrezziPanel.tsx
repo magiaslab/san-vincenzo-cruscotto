@@ -127,14 +127,15 @@ export default function EvPrezziPanel() {
 
       <div className="mt-3 overflow-x-auto">
         <table className="min-w-full text-left text-xs sm:text-sm">
+            <caption className="sr-only">Tabella dati</caption>
           <thead className="bg-[#e8f2fc]">
             <tr>
-              <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Stazione")}</th>
-              <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Gestore")}</th>
-              <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Potenza")}</th>
-              <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Corrente")}</th>
-              <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Prezzo")}</th>
-              <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Stato")}</th>
+              <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Stazione")}</th>
+              <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Gestore")}</th>
+              <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Potenza")}</th>
+              <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Corrente")}</th>
+              <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Prezzo")}</th>
+              <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Stato")}</th>
             </tr>
           </thead>
           <tbody>

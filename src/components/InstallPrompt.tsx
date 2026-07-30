@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { Download, Share, X } from "lucide-react";
 import { useT } from "@/lib/i18n";
+import { useFocusTrap } from "@/lib/focus-trap";
 
 const STORAGE_KEY = "sv-cruscotto-install-prompt";
 const COOKIE_KEY = "sv-cruscotto-cookie-consent";
@@ -15,14 +16,18 @@ type BeforeInstallPromptEvent = Event & {
 function isStandalone(): boolean {
   if (typeof window === "undefined") return true;
   const mq = window.matchMedia("(display-mode: standalone)").matches;
-  const ios = "standalone" in navigator && Boolean((navigator as Navigator & { standalone?: boolean }).standalone);
+  const ios =
+    "standalone" in navigator &&
+    Boolean((navigator as Navigator & { standalone?: boolean }).standalone);
   return mq || ios;
 }
 
 function isIosSafari(): boolean {
   if (typeof navigator === "undefined") return false;
   const ua = navigator.userAgent;
-  const iOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const iOS =
+    /iPad|iPhone|iPod/.test(ua) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   const webkit = /WebKit/.test(ua);
   const criOS = /CriOS|FxiOS|EdgiOS/.test(ua);
   return iOS && webkit && !criOS;
@@ -32,7 +37,10 @@ function wasDismissed(): boolean {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return false;
-    const parsed = JSON.parse(raw) as { dismissed?: boolean; installed?: boolean };
+    const parsed = JSON.parse(raw) as {
+      dismissed?: boolean;
+      installed?: boolean;
+    };
     return Boolean(parsed.dismissed || parsed.installed);
   } catch {
     return false;
@@ -65,8 +73,16 @@ export function InstallPrompt() {
   const [iosHint, setIosHint] = useState(false);
   const deferredRef = useRef<BeforeInstallPromptEvent | null>(null);
   const installBtnRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
   const titleId = useId();
   const descId = useId();
+
+  const dismiss = useCallback(() => {
+    persist({ dismissed: true });
+    setVisible(false);
+  }, []);
+
+  useFocusTrap(dialogRef, visible, dismiss);
 
   useEffect(() => {
     if (isStandalone() || wasDismissed()) return;
@@ -90,10 +106,8 @@ export function InstallPrompt() {
     window.addEventListener("beforeinstallprompt", onBip);
     window.addEventListener("sv-cookie-consent", maybeShow);
 
-    // iOS non emette beforeinstallprompt: istruzioni dopo il cookie.
     const timer = window.setTimeout(maybeShow, 1200);
 
-    // Poll breve: il cookie banner salva su localStorage nella stessa tab.
     const poll = window.setInterval(() => {
       if (cookieSettled()) {
         maybeShow();
@@ -112,22 +126,11 @@ export function InstallPrompt() {
   useEffect(() => {
     if (!visible) return;
     installBtnRef.current?.focus();
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") dismiss();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
   }, [visible]);
-
-  function dismiss() {
-    persist({ dismissed: true });
-    setVisible(false);
-  }
 
   async function install() {
     const evt = deferredRef.current;
     if (!evt) {
-      // iOS: l'utente segue le istruzioni; non chiudiamo forzatamente come installed
       return;
     }
     try {
@@ -153,10 +156,12 @@ export function InstallPrompt() {
   return (
     <div className="fixed inset-0 z-[1100] flex items-end justify-center bg-[rgba(23,50,77,0.45)] p-3 sm:items-center sm:p-6">
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descId}
+        tabIndex={-1}
         className="w-full max-w-md overflow-hidden rounded-2xl border border-[var(--pa-border)] bg-white shadow-2xl"
       >
         <div className="flex items-start justify-between gap-3 border-b border-[var(--pa-border)] bg-[var(--pa-surface-soft)] px-4 py-3">

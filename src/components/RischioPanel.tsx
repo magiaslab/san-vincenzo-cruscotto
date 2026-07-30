@@ -231,15 +231,16 @@ export function RischioPanel() {
                       {t("Confronto territoriale (frane P3+P4)")}
                     </h3>
                     <table className="w-full min-w-[28rem] border-collapse text-left text-xs sm:text-sm">
+            <caption className="sr-only">Tabella dati</caption>
                       <thead>
                         <tr className="border-b border-[var(--pa-border)] text-[var(--pa-muted)]">
-                          <th className="py-1.5 pr-3 font-medium">
+                          <th scope="col" className="py-1.5 pr-3 font-medium">
                             {t("Livello")}
                           </th>
-                          <th className="py-1.5 pr-3 font-medium">
+                          <th scope="col" className="py-1.5 pr-3 font-medium">
                             {t("% territorio")}
                           </th>
-                          <th className="py-1.5 font-medium">
+                          <th scope="col" className="py-1.5 font-medium">
                             {t("Popolazione")}
                           </th>
                         </tr>

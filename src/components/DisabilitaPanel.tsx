@@ -359,13 +359,14 @@ export default function DisabilitaPanel({
             </p>
           </div>
           <table className="mt-2 min-w-full text-left text-xs sm:text-sm">
+            <caption className="sr-only">Tabella dati</caption>
             <thead className="bg-[#e8f2fc]">
               <tr>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Nome")}</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Tipo")}</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Categoria")}</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Indirizzo")}</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Link")}</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Nome")}</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Tipo")}</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Categoria")}</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Indirizzo")}</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Link")}</th>
               </tr>
             </thead>
             <tbody>

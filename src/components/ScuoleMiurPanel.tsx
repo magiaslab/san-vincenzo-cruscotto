@@ -124,12 +124,13 @@ export function ScuoleMiurPanel() {
       {perOrdine.length > 0 ? (
         <div className="mb-4 overflow-x-auto">
           <table className="min-w-full text-left text-xs sm:text-sm">
+            <caption className="sr-only">Tabella dati</caption>
             <thead className="bg-[var(--pa-surface-soft)]">
               <tr>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Ordine</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Alunni</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Classi</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">Non italiani</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">Ordine</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">Alunni</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">Classi</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">Non italiani</th>
               </tr>
             </thead>
             <tbody>

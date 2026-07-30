@@ -12,6 +12,7 @@ import {
 import { Menu, X, type LucideIcon } from "lucide-react";
 import { GlobalSearch } from "@/components/GlobalSearch";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { SkipLink } from "@/components/SkipLink";
 import {
   AUTHOR,
   COMUNE_NOME,

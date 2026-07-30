@@ -136,13 +136,14 @@ export function EventiComunePanel({
 
       <div className="overflow-x-auto">
         <table className="min-w-full text-left text-xs sm:text-sm">
+            <caption className="sr-only">Tabella dati</caption>
           <thead className="bg-[#e8f2fc] text-[#17324d]">
             <tr>
-              <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Evento")}</th>
-              <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Periodo")}</th>
-              <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Luogo")}</th>
-              <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Orario")}</th>
-              <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Link")}</th>
+              <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Evento")}</th>
+              <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Periodo")}</th>
+              <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Luogo")}</th>
+              <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Orario")}</th>
+              <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Link")}</th>
             </tr>
           </thead>
           <tbody>

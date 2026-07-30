@@ -41,7 +41,7 @@ export default async function Home() {
       <>
         {homeJsonLd}
         <Header generatedAt={generatedAt} />
-        <main className="flex-1">
+        <main id="contenuto-principale" className="flex-1">
           <div className="mx-auto max-w-3xl px-4 py-8">
             <div className="rounded-lg border border-[#d9364f] bg-[#fce8eb] p-4 text-[#17324d]">
               {error}
