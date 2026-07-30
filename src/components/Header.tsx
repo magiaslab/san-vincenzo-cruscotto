@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { SkipLink } from "@/components/SkipLink";
 import {
   AUTHOR,
   COMUNE_NOME,
@@ -25,6 +26,7 @@ export function Header({ generatedAt, brandAsHeading = true }: HeaderProps) {
   const BrandTag = brandAsHeading ? "h1" : "p";
   return (
     <header className="site-header relative z-40 bg-white shadow-sm">
+      <SkipLink />
       <div className="bg-[var(--pa-primary)] text-white">
         <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-1.5 px-4 py-2 text-xs sm:flex-row sm:items-center sm:gap-2 sm:text-sm sm:px-6">
           <span className="font-semibold leading-snug tracking-wide">

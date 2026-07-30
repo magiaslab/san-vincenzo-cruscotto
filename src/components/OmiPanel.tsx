@@ -226,15 +226,16 @@ export function OmiPanel() {
               ) : (
                 <div className="mb-4 overflow-x-auto">
                   <table className="w-full min-w-[36rem] border-collapse text-left">
+            <caption className="sr-only">Tabella dati</caption>
                     <thead>
                       <tr className="border-b border-[var(--pa-border)] text-xs uppercase tracking-wide text-[var(--pa-muted)]">
-                        <th className="py-2 pr-2 font-medium">
+                        <th scope="col" className="py-2 pr-2 font-medium">
                           {t("Zona OMI")}
                         </th>
-                        <th className="py-2 pr-2 font-medium">
+                        <th scope="col" className="py-2 pr-2 font-medium">
                           {t("Compravendita (abitazioni civili)")}
                         </th>
-                        <th className="py-2 font-medium">
+                        <th scope="col" className="py-2 font-medium">
                           {t("Locazione (abitazioni civili)")}
                         </th>
                       </tr>

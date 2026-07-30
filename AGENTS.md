@@ -20,4 +20,4 @@ uses Turbopack), `npm run build`, `npm run start`, `npm run lint`.
 - Quick smoke test that core data works: `curl -s localhost:3000/api/kpi` should return a
   JSON body with real demographics for San Vincenzo (ISTAT `049018`).
 - No automated test framework is configured; `npm run lint` is the only quality gate beyond
-  the build.
+  the build. Accessibility: jsx-a11y via ESLint + checklist in `docs/a11y-checklist.md`.

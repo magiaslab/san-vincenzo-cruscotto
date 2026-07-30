@@ -442,17 +442,18 @@ export function TrasportiPanel({
           </div>
         ) : hasLive ? (
           <table className="mt-2 min-w-full text-left text-xs sm:text-sm">
+            <caption className="sr-only">Tabella dati</caption>
             <thead className="bg-[#e8f2fc] text-[#17324d]">
               <tr>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Ora")}</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Ora")}</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">
                   {boardMode === "partenze"
                     ? t("Destinazione")
                     : t("Provenienza")}
                 </th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Treno")}</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Ritardo")}</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Binario")}</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Treno")}</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Ritardo")}</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Binario")}</th>
               </tr>
             </thead>
             <tbody>
@@ -507,15 +508,16 @@ export function TrasportiPanel({
           </table>
         ) : (
           <table className="mt-2 min-w-full text-left text-xs sm:text-sm">
+            <caption className="sr-only">Tabella dati</caption>
             <thead className="bg-[#e8f2fc] text-[#17324d]">
               <tr>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Ora")}</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Ora")}</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">
                   {boardMode === "partenze"
                     ? t("Destinazione")
                     : t("Provenienza / direzione")}
                 </th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Linea")}</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Linea")}</th>
               </tr>
             </thead>
             <tbody>
@@ -563,10 +565,11 @@ export function TrasportiPanel({
             </h3>
           </div>
           <table className="mt-2 min-w-full text-left text-xs sm:text-sm">
+            <caption className="sr-only">Tabella dati</caption>
             <thead className="bg-[#e8f2fc] text-[#17324d]">
               <tr>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Linea")}</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Percorso")}</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Linea")}</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Percorso")}</th>
               </tr>
             </thead>
             <tbody>
@@ -605,11 +608,12 @@ export function TrasportiPanel({
           </label>
         </div>
         <table className="mt-2 min-w-full text-left text-xs sm:text-sm">
+            <caption className="sr-only">Tabella dati</caption>
           <thead className="bg-[#e8f2fc] text-[#17324d]">
             <tr>
-              <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Fermata")}</th>
-              <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Distanza")}</th>
-              <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Linee")}</th>
+              <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Fermata")}</th>
+              <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Distanza")}</th>
+              <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Linee")}</th>
             </tr>
           </thead>
           <tbody>

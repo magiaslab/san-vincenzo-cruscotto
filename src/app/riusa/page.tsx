@@ -148,7 +148,7 @@ export default function RiusaPage() {
         ])}
       />
       <Header brandAsHeading={false} />
-      <main className="flex-1">
+      <main id="contenuto-principale" className="flex-1">
         <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 sm:py-8">
           <nav aria-label="Breadcrumb" className="mb-2 text-sm">
             <ol className="m-0 flex list-none flex-wrap gap-1 p-0 text-[var(--pa-muted)]">

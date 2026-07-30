@@ -904,13 +904,14 @@ function Societa({ kpi }: { kpi: Kpi }) {
         <div className="overflow-x-auto panel p-0">
           <h3 className="px-3 pt-3 sm:px-4 sm:pt-4">{t("Elenco enti RUNTS")}</h3>
           <table className="min-w-full text-left text-xs sm:text-sm">
+            <caption className="sr-only">Tabella dati</caption>
             <thead className="bg-[#e8f2fc] text-[#17324d]">
               <tr>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Denominazione")}</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Sezione")}</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Rappresentante")}</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">5x1000</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Iscrizione")}</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Denominazione")}</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Sezione")}</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Rappresentante")}</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">5x1000</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Iscrizione")}</th>
               </tr>
             </thead>
             <tbody>
@@ -1789,12 +1790,13 @@ function Finanza({ kpi }: { kpi: Kpi }) {
         <div className="mb-4 overflow-x-auto panel p-0">
           <h3 className={`px-3 pt-3 sm:px-4 sm:pt-4 ${h3}`}>{t("Contratti ANAC per CPV")}</h3>
           <table className="min-w-full text-left text-xs sm:text-sm">
+            <caption className="sr-only">Tabella dati</caption>
             <thead className="bg-[#e8f2fc] text-[#17324d]">
               <tr>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("CPV")}</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Descrizione")}</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("N.")}</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Importo")}</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("CPV")}</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Descrizione")}</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("N.")}</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Importo")}</th>
               </tr>
             </thead>
             <tbody>
@@ -1843,13 +1845,14 @@ function Finanza({ kpi }: { kpi: Kpi }) {
             {t("Progetti PNRR")} ({formatInteger(progettiPnrr.length)})
           </h3>
           <table className="min-w-full text-left text-xs sm:text-sm">
+            <caption className="sr-only">Tabella dati</caption>
             <thead className="bg-[#e8f2fc] text-[#17324d]">
               <tr>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Titolo")}</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Missione")}</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Stato")}</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Finanziamento")}</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Fine")}</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Titolo")}</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Missione")}</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Stato")}</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Finanziamento")}</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Fine")}</th>
               </tr>
             </thead>
             <tbody>
@@ -1902,12 +1905,13 @@ function Finanza({ kpi }: { kpi: Kpi }) {
             )
           </h3>
           <table className="min-w-full text-left text-xs sm:text-sm">
+            <caption className="sr-only">Tabella dati</caption>
             <thead className="bg-[#e8f2fc] text-[#17324d]">
               <tr>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Descrizione")}</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Settore")}</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Stato")}</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Costo prev.")}</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Descrizione")}</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Settore")}</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Stato")}</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Costo prev.")}</th>
               </tr>
             </thead>
             <tbody>
@@ -2219,13 +2223,14 @@ function Infra({ kpi }: { kpi: Kpi }) {
             </p>
           </div>
           <table className="mt-2 min-w-full text-left text-xs sm:text-sm">
+            <caption className="sr-only">Tabella dati</caption>
             <thead className="bg-[#e8f2fc]">
               <tr>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Impianto")}</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Bandiera")}</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Benzina self")}</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Gasolio self")}</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Aggiornato")}</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Impianto")}</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Bandiera")}</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Benzina self")}</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Gasolio self")}</th>
+                <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Aggiornato")}</th>
               </tr>
             </thead>
             <tbody>
@@ -2589,13 +2594,14 @@ function Ambiente({ kpi }: { kpi: Kpi }) {
           <h3>{t("Aree di balneazione controllate ARPAT")}</h3>
           <div className="overflow-x-auto">
             <table className="min-w-full text-left text-xs sm:text-sm">
+            <caption className="sr-only">Tabella dati</caption>
               <thead className="bg-[#e8f2fc] text-[#17324d]">
                 <tr>
-                  <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Area")}</th>
-                  <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Classificazione")}</th>
-                  <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Km costa")}</th>
-                  <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Campionamenti")}</th>
-                  <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Superamenti")}</th>
+                  <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Area")}</th>
+                  <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Classificazione")}</th>
+                  <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Km costa")}</th>
+                  <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Campionamenti")}</th>
+                  <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Superamenti")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -3034,14 +3040,15 @@ function Meteo({ kpi }: { kpi: Kpi }) {
           <h3>{t("Previsione 5 giorni (OpenWeather)")}</h3>
           <div className="overflow-x-auto">
             <table className="min-w-full text-left text-xs sm:text-sm">
+            <caption className="sr-only">Tabella dati</caption>
               <thead className="bg-[#e8f2fc] text-[#17324d]">
                 <tr>
-                  <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Giorno")}</th>
-                  <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Condizioni")}</th>
-                  <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Min/Max")}</th>
-                  <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Pioggia")}</th>
-                  <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Prob.")}</th>
-                  <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Vento max")}</th>
+                  <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Giorno")}</th>
+                  <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Condizioni")}</th>
+                  <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Min/Max")}</th>
+                  <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Pioggia")}</th>
+                  <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Prob.")}</th>
+                  <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Vento max")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -3156,14 +3163,15 @@ function Meteo({ kpi }: { kpi: Kpi }) {
           </div>
           <div className="overflow-x-auto">
             <table className="min-w-full text-left text-xs sm:text-sm">
+            <caption className="sr-only">Tabella dati</caption>
               <thead className="bg-[#e8f2fc] text-[#17324d]">
                 <tr>
-                  <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Giorno")}</th>
-                  <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Condizioni")}</th>
-                  <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Min/Max")}</th>
-                  <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Pioggia")}</th>
-                  <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Prob.")}</th>
-                  <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Vento max")}</th>
+                  <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Giorno")}</th>
+                  <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Condizioni")}</th>
+                  <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Min/Max")}</th>
+                  <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Pioggia")}</th>
+                  <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Prob.")}</th>
+                  <th scope="col" className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Vento max")}</th>
                 </tr>
               </thead>
               <tbody>

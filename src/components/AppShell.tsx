@@ -12,6 +12,7 @@ import {
 import { Menu, X, type LucideIcon } from "lucide-react";
 import { GlobalSearch } from "@/components/GlobalSearch";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { SkipLink } from "@/components/SkipLink";
 import {
   AUTHOR,
   COMUNE_NOME,
@@ -196,9 +197,7 @@ export function AppShell({
 
   return (
     <div className="flex min-h-screen flex-col bg-[var(--background)]">
-      <a href="#contenuto-principale" className="skip-link">
-        {t("Vai al contenuto")}
-      </a>
+      <SkipLink />
 
       <div className="flex min-h-0 flex-1">
         <aside className="sticky top-0 z-30 hidden h-screen w-64 shrink-0 border-r border-[var(--pa-border)] bg-[var(--pa-surface)] lg:block">
