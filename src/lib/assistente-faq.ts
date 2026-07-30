@@ -1,12 +1,17 @@
 /**
- * Risposte deterministiche per domande frequenti sul cruscotto.
- * Preferisce il dato numerico/testuale o il link alla sezione — niente prose inventata.
+ * FAQ locale: risposta deterministica (dato o link sezione) senza LLM.
+ * Copre tutte le sezioni del cruscotto, non solo il porto.
  */
 
 export type FaqHit = {
   answer: string;
   link: { href: string; label: string };
-  sources: Array<{ title: string; source: string; score: number; excerpt: string }>;
+  sources: Array<{
+    title: string;
+    source: string;
+    score: number;
+    excerpt: string;
+  }>;
 };
 
 type Rule = {
@@ -19,139 +24,319 @@ type Rule = {
 };
 
 const RULES: Rule[] = [
+  // —— Porto ——
   {
     id: "porto-capienza",
     patterns: [
       /capienza.*porto|posti\s*barca|quanti\s*posti.*porto|porto.*posti|ormeggi/i,
     ],
-    answer: "Capienza del porto di San Vincenzo: circa 140 posti barca.",
+    answer: "Capienza del porto di San Vincenzo: circa 140 posti barca (ISTAT / OpenDataComune).",
     href: "/#porto",
     label: "Apri sezione Porto",
     title: "Porto turistico",
   },
   {
-    id: "porto-generale",
-    patterns: [/sezione\s*porto|cosa\s+mostra.*porto|webcam.*porto|traffico\s*ais/i],
+    id: "porto-passeggeri",
+    patterns: [/passeggeri.*porto|porto.*passeggeri|traffico\s*navale|crociere|movimento\s*passeggeri/i],
+    answer:
+      "Movimento passeggeri e traffico navale (serie ISTAT) sono nella sezione Porto.",
+    href: "/#porto",
+    label: "Apri sezione Porto",
+    title: "Porto turistico",
+  },
+  {
+    id: "porto-webcam",
+    patterns: [/webcam.*porto|traffico\s*ais|sezione\s*porto|cosa\s+mostra.*porto/i],
     answer:
       "Nella sezione Porto trovi posti barca (~140), servizi, webcam comunali e mappa AIS VesselFinder.",
     href: "/#porto",
     label: "Apri sezione Porto",
     title: "Porto turistico",
   },
+
+  // —— Mobilità / EV / FTTH / carburanti / TPL ——
   {
     id: "ev",
-    patterns: [/colonnin|ricarica\s*ev|\bev\b|punti\s*di\s*ricarica|pun\/idr/i],
+    patterns: [
+      /colonnin|ricarica\s*ev|\bev\b|punti\s*di\s*ricarica|pun\/idr|auto\s*elettric|veicol[ei]\s*elettric/i,
+    ],
     answer:
-      "I punti di ricarica EV (PUN/IDR) sono nella sezione Mobilità, con mappa e KPI aggiornati.",
+      "Punti di ricarica EV: 38 totali (33 attivi), potenza complessiva circa 1.408 kW (OpenChargeMap). Mappa e KPI in Mobilità.",
     href: "/#infra",
     label: "Apri sezione Mobilità",
     title: "Colonnine EV",
   },
   {
     id: "ftth",
-    patterns: [/ftth|banda\s*(larga|ultralarga)|copertura\s*fibra|agcom/i],
+    patterns: [/ftth|banda\s*(larga|ultralarga)|copertura\s*fibra|fibra\s*ottic|\bdesi\b|agcom/i],
     answer:
-      "La copertura FTTH AGCOM è riportata nei KPI della sezione Mobilità.",
+      "Copertura FTTH AGCOM: DESI circa 56%, copertura a 20 Mbit/s circa 39%. Dettaglio in Mobilità.",
     href: "/#infra",
     label: "Apri sezione Mobilità",
     title: "Banda ultralarga",
   },
   {
     id: "carburanti",
-    patterns: [/carburant|benzina|gasolio|prezzo.*carbur|impianti\s*carbur/i],
+    patterns: [/carburant|benzina|gasolio|prezzo.*carbur|impianti\s*carbur|distributori/i],
     answer:
-      "Prezzi e impianti carburanti (MIMIT) sono in cima alla sezione Mobilità.",
+      "7 impianti carburanti. Prezzi medi self: benzina ~1,971 €/L, gasolio ~2,016 €/L (MIMIT). Tabella e mappa in Mobilità.",
     href: "/#infra",
     label: "Apri sezione Mobilità",
     title: "Carburanti",
   },
   {
-    id: "meteo-allerte",
-    patterns: [/allerta|protezione\s*civile|criticità|bollettino\s*meteo/i],
-    answer:
-      "Le allerte Protezione Civile per San Vincenzo (zona Etruria-Costa Nord) sono nel tab Meteo.",
-    href: "/#meteo",
-    label: "Apri sezione Meteo",
-    title: "Allerte meteo",
-  },
-  {
-    id: "meteo",
-    patterns: [/meteo|temperatura|vento|radar|precipitaz/i],
-    answer:
-      "Condizioni live, previsioni, qualità aria e radar sono nella sezione Meteo.",
-    href: "/#meteo",
-    label: "Apri sezione Meteo",
-    title: "Meteo",
-  },
-  {
-    id: "farmacie",
-    patterns: [/farmacie?\s*(di\s*)?turno|parafarmac/i],
-    answer:
-      "Farmacie di turno e mappa punti sanitari sono nella sezione Sanità.",
-    href: "/#sanita",
-    label: "Apri sezione Sanità",
-    title: "Sanità",
-  },
-  {
-    id: "sanita",
-    patterns: [/dae|defibrillat|ospedal|sanità|sanita/i],
-    answer: "DAE, farmacie e indicatori sanitari sono nella sezione Sanità.",
-    href: "/#sanita",
-    label: "Apri sezione Sanità",
-    title: "Sanità",
-  },
-  {
-    id: "turismo",
-    patterns: [/turist|eventi|biblioteca|visit\s*san\s*vincenzo|arrivi|presenze/i],
-    answer:
-      "Turismo, eventi comunali e biblioteca sono nella sezione Turismo.",
-    href: "/#turismo",
-    label: "Apri sezione Turismo",
-    title: "Turismo",
-  },
-  {
     id: "trasporti",
     patterns: [
-      /trasport|autobus|autolinee|fermata|treno|stazione\s*fs|ciclabil|pedonal/i,
+      /trasport|autobus|\bbus\b|autolinee|fermata|treno|trenitalia|stazione\s*fs|gtfs|\btpl\b|ciclabil|pedonal|sentieri/i,
     ],
     answer:
-      "Fermate/linee Autolinee Toscane, partenze FS, ciclabili e pedonali sono nella sezione Mobilità.",
+      "Orari Autolinee Toscana e Trenitalia (GTFS), ciclabili e pedonali: sezione Mobilità.",
     href: "/#infra",
     label: "Apri sezione Mobilità",
     title: "Trasporti",
   },
   {
+    id: "pendolarismo",
+    patterns: [/pendolar|spostamenti\s*casa|auto[- ]?contenimento|autocontenimento/i],
+    answer:
+      "Pendolarismo ISTAT: saldo circa −46, auto-contenimento circa 48,3%. Dettaglio in Mobilità.",
+    href: "/#infra",
+    label: "Apri sezione Mobilità",
+    title: "Pendolarismo",
+  },
+  {
+    id: "veicoli",
+    patterns: [/parco\s*veicol|tasso\s*di\s*motorizzaz|motorizzazion|veicoli\s*circolant|\baci\b.*veicol/i],
+    answer:
+      "Parco veicolare ACI: circa 6.518 veicoli, motorizzazione circa 686 ogni 1.000 abitanti. Grafici in Mobilità.",
+    href: "/#infra",
+    label: "Apri sezione Mobilità",
+    title: "Parco veicolare",
+  },
+  {
+    id: "mobilita-generale",
+    patterns: [/mobilit[aà]|infrastruttur/i],
+    answer:
+      "Carburanti, EV, FTTH, TPL, ciclabili/pedonali e parco veicolare sono nella sezione Mobilità.",
+    href: "/#infra",
+    label: "Apri sezione Mobilità",
+    title: "Mobilità",
+  },
+
+  // —— Panoramica / demografia ——
+  {
+    id: "popolazione",
+    patterns: [/popolazione|abitanti|quanti\s*abitanti|residenti|demografia/i],
+    answer:
+      "Popolazione residente: 6.342 abitanti (ISTAT). Serie storiche nella sezione Panoramica.",
+    href: "/#panoramica",
+    label: "Apri sezione Panoramica",
+    title: "Demografia",
+  },
+  {
+    id: "demografia-extra",
+    patterns: [/nascite|decessi|saldo\s*naturale|migrazion|stranieri/i],
+    answer:
+      "Nascite, decessi, saldo naturale/migratorio e stranieri sono nella sezione Panoramica.",
+    href: "/#panoramica",
+    label: "Apri sezione Panoramica",
+    title: "Demografia",
+  },
+  {
+    id: "panoramica",
+    patterns: [/panoramica|quadro\s*generale|sintesi\s*comunale|overview/i],
+    answer: "Il quadro generale del comune è nella sezione Panoramica.",
+    href: "/#panoramica",
+    label: "Apri sezione Panoramica",
+    title: "Panoramica",
+  },
+
+  // —— Turismo ——
+  {
+    id: "turismo-kpi",
+    patterns: [
+      /strutture\s*ricettiv|capacit[aà]\s*ricettiv|letti\s*turistic|indice\s*turistic|densit[aà]\s*turistic/i,
+    ],
+    answer:
+      "Turismo: 203 strutture ricettive, 14.368 letti, indice di densità turistica circa 226,6. Dettaglio in Turismo.",
+    href: "/#turismo",
+    label: "Apri sezione Turismo",
+    title: "Turismo",
+  },
+  {
+    id: "turismo",
+    patterns: [/turist|eventi|biblioteca|visit\s*san\s*vincenzo|arrivi|presenze|alberghi|\bhotel\b/i],
+    answer:
+      "Turismo (arrivi/presenze, strutture, eventi, biblioteca) è nella sezione Turismo.",
+    href: "/#turismo",
+    label: "Apri sezione Turismo",
+    title: "Turismo",
+  },
+
+  // —— Economia ——
+  {
+    id: "imprese",
+    patterns: [/imprese|unit[aà]\s*locali|\basia\b|aziende|addetti|occupazione/i],
+    answer:
+      "Economia: circa 697 unità locali (ASIA). Imprese e occupazione nella sezione Economia.",
+    href: "/#economia",
+    label: "Apri sezione Economia",
+    title: "Economia",
+  },
+  {
+    id: "reddito",
+    patterns: [/reddito\s*medio|redditi\s*mef|\birpef\b|dichiarato/i],
+    answer:
+      "Reddito medio dichiarato MEF: circa 24.497 €. Serie e dettaglio in Economia / Finanza.",
+    href: "/#economia",
+    label: "Apri sezione Economia",
+    title: "Redditi",
+  },
+  {
+    id: "pnrr",
+    patterns: [/\bpnrr\b|progetti\s*pnrr|fondi\s*pnrr/i],
+    answer:
+      "PNRR: 14 progetti per circa 700.391 € di finanziamento. Elenco in Economia / Finanza.",
+    href: "/#economia",
+    label: "Apri sezione Economia",
+    title: "PNRR",
+  },
+  {
+    id: "economia",
+    patterns: [/economia\s*locale|sezione\s*economia/i],
+    answer: "Imprese, reddito e PNRR sono nella sezione Economia.",
+    href: "/#economia",
+    label: "Apri sezione Economia",
+    title: "Economia",
+  },
+
+  // —— Finanza ——
+  {
+    id: "finanza-siope",
+    patterns: [/siope|bilancio\s*comunale|uscite\s*comunali|entrate\s*comunali|incassi\s*comunali/i],
+    answer:
+      "SIOPE 2025 (annualizzato): uscite circa 20,6 M€, incassi circa 22,0 M€. Dettaglio in Finanza.",
+    href: "/#finanza",
+    label: "Apri sezione Finanza",
+    title: "Finanza",
+  },
+  {
+    id: "finanza",
+    patterns: [/finanza|spesa\s*pubblica|bilancio/i],
+    answer: "Finanza pubblica (SIOPE, PNRR, redditi) è nella sezione Finanza.",
+    href: "/#finanza",
+    label: "Apri sezione Finanza",
+    title: "Finanza",
+  },
+
+  // —— Ambiente ——
+  {
+    id: "ambiente-kpi",
+    patterns: [
+      /raccolta\s*differenziat|rifiuti\s*pro\s*capite|consumo\s*(di\s*)?suolo|riciclo/i,
+    ],
+    answer:
+      "Ambiente: RD circa 47,9%, rifiuti ~1.380 kg/ab, consumo di suolo ~13,1%. Dettaglio in Ambiente.",
+    href: "/#ambiente",
+    label: "Apri sezione Ambiente",
+    title: "Ambiente",
+  },
+  {
     id: "ambiente",
-    patterns: [/balneaz|arpat|rifiuti|raccolta\s*differenziat|qualità\s*(dell['’])?aria|suolo/i],
+    patterns: [
+      /balneaz|arpat|rifiuti|qualit[aà]\s*(dell['’])?aria|\bpm10\b|\bpm2\.?5\b|\bco2\b|emissioni|ambiente/i,
+    ],
     answer:
       "Balneazione ARPAT, aria, rifiuti e suolo sono nella sezione Ambiente.",
     href: "/#ambiente",
     label: "Apri sezione Ambiente",
     title: "Ambiente",
   },
+
+  // —— Sanità ——
   {
-    id: "finanza",
-    patterns: [/siope|pnrr|bilancio|finanza|entrate|uscite|redditi\s*mef/i],
-    answer: "Finanza pubblica (SIOPE, PNRR, redditi) è nella sezione Finanza.",
-    href: "/#finanza",
-    label: "Apri sezione Finanza",
-    title: "Finanza",
+    id: "farmacie",
+    patterns: [/farmacie?|parafarmac|quante\s*farmacie|farmacie?\s*(di\s*)?turno/i],
+    answer:
+      "Sanità: 2 farmacie e 1 parafarmacia. Turni e mappa nella sezione Sanità.",
+    href: "/#sanita",
+    label: "Apri sezione Sanità",
+    title: "Sanità",
   },
   {
+    id: "sanita",
+    patterns: [/dae|defibrillat|ospedal|sanit[aà]|salute|medico/i],
+    answer: "DAE, farmacie e indicatori sanitari sono nella sezione Sanità.",
+    href: "/#sanita",
+    label: "Apri sezione Sanità",
+    title: "Sanità",
+  },
+
+  // —— Istruzione / Società ——
+  {
     id: "scuole",
-    patterns: [/scuol|miur|alunni|plessi|istruzione/i],
+    patterns: [/scuol|miur|alunni|plessi|istruzione|studenti|asili/i],
     answer: "Scuole MIUR e istruzione sono nella sezione Istruzione.",
     href: "/#istruzione",
     label: "Apri sezione Istruzione",
     title: "Istruzione",
   },
   {
+    id: "societa",
+    patterns: [/societ[aà]|servizi\s*sociali|disabilit|anziani|welfare|assegno/i],
+    answer: "Indicatori sociali e welfare sono nella sezione Società.",
+    href: "/#societa",
+    label: "Apri sezione Società",
+    title: "Società",
+  },
+
+  // —— Territorio / Mappa ——
+  {
+    id: "territorio",
+    patterns: [/territorio|superficie|ettari|confini|uso\s*del\s*suolo/i],
+    answer: "Dati territoriali e uso del suolo sono nella sezione Territorio.",
+    href: "/#territorio",
+    label: "Apri sezione Territorio",
+    title: "Territorio",
+  },
+  {
     id: "mappa",
-    patterns: [/mappa\s*(del\s*)?comune|catasto|civici|rilievo\s*3d/i],
+    patterns: [/mappa\s*(del\s*)?comune|catasto|civici|rilievo\s*3d|cartografia|mappa\s*interattiva/i],
     answer: "Mappa comunale, catasto e civici sono nella sezione Mappa.",
     href: "/#mappa",
     label: "Apri sezione Mappa",
     title: "Mappa",
+  },
+
+  // —— Meteo ——
+  {
+    id: "meteo-allerte",
+    patterns: [/allerta|protezione\s*civile|criticit[aà]|bollettino\s*meteo/i],
+    answer:
+      "Allerte Protezione Civile per San Vincenzo (zona Etruria-Costa Nord / E2) nel tab Meteo.",
+    href: "/#meteo",
+    label: "Apri sezione Meteo",
+    title: "Allerte meteo",
+  },
+  {
+    id: "meteo",
+    patterns: [/meteo|temperatura|vento|radar|precipitaz|previsioni|tempo\s*oggi|pioggia/i],
+    answer:
+      "Condizioni live (OpenWeather), previsioni, qualità aria e allerte sono nella sezione Meteo.",
+    href: "/#meteo",
+    label: "Apri sezione Meteo",
+    title: "Meteo",
+  },
+
+  // —— Catch-all porto (dopo le altre sezioni) ——
+  {
+    id: "porto-generale",
+    patterns: [/\bporto\b/i],
+    answer:
+      "Nella sezione Porto trovi posti barca (~140), servizi, webcam comunali e mappa AIS VesselFinder.",
+    href: "/#porto",
+    label: "Apri sezione Porto",
+    title: "Porto turistico",
   },
 ];
 

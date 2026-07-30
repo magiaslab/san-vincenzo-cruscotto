@@ -227,16 +227,28 @@ def _link_for_source(source: str) -> dict[str, str] | None:
         ("banda", "/#infra", "Apri sezione Mobilità"),
         ("ev_pun", "/#infra", "Apri sezione Mobilità"),
         ("veicol", "/#infra", "Apri sezione Mobilità"),
+        ("pendolar", "/#infra", "Apri sezione Mobilità"),
+        ("trasport", "/#infra", "Apri sezione Mobilità"),
         ("meteo", "/#meteo", "Apri sezione Meteo"),
+        ("allert", "/#meteo", "Apri sezione Meteo"),
         ("sanita", "/#sanita", "Apri sezione Sanità"),
+        ("farmac", "/#sanita", "Apri sezione Sanità"),
         ("turism", "/#turismo", "Apri sezione Turismo"),
         ("ambient", "/#ambiente", "Apri sezione Ambiente"),
         ("aria", "/#ambiente", "Apri sezione Ambiente"),
+        ("rifiut", "/#ambiente", "Apri sezione Ambiente"),
         ("siope", "/#finanza", "Apri sezione Finanza"),
-        ("pnrr", "/#finanza", "Apri sezione Finanza"),
-        ("redditi", "/#finanza", "Apri sezione Finanza"),
+        ("pnrr", "/#economia", "Apri sezione Economia"),
+        ("redditi", "/#economia", "Apri sezione Economia"),
+        ("imprese", "/#economia", "Apri sezione Economia"),
+        ("asia", "/#economia", "Apri sezione Economia"),
+        ("popolaz", "/#panoramica", "Apri sezione Panoramica"),
+        ("demograf", "/#panoramica", "Apri sezione Panoramica"),
         ("scuol", "/#istruzione", "Apri sezione Istruzione"),
         ("istruz", "/#istruzione", "Apri sezione Istruzione"),
+        ("societ", "/#societa", "Apri sezione Società"),
+        ("territor", "/#territorio", "Apri sezione Territorio"),
+        ("mappa", "/#mappa", "Apri sezione Mappa"),
     ]
     for key, href, label in mapping:
         if key in name:
@@ -244,27 +256,161 @@ def _link_for_source(source: str) -> dict[str, str] | None:
     return None
 
 
+# FAQ su tutto il cruscotto (dato o link sezione) — allineata a src/lib/assistente-faq.ts
 _FAQ: list[tuple[str, list[str], str, str, str]] = [
     (
         "porto-capienza",
         [r"capienza.*porto", r"posti\s*barca", r"porto.*posti", r"ormeggi"],
-        "Capienza del porto di San Vincenzo: circa 140 posti barca.",
+        "Capienza del porto di San Vincenzo: circa 140 posti barca (ISTAT / OpenDataComune).",
         "/#porto",
         "Apri sezione Porto",
     ),
     (
-        "carburanti",
-        [r"carburant", r"benzina", r"gasolio"],
-        "Prezzi e impianti carburanti (MIMIT) sono in cima alla sezione Mobilità.",
+        "popolazione",
+        [r"popolazione", r"abitanti", r"residenti", r"demografia"],
+        "Popolazione residente: 6.342 abitanti (ISTAT). Serie storiche nella sezione Panoramica.",
+        "/#panoramica",
+        "Apri sezione Panoramica",
+    ),
+    (
+        "ev",
+        [r"colonnin", r"ricarica\s*ev", r"punti\s*di\s*ricarica", r"auto\s*elettric"],
+        "Punti di ricarica EV: 38 totali (33 attivi), potenza complessiva circa 1.408 kW. Mappa in Mobilità.",
         "/#infra",
         "Apri sezione Mobilità",
     ),
     (
-        "ev",
-        [r"colonnin", r"ricarica\s*ev", r"punti\s*di\s*ricarica"],
-        "I punti di ricarica EV sono nella sezione Mobilità (KPI e mappa).",
+        "ftth",
+        [r"ftth", r"banda\s*(larga|ultralarga)", r"fibra", r"\bdesi\b"],
+        "Copertura FTTH AGCOM: DESI circa 56%, copertura a 20 Mbit/s circa 39%. Dettaglio in Mobilità.",
         "/#infra",
         "Apri sezione Mobilità",
+    ),
+    (
+        "carburanti",
+        [r"carburant", r"benzina", r"gasolio", r"distributori"],
+        "7 impianti carburanti. Prezzi medi self: benzina ~1,971 €/L, gasolio ~2,016 €/L. Tabella in Mobilità.",
+        "/#infra",
+        "Apri sezione Mobilità",
+    ),
+    (
+        "trasporti",
+        [r"trasport", r"autobus", r"\bbus\b", r"autolinee", r"treno", r"ciclabil", r"pedonal"],
+        "Orari Autolinee/Trenitalia (GTFS), ciclabili e pedonali: sezione Mobilità.",
+        "/#infra",
+        "Apri sezione Mobilità",
+    ),
+    (
+        "pendolarismo",
+        [r"pendolar", r"auto[- ]?contenimento"],
+        "Pendolarismo ISTAT: saldo circa −46, auto-contenimento circa 48,3%. Dettaglio in Mobilità.",
+        "/#infra",
+        "Apri sezione Mobilità",
+    ),
+    (
+        "veicoli",
+        [r"parco\s*veicol", r"motorizzazion", r"veicoli\s*circolant"],
+        "Parco veicolare ACI: circa 6.518 veicoli, motorizzazione circa 686/1.000 ab. Grafici in Mobilità.",
+        "/#infra",
+        "Apri sezione Mobilità",
+    ),
+    (
+        "turismo",
+        [r"turist", r"strutture\s*ricettiv", r"arrivi", r"presenze", r"letti"],
+        "Turismo: 203 strutture, 14.368 letti, indice densità ~226,6. Dettaglio in Turismo.",
+        "/#turismo",
+        "Apri sezione Turismo",
+    ),
+    (
+        "imprese",
+        [r"imprese", r"unit[aà]\s*locali", r"\basia\b", r"occupazione"],
+        "Economia: circa 697 unità locali (ASIA). Dettaglio in Economia.",
+        "/#economia",
+        "Apri sezione Economia",
+    ),
+    (
+        "reddito",
+        [r"reddito", r"redditi\s*mef", r"\birpef\b"],
+        "Reddito medio dichiarato MEF: circa 24.497 €. Dettaglio in Economia.",
+        "/#economia",
+        "Apri sezione Economia",
+    ),
+    (
+        "pnrr",
+        [r"\bpnrr\b"],
+        "PNRR: 14 progetti per circa 700.391 €. Elenco in Economia / Finanza.",
+        "/#economia",
+        "Apri sezione Economia",
+    ),
+    (
+        "finanza",
+        [r"siope", r"bilancio", r"uscite\s*comunali", r"entrate\s*comunali", r"finanza"],
+        "SIOPE 2025 (annualizzato): uscite ~20,6 M€, incassi ~22,0 M€. Dettaglio in Finanza.",
+        "/#finanza",
+        "Apri sezione Finanza",
+    ),
+    (
+        "ambiente",
+        [r"rifiuti", r"differenziat", r"consumo\s*(di\s*)?suolo", r"balneaz", r"ambiente", r"\bpm10\b"],
+        "Ambiente: RD ~47,9%, rifiuti ~1.380 kg/ab, consumo suolo ~13,1%. Dettaglio in Ambiente.",
+        "/#ambiente",
+        "Apri sezione Ambiente",
+    ),
+    (
+        "sanita",
+        [r"farmac", r"sanit", r"dae", r"ospedal"],
+        "Sanità: 2 farmacie e 1 parafarmacia. Turni e mappa in Sanità.",
+        "/#sanita",
+        "Apri sezione Sanità",
+    ),
+    (
+        "scuole",
+        [r"scuol", r"istruzione", r"alunni", r"miur"],
+        "Scuole MIUR e istruzione sono nella sezione Istruzione.",
+        "/#istruzione",
+        "Apri sezione Istruzione",
+    ),
+    (
+        "societa",
+        [r"societ[aà]", r"servizi\s*sociali", r"welfare"],
+        "Indicatori sociali e welfare sono nella sezione Società.",
+        "/#societa",
+        "Apri sezione Società",
+    ),
+    (
+        "territorio",
+        [r"territorio", r"superficie", r"uso\s*del\s*suolo"],
+        "Dati territoriali e uso del suolo sono nella sezione Territorio.",
+        "/#territorio",
+        "Apri sezione Territorio",
+    ),
+    (
+        "mappa",
+        [r"mappa\s*(del\s*)?comune", r"catasto", r"civici"],
+        "Mappa comunale, catasto e civici sono nella sezione Mappa.",
+        "/#mappa",
+        "Apri sezione Mappa",
+    ),
+    (
+        "meteo-allerte",
+        [r"allerta", r"protezione\s*civile"],
+        "Allerte Protezione Civile (zona Etruria-Costa Nord / E2) nel tab Meteo.",
+        "/#meteo",
+        "Apri sezione Meteo",
+    ),
+    (
+        "meteo",
+        [r"meteo", r"temperatura", r"previsioni", r"pioggia"],
+        "Meteo live, previsioni e allerte sono nella sezione Meteo.",
+        "/#meteo",
+        "Apri sezione Meteo",
+    ),
+    (
+        "porto-generale",
+        [r"\bporto\b"],
+        "Nella sezione Porto trovi posti barca (~140), servizi, webcam e mappa AIS.",
+        "/#porto",
+        "Apri sezione Porto",
     ),
 ]
 
@@ -360,10 +506,12 @@ class RagService:
         if len(ctx) > 2200:
             ctx = ctx[:2200]
         system = (
-            "Sei l'assistente del Cruscotto San Vincenzo. "
+            "Sei l'assistente di TUTTO il Cruscotto San Vincenzo "
+            "(Panoramica, Turismo, Porto, Economia, Istruzione, Società, "
+            "Finanza, Territorio, Ambiente, Mobilità, Sanità, Meteo, Mappa). "
             "Rispondi SOLO in italiano. "
             "Formato obbligatorio: (1) il dato richiesto in UNA frase, oppure "
-            "(2) indica la sezione del cruscotto (es. Porto, Mobilità, Meteo). "
+            "(2) indica la sezione del cruscotto dove trovarlo. "
             "Usa SOLO numeri presenti nel CONTESTO. Non inventare. "
             "Vietato: elenchi lunghi, storie, markdown, ripetere il contesto. "
             "Se manca il dato: scrivi esattamente "

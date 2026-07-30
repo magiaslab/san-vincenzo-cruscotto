@@ -100,13 +100,18 @@ function linkFromSources(
 ): { href: string; label: string } | null {
   const map: Array<[RegExp, string, string]> = [
     [/porto/i, "/#porto", "Apri sezione Porto"],
-    [/carburant|banda|ev_pun|veicol|trasport|infra/i, "/#infra", "Apri sezione Mobilità"],
+    [/carburant|banda|ev_pun|veicol|trasport|pendolar|infra/i, "/#infra", "Apri sezione Mobilità"],
     [/meteo|allert/i, "/#meteo", "Apri sezione Meteo"],
     [/sanita|farmac/i, "/#sanita", "Apri sezione Sanità"],
     [/turism|event/i, "/#turismo", "Apri sezione Turismo"],
     [/ambient|aria|rifiut|balne/i, "/#ambiente", "Apri sezione Ambiente"],
-    [/finanz|siope|pnrr|redditi/i, "/#finanza", "Apri sezione Finanza"],
+    [/imprese|asia|pnrr|redditi|econom/i, "/#economia", "Apri sezione Economia"],
+    [/finanz|siope/i, "/#finanza", "Apri sezione Finanza"],
     [/scuol|istruz|miur/i, "/#istruzione", "Apri sezione Istruzione"],
+    [/societ|welfare/i, "/#societa", "Apri sezione Società"],
+    [/popolaz|demograf|panoramic/i, "/#panoramica", "Apri sezione Panoramica"],
+    [/territor/i, "/#territorio", "Apri sezione Territorio"],
+    [/mappa|catasto|civici/i, "/#mappa", "Apri sezione Mappa"],
   ];
   for (const s of sources) {
     const name = String(s.source ?? "");

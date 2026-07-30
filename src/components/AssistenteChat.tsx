@@ -24,9 +24,13 @@ type Msg = {
 };
 
 const SUGGESTIONS = [
+  "Quanti abitanti ha San Vincenzo?",
   "Qual è la capienza del porto?",
-  "Quante colonnine EV ci sono a San Vincenzo?",
+  "Quante colonnine EV ci sono?",
   "Dove trovo i prezzi dei carburanti?",
+  "Quante strutture ricettive ci sono?",
+  "Qual è la raccolta differenziata?",
+  "Come va il bilancio comunale?",
   "Dove sono le allerte Protezione Civile?",
 ];
 
@@ -39,7 +43,7 @@ export default function AssistenteChat({
   const [messages, setMessages] = useState<Msg[]>([
     {
       role: "assistant",
-      text: "Ciao: rispondo con il dato del cruscotto o con il link alla sezione dove trovarlo. Niente testi inventati.",
+      text: "Ciao: copro tutto il cruscotto (demografia, turismo, porto, mobilità, economia, finanza, ambiente, sanità, meteo…). Rispondo con il dato o il link alla sezione. Niente testi inventati.",
     },
   ]);
   const [input, setInput] = useState("");
@@ -174,7 +178,7 @@ export default function AssistenteChat({
               onChange={(e) => setInput(e.target.value)}
               rows={compact ? 2 : 2}
               className="w-full resize-y rounded-lg border border-[var(--pa-border)] px-3 py-2 text-[var(--pa-ink)]"
-              placeholder={t("Es. Qual è la capienza del porto?")}
+              placeholder={t("Es. Quanti abitanti? Prezzi benzina? Raccolta differenziata?")}
               disabled={loading}
             />
           </label>
