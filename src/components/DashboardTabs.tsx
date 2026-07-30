@@ -38,6 +38,7 @@ import {
   Sunrise,
   Leaf,
   Accessibility,
+  Zap,
 } from "lucide-react";
 import { AppShell, type NavGroup } from "@/components/AppShell";
 import { EventiComunePanel } from "@/components/EventiComunePanel";
@@ -193,6 +194,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { id: "panoramica", label: "Panoramica", Icon: Globe2 },
       { id: "sanita", label: "Sanità", Icon: Stethoscope },
+      { id: "disabilita", label: "Disabilità", Icon: Accessibility },
       { id: "infra", label: "Mobilità", Icon: Train },
       { id: "meteo", label: "Meteo", Icon: CloudSun },
     ],
@@ -213,7 +215,6 @@ const NAV_GROUPS: NavGroup[] = [
       { id: "economia", label: "Economia", Icon: Factory },
       { id: "istruzione", label: "Istruzione", Icon: School },
       { id: "societa", label: "Società", Icon: Handshake },
-      { id: "disabilita", label: "Disabilità", Icon: Accessibility },
       { id: "finanza", label: "Finanza", Icon: Landmark },
     ],
   },
@@ -393,22 +394,34 @@ function Panoramica({
               Icon: Pill,
             },
             {
+              id: "disabilita" as const,
+              title: t("Accessibilità e disabilità"),
+              hint: t("Luoghi accessibili, stalli e bagni OSM"),
+              Icon: Accessibility,
+            },
+            {
               id: "infra" as const,
               title: t("Prezzi carburanti"),
               hint: `Benzina self media ${formatDecimal(num(carburanti?.prezzo_medio_benzina_self), 3)} €/L`,
               Icon: Fuel,
             },
             {
+              id: "infra" as const,
+              title: t("Trasporti e mobilità"),
+              hint: t("Bus, treni GTFS, ciclabili e colonnine EV"),
+              Icon: Train,
+            },
+            {
+              id: "meteo" as const,
+              title: t("Meteo e allerte"),
+              hint: t("OpenWeather, previsioni e Protezione Civile"),
+              Icon: CloudSun,
+            },
+            {
               id: "ambiente" as const,
               title: t("Mare e balneazione"),
               hint: t("Qualità acque ARPAT"),
               Icon: Waves,
-            },
-            {
-              id: "meteo" as const,
-              title: t("Meteo e radar"),
-              hint: t("Previsioni e precipitazioni"),
-              Icon: CloudSun,
             },
             {
               id: "istruzione" as const,
@@ -429,9 +442,9 @@ function Panoramica({
               Icon: Palmtree,
             },
           ] as const
-        ).map(({ id, title, hint, Icon }) => (
+        ).map(({ id, title, hint, Icon }, i) => (
           <button
-            key={id}
+            key={`${id}-${title}-${i}`}
             type="button"
             onClick={() => onNavigate(id)}
             className="panel min-h-11 text-left transition hover:border-[var(--pa-primary)]"
@@ -497,6 +510,28 @@ function Panoramica({
           icon={Heart}
           variant="info"
           {...go("sanita")}
+        />
+        <KpiCard
+          label={t("Punti ricarica EV")}
+          value={valueOrMissing(ev?.n_totale, formatInteger)}
+          hint={`${formatPercent(num(ev?.pct_attivi))} attivi · ${t("prezzi in Mobilità")}`}
+          icon={Zap}
+          {...go("infra")}
+        />
+        <KpiCard
+          label={t("Accessibilità OSM")}
+          value={t("Mappa e stalli")}
+          hint={t("Disabilità e luoghi accessibili")}
+          icon={Accessibility}
+          variant="info"
+          {...go("disabilita")}
+        />
+        <KpiCard
+          label={t("Enti RUNTS")}
+          value={valueOrMissing(runts?.n_enti_totali, formatInteger)}
+          hint={t("Terzo settore e inclusione")}
+          icon={Handshake}
+          {...go("societa")}
         />
       </div>
 
@@ -583,13 +618,6 @@ function Panoramica({
             label={t("Enti RUNTS")}
             value={valueOrMissing(runts?.n_enti_totali, formatInteger)}
             {...go("societa")}
-          />
-          <KpiCard
-            label={t("Accessibilità OSM")}
-            value={t("Mappa e stalli")}
-            hint={t("Disabilità e luoghi accessibili")}
-            icon={Accessibility}
-            {...go("disabilita")}
           />
           <KpiCard
             label={t("Civici ANNCSU")}

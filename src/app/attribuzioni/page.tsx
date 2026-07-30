@@ -20,6 +20,7 @@ import {
   CFR_TOSCANA_URL,
   DPC_ALLERTAMENTO_URL,
   OPEN_METEO_ATTRIBUTION_URL,
+  OPENWEATHER_ATTRIBUTION_URL,
   OSM_COPYRIGHT_URL,
   RAINVIEWER_ATTRIBUTION_URL,
   REGIONE_TOSCANA_ALLERTA_URL,
@@ -344,6 +345,15 @@ export default function AttribuzioniPage() {
                 (IODL 2.0)
               </li>
               <li>
+                <a
+                  className="text-[#0066CC] underline"
+                  href={OPENWEATHER_ATTRIBUTION_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  OpenWeather
+                </a>{" "}
+                — meteo live, previsioni e AQI;{" "}
                 <a
                   className="text-[#0066CC] underline"
                   href={OPEN_METEO_ATTRIBUTION_URL}
