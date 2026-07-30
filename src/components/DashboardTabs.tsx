@@ -981,7 +981,9 @@ function Turismo({
 
       {flussi ? (
         <div className="mt-4 panel bg-[#fff8e6]">
-          <h3>{t("Flussi provinciali (Livorno) — anno {String(flussi.anno)}")}</h3>
+          <h3 className="m-0 mb-3 text-base font-bold text-[var(--pa-ink)]">
+            {t("Flussi provinciali (Livorno) — anno")} {String(flussi.anno ?? "")}
+          </h3>
           {flussi._warning ? <p className="text-sm text-[#5b6f82]">{String(flussi._warning)}</p> : null}
           <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <KpiCard label={t("Arrivi totali")} value={formatInteger(num(flussi.arrivi_totali))} />
@@ -1446,6 +1448,32 @@ function Economia({ kpi }: { kpi: Kpi }) {
   );
 }
 
+function monthLabelIt(raw: string): string {
+  const mesi = [
+    "Gen",
+    "Feb",
+    "Mar",
+    "Apr",
+    "Mag",
+    "Giu",
+    "Lug",
+    "Ago",
+    "Set",
+    "Ott",
+    "Nov",
+    "Dic",
+  ];
+  const n = Number(String(raw).replace(/^0+/, "") || raw);
+  if (n >= 1 && n <= 12) return mesi[n - 1]!;
+  return String(raw);
+}
+
+function humanizeKey(key: string): string {
+  return key
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 function Finanza({ kpi }: { kpi: Kpi }) {
   const t = useT();
   const { detail, loading } = useDettaglio("siope,anac,bdap,pnrr,patrimonio");
@@ -1453,18 +1481,25 @@ function Finanza({ kpi }: { kpi: Kpi }) {
   const anacKpi = asRecord(kpi.contratti_anac);
   const opereKpi = asRecord(kpi.opere_bdap);
   const pnrrKpi = asRecord(kpi.pnrr);
+  const patrimonioKpi = asRecord(kpi.patrimonio_pa);
 
   const siope = asRecord(detail?.siope);
   const anac = asRecord(detail?.anac);
   const bdap = asRecord(detail?.bdap_kpi);
   const pnrr = asRecord(detail?.pnrr);
   const patrimonio = asRecord(detail?.immobili_pa);
+  const patrimonioDetailKpi = asRecord(patrimonio?.kpi);
   const topCpv = Array.isArray(anac?.top_cpv)
     ? (anac.top_cpv as Array<{ desc?: string; code?: string; importo?: number; count?: number }>)
     : [];
+  const cpvAll = Array.isArray(anac?.cpv)
+    ? (anac.cpv as Array<{ desc?: string; code?: string; importo?: number; count?: number }>)
+    : topCpv;
   const topSettori = Array.isArray(bdap?.top_settori)
     ? (bdap.top_settori as Array<{ settore?: string; count?: number; costo?: number }>)
     : [];
+  const bdapStati = asRecord(bdap?.per_stato);
+  const bdapTotale = asRecord(bdap?.totale);
   const missioni = Array.isArray(pnrr?.per_missione)
     ? (pnrr.per_missione as Array<{ missione?: string; descrizione?: string; tot_pnrr?: number; n_progetti?: number }>)
     : [];
@@ -1474,32 +1509,110 @@ function Finanza({ kpi }: { kpi: Kpi }) {
   const progettiOpere = Array.isArray(asRecord(detail?.opere)?.progetti)
     ? (asRecord(detail?.opere)?.progetti as Array<Record<string, unknown>>)
     : [];
-  const mixPat = asRecord(asRecord(patrimonio?.kpi)?.mix_categoria);
+  const mixPat = asRecord(patrimonioDetailKpi?.mix_categoria);
+  const mixNatura = asRecord(patrimonioDetailKpi?.mix_natura);
+  const h3 = "m-0 mb-3 text-base font-bold text-[var(--pa-ink)]";
+
+  const siopeTitle = [
+    t("SIOPE mensile"),
+    siope?.anno != null ? String(siope.anno) : "",
+    siope?.parziale ? `(${t("parziale")})` : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <section>
-      <SectionIntro title={t("Finanza pubblica")} description={t("SIOPE mensile, contratti ANAC, opere BDAP, PNRR e patrimonio immobiliare PA.")} />
+      <SectionIntro
+        title={t("Finanza pubblica")}
+        description={t(
+          "SIOPE mensile, contratti ANAC, opere BDAP, PNRR e patrimonio immobiliare PA.",
+        )}
+      />
       <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
-        <KpiCard label={t("Uscite SIOPE")} value={valueOrMissing(siopeKpi?.totale_uscite_eur, formatEuroCompact)} hint={`${formatEuro(num(siopeKpi?.uscite_per_abitante_eur))} /ab.`} />
-        <KpiCard label={t("Incassi SIOPE")} value={valueOrMissing(siopeKpi?.totale_incassi_eur, formatEuroCompact)} hint={`${formatEuro(num(siopeKpi?.incassi_per_abitante_eur))} /ab.`} />
-        <KpiCard label={t("Saldo cassa")} value={valueOrMissing(siopeKpi?.saldo_cassa_eur, formatEuroCompact)} />
-        <KpiCard label={t("Contratti ANAC")} value={valueOrMissing(anacKpi?.n_aggiudicazioni, formatInteger)} hint={valueOrMissing(anacKpi?.importo_totale_eur, formatEuroCompact)} />
-        <KpiCard label={t("Opere BDAP")} value={valueOrMissing(opereKpi?.n_progetti, formatInteger)} hint={valueOrMissing(opereKpi?.importo_totale_eur, formatEuroCompact)} />
-        <KpiCard label={t("PNRR assegnato")} value={valueOrMissing(pnrrKpi?.importo_assegnato_eur, formatEuroCompact)} hint={`${formatInteger(num(pnrrKpi?.n_concluso))} conclusi / ${formatInteger(num(pnrrKpi?.n_in_corso))} in corso`} />
-        <KpiCard label={t("Immobili PA")} value={valueOrMissing(asRecord(patrimonio?.kpi)?.n_totale ?? asRecord(kpi.patrimonio_pa)?.n_immobili, formatInteger)} />
-        <KpiCard label={t("Superficie PA")} value={valueOrMissing(asRecord(patrimonio?.kpi)?.superficie_totale_mq ?? asRecord(kpi.patrimonio_pa)?.superficie_totale_mq, (v) => `${formatInteger(v)} m²`)} />
+        <KpiCard
+          label={t("Uscite SIOPE")}
+          value={valueOrMissing(siopeKpi?.totale_uscite_eur, formatEuroCompact)}
+          hint={`${formatEuro(num(siopeKpi?.uscite_per_abitante_eur))} /ab.`}
+          variant="danger"
+        />
+        <KpiCard
+          label={t("Incassi SIOPE")}
+          value={valueOrMissing(siopeKpi?.totale_incassi_eur, formatEuroCompact)}
+          hint={`${formatEuro(num(siopeKpi?.incassi_per_abitante_eur))} /ab.`}
+          variant="success"
+        />
+        <KpiCard
+          label={t("Saldo cassa")}
+          value={valueOrMissing(siopeKpi?.saldo_cassa_eur, formatEuroCompact)}
+          hint={siopeKpi?.anno != null ? `${t("Anno")} ${String(siopeKpi.anno)}` : undefined}
+          variant="info"
+        />
+        <KpiCard
+          label={t("Contratti ANAC")}
+          value={valueOrMissing(anacKpi?.n_aggiudicazioni ?? anac?.count, formatInteger)}
+          hint={valueOrMissing(
+            anacKpi?.importo_totale_eur ?? anac?.importo_totale,
+            formatEuroCompact,
+          )}
+        />
+        <KpiCard
+          label={t("Opere BDAP")}
+          value={valueOrMissing(opereKpi?.n_progetti ?? bdapTotale?.count, formatInteger)}
+          hint={valueOrMissing(opereKpi?.importo_totale_eur, formatEuroCompact)}
+        />
+        <KpiCard
+          label={t("PNRR assegnato")}
+          value={valueOrMissing(pnrrKpi?.importo_assegnato_eur, formatEuroCompact)}
+          hint={`${formatInteger(num(pnrrKpi?.n_concluso))} ${t("conclusi")} / ${formatInteger(num(pnrrKpi?.n_in_corso))} ${t("in corso")}`}
+        />
+        <KpiCard
+          label={t("Immobili PA")}
+          value={valueOrMissing(
+            patrimonioDetailKpi?.n_totale ?? patrimonioKpi?.n_immobili,
+            formatInteger,
+          )}
+          hint={`${formatInteger(num(patrimonioDetailKpi?.n_fabbricati ?? patrimonioKpi?.n_fabbricati))} ${t("fabbricati")} · ${formatInteger(num(patrimonioDetailKpi?.n_terreni ?? patrimonioKpi?.n_terreni))} ${t("terreni")}`}
+        />
+        <KpiCard
+          label={t("Superficie PA")}
+          value={valueOrMissing(
+            patrimonioDetailKpi?.superficie_totale_mq ?? patrimonioKpi?.superficie_totale_mq,
+            (v) => `${formatInteger(v)} m²`,
+          )}
+          hint={
+            patrimonioDetailKpi?.pct_geo_referenziati != null
+              ? `${formatPercent(num(patrimonioDetailKpi.pct_geo_referenziati))} ${t("georeferenziati")}`
+              : undefined
+          }
+        />
       </div>
 
       {loading ? <LoadingBlock /> : null}
 
       {siope?.disponibile ? (
         <div className="mb-4 panel">
-          <h3>{t("SIOPE mensile {String(siope.anno)}{siope.parziale ? \" (parziale)\" : \"\"}")}</h3>
+          <h3 className={h3}>{siopeTitle}</h3>
+          <p className="m-0 mb-3 text-xs text-[var(--pa-muted)] sm:text-sm">
+            {t("Uscite")}: {formatEuroCompact(num(siope.totale_uscite ?? siopeKpi?.totale_uscite_eur))}
+            {" · "}
+            {t("Entrate")}: {formatEuroCompact(num(siope.totale_entrate ?? siopeKpi?.totale_incassi_eur))}
+            {" · "}
+            {t("Saldo cassa")}: {formatEuroCompact(num(siope.saldo_cassa ?? siopeKpi?.saldo_cassa_eur))}
+          </p>
           <LineChart
-            labels={(siope.labels as string[]) ?? []}
+            labels={((siope.labels as string[]) ?? []).map(monthLabelIt)}
             datasets={[
-              { label: "Uscite", data: (siope.uscite_mensili as number[]) ?? [], color: "#D9364F" },
-              { label: "Entrate", data: (siope.entrate_mensili as number[]) ?? [], color: "#008758" },
+              {
+                label: t("Uscite"),
+                data: (siope.uscite_mensili as number[]) ?? [],
+                color: "#D9364F",
+              },
+              {
+                label: t("Entrate"),
+                data: (siope.entrate_mensili as number[]) ?? [],
+                color: "#008758",
+              },
             ]}
           />
         </div>
@@ -1508,31 +1621,101 @@ function Finanza({ kpi }: { kpi: Kpi }) {
       <div className="mb-4 grid gap-3 sm:gap-4 lg:grid-cols-2">
         {topCpv.length > 0 ? (
           <div className="panel">
-            <h3>{t("Top CPV ANAC")}</h3>
+            <h3 className={h3}>{t("Top CPV ANAC")}</h3>
+            <p className="m-0 mb-3 text-xs text-[var(--pa-muted)] sm:text-sm">
+              {String(anac?.buyer_name ?? t("Comune di San Vincenzo"))}
+              {anac?.first_award_date || anac?.last_award_date
+                ? ` · ${t("Aggiudicazioni")} ${String(anac?.first_award_date ?? "—")} → ${String(anac?.last_award_date ?? "—")}`
+                : null}
+              {anac?.distinct_cpv != null
+                ? ` · ${formatInteger(num(anac.distinct_cpv))} CPV`
+                : null}
+            </p>
             <BarChart
               labels={topCpv.map((c) => String(c.desc ?? c.code ?? "").slice(0, 40))}
-              datasets={[{ label: "Importo €", data: topCpv.map((c) => c.importo ?? 0), color: "#0066CC" }]}
+              datasets={[
+                {
+                  label: t("Importo €"),
+                  data: topCpv.map((c) => c.importo ?? 0),
+                  color: "#0066CC",
+                },
+              ]}
             />
           </div>
         ) : null}
         {topSettori.length > 0 ? (
           <div className="panel">
-            <h3>{t("Opere BDAP per settore")}</h3>
+            <h3 className={h3}>{t("Opere BDAP per settore")}</h3>
+            {bdapStati ? (
+              <p className="m-0 mb-3 text-xs text-[var(--pa-muted)] sm:text-sm">
+                {Object.entries(bdapStati)
+                  .map(([stato, info]) => {
+                    const rec = asRecord(info);
+                    return `${humanizeKey(stato)}: ${formatInteger(num(rec?.count))}`;
+                  })
+                  .join(" · ")}
+              </p>
+            ) : null}
             <BarChart
               labels={topSettori.map((s) => String(s.settore ?? "").slice(0, 36))}
-              datasets={[{ label: "Costo €", data: topSettori.map((s) => s.costo ?? 0), color: "#CC7A00" }]}
+              datasets={[
+                {
+                  label: t("Costo €"),
+                  data: topSettori.map((s) => s.costo ?? 0),
+                  color: "#CC7A00",
+                },
+              ]}
             />
           </div>
         ) : null}
       </div>
 
+      {cpvAll.length > 0 ? (
+        <div className="mb-4 overflow-x-auto panel p-0">
+          <h3 className={`px-3 pt-3 sm:px-4 sm:pt-4 ${h3}`}>{t("Contratti ANAC per CPV")}</h3>
+          <table className="min-w-full text-left text-xs sm:text-sm">
+            <thead className="bg-[#e8f2fc] text-[#17324d]">
+              <tr>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("CPV")}</th>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Descrizione")}</th>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("N.")}</th>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Importo")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {cpvAll.map((c) => (
+                <tr key={String(c.code ?? c.desc)} className="border-t border-[#eef2f5]">
+                  <td className="whitespace-nowrap px-2 py-1.5 sm:px-3 sm:py-2">
+                    {String(c.code ?? "—")}
+                  </td>
+                  <td className="px-2 py-1.5 sm:px-3 sm:py-2">{String(c.desc ?? "—")}</td>
+                  <td className="px-2 py-1.5 sm:px-3 sm:py-2">{formatInteger(num(c.count))}</td>
+                  <td className="px-2 py-1.5 sm:px-3 sm:py-2">
+                    {formatEuroCompact(num(c.importo))}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : null}
+
       {missioni.length > 0 ? (
         <div className="mb-4 panel">
-          <h3>{t("PNRR per missione")}</h3>
-          <ul className="space-y-2 text-xs sm:text-sm">
+          <h3 className={h3}>{t("PNRR per missione")}</h3>
+          <ul className="m-0 list-none space-y-2 p-0 text-xs sm:text-sm">
             {missioni.map((m) => (
-              <li key={String(m.missione)}>
-                <strong>{m.missione} — {m.descrizione}</strong>: {formatInteger(num(m.n_progetti))} progetti · {formatEuroCompact(num(m.tot_pnrr))}
+              <li
+                key={String(m.missione)}
+                className="rounded-lg border border-[var(--pa-border)] bg-[var(--pa-surface-soft)] px-3 py-2"
+              >
+                <strong>
+                  {m.missione} — {m.descrizione}
+                </strong>
+                <span className="mt-0.5 block text-[var(--pa-muted)]">
+                  {formatInteger(num(m.n_progetti))} {t("progetti")} ·{" "}
+                  {formatEuroCompact(num(m.tot_pnrr))}
+                </span>
               </li>
             ))}
           </ul>
@@ -1541,11 +1724,14 @@ function Finanza({ kpi }: { kpi: Kpi }) {
 
       {progettiPnrr.length > 0 ? (
         <div className="mb-4 overflow-x-auto panel p-0">
-          <h3 className="px-3 pt-3 sm:px-4 sm:pt-4">{t("Progetti PNRR")}</h3>
+          <h3 className={`px-3 pt-3 sm:px-4 sm:pt-4 ${h3}`}>
+            {t("Progetti PNRR")} ({formatInteger(progettiPnrr.length)})
+          </h3>
           <table className="min-w-full text-left text-xs sm:text-sm">
             <thead className="bg-[#e8f2fc] text-[#17324d]">
               <tr>
                 <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Titolo")}</th>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Missione")}</th>
                 <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Stato")}</th>
                 <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Finanziamento")}</th>
                 <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Fine")}</th>
@@ -1554,10 +1740,36 @@ function Finanza({ kpi }: { kpi: Kpi }) {
             <tbody>
               {progettiPnrr.map((p) => (
                 <tr key={String(p.cup)} className="border-t border-[#eef2f5]">
-                  <td className="px-2 py-1.5 sm:px-3 sm:py-2">{String(p.titolo)}</td>
-                  <td className="px-2 py-1.5 sm:px-3 sm:py-2">{String(p.stato_avanzamento ?? "—")}</td>
-                  <td className="px-2 py-1.5 sm:px-3 sm:py-2">{formatEuroCompact(num(p.finanziamento_pnrr))}</td>
-                  <td className="px-2 py-1.5 sm:px-3 sm:py-2">{String(p.data_fine_effettiva ?? p.data_fine_prevista ?? "—")}</td>
+                  <td className="max-w-sm px-2 py-1.5 sm:px-3 sm:py-2">
+                    {String(p.titolo)}
+                    {p.cup ? (
+                      <span className="mt-0.5 block text-[10px] text-[var(--pa-muted)]">
+                        CUP {String(p.cup)}
+                      </span>
+                    ) : null}
+                  </td>
+                  <td className="px-2 py-1.5 sm:px-3 sm:py-2">
+                    {String(p.missione ?? "—")}
+                  </td>
+                  <td className="px-2 py-1.5 sm:px-3 sm:py-2">
+                    {String(p.stato_avanzamento ?? "—")}
+                    {p.fase_iter ? (
+                      <span className="mt-0.5 block text-[10px] text-[var(--pa-muted)]">
+                        {String(p.fase_iter)}
+                      </span>
+                    ) : null}
+                  </td>
+                  <td className="px-2 py-1.5 sm:px-3 sm:py-2">
+                    {formatEuroCompact(num(p.finanziamento_pnrr))}
+                    {p.finanziamento_totale != null ? (
+                      <span className="mt-0.5 block text-[10px] text-[var(--pa-muted)]">
+                        {t("Totale")} {formatEuroCompact(num(p.finanziamento_totale))}
+                      </span>
+                    ) : null}
+                  </td>
+                  <td className="whitespace-nowrap px-2 py-1.5 sm:px-3 sm:py-2">
+                    {String(p.data_fine_effettiva ?? p.data_fine_prevista ?? "—")}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -1567,7 +1779,13 @@ function Finanza({ kpi }: { kpi: Kpi }) {
 
       {progettiOpere.length > 0 ? (
         <div className="mb-4 overflow-x-auto panel p-0">
-          <h3 className="px-3 pt-3 sm:px-4 sm:pt-4">{t("Opere BDAP (campione)")}</h3>
+          <h3 className={`px-3 pt-3 sm:px-4 sm:pt-4 ${h3}`}>
+            {t("Opere BDAP")} ({formatInteger(progettiOpere.length)}
+            {asRecord(detail?.opere)?.n_progetti != null
+              ? ` / ${formatInteger(num(asRecord(detail?.opere)?.n_progetti))}`
+              : null}
+            )
+          </h3>
           <table className="min-w-full text-left text-xs sm:text-sm">
             <thead className="bg-[#e8f2fc] text-[#17324d]">
               <tr>
@@ -1578,12 +1796,16 @@ function Finanza({ kpi }: { kpi: Kpi }) {
               </tr>
             </thead>
             <tbody>
-              {progettiOpere.slice(0, 20).map((p) => (
-                <tr key={String(p.cup)} className="border-t border-[#eef2f5]">
-                  <td className="max-w-md px-2 py-1.5 sm:px-3 sm:py-2">{String(p.descrizione)}</td>
+              {progettiOpere.slice(0, 30).map((p) => (
+                <tr key={String(p.cup ?? p.descrizione)} className="border-t border-[#eef2f5]">
+                  <td className="max-w-md px-2 py-1.5 sm:px-3 sm:py-2">
+                    {String(p.descrizione)}
+                  </td>
                   <td className="px-2 py-1.5 sm:px-3 sm:py-2">{String(p.settore ?? "—")}</td>
                   <td className="px-2 py-1.5 sm:px-3 sm:py-2">{String(p.stato ?? "—")}</td>
-                  <td className="px-2 py-1.5 sm:px-3 sm:py-2">{formatEuroCompact(num(p.costo_prev))}</td>
+                  <td className="px-2 py-1.5 sm:px-3 sm:py-2">
+                    {formatEuroCompact(num(p.costo_prev))}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -1591,13 +1813,41 @@ function Finanza({ kpi }: { kpi: Kpi }) {
         </div>
       ) : null}
 
-      {mixPat ? (
-        <div className="panel">
-          <h3>{t("Patrimonio PA — mix categorie")}</h3>
-          <BarChart
-            labels={Object.keys(mixPat).map((k) => k.replace(/_/g, " "))}
-            datasets={[{ label: "N. immobili", data: Object.values(mixPat).map((v) => Number(v) || 0) }]}
-          />
+      {mixPat || mixNatura ? (
+        <div className="mb-4 grid gap-3 sm:gap-4 lg:grid-cols-2">
+          {mixPat ? (
+            <div className="panel">
+              <h3 className={h3}>{t("Patrimonio PA — mix categorie")}</h3>
+              <BarChart
+                labels={Object.keys(mixPat).map(humanizeKey)}
+                datasets={[
+                  {
+                    label: t("N. immobili"),
+                    data: Object.values(mixPat).map((v) => Number(v) || 0),
+                    color: "#0066CC",
+                  },
+                ]}
+              />
+            </div>
+          ) : null}
+          {mixNatura ? (
+            <div className="panel">
+              <h3 className={h3}>{t("Patrimonio PA — natura")}</h3>
+              <DoughnutChart
+                labels={Object.keys(mixNatura).map(humanizeKey)}
+                values={Object.values(mixNatura).map((v) => Number(v) || 0)}
+              />
+              {patrimonioDetailKpi?.pct_vincolo_culturale != null ? (
+                <p className="mb-0 mt-3 text-xs text-[var(--pa-muted)] sm:text-sm">
+                  {t("Con vincolo culturale")}:{" "}
+                  {formatPercent(num(patrimonioDetailKpi.pct_vincolo_culturale))}
+                  {patrimonioDetailKpi.pct_uso_terzi != null
+                    ? ` · ${t("Uso terzi")}: ${formatPercent(num(patrimonioDetailKpi.pct_uso_terzi))}`
+                    : null}
+                </p>
+              ) : null}
+            </div>
+          ) : null}
         </div>
       ) : null}
     </section>
@@ -1909,7 +2159,9 @@ function Infra({ kpi }: { kpi: Kpi }) {
         ) : null}
         {iscrizioni ? (
           <div className="panel">
-            <h3>{t("Nuove iscrizioni veicoli {String(iscrizioni.anno)}")}</h3>
+            <h3 className="m-0 mb-3 text-base font-bold text-[var(--pa-ink)]">
+              {t("Nuove iscrizioni veicoli")} {String(iscrizioni.anno ?? "")}
+            </h3>
             <DoughnutChart
               labels={["Benzina", "Gasolio", "Elettriche", "Ibride", "Gas/GPL"]}
               values={[num(iscrizioni.benzina) ?? 0, num(iscrizioni.gasolio) ?? 0, num(iscrizioni.elettriche) ?? 0, num(iscrizioni.ibride) ?? 0, num(iscrizioni.gas_metano_gpl) ?? 0]}
