@@ -90,7 +90,6 @@ const TOC: { id: string; label: string }[] = [
   { id: "minimo", label: "Identità comune" },
   { id: "env", label: "Variabili d’ambiente" },
   { id: "moduli", label: "Moduli opzionali" },
-  { id: "mcp", label: "Cursor, Claude e MCP" },
   { id: "limiti", label: "Checklist e limiti" },
 ];
 
@@ -203,14 +202,6 @@ const ACCOUNTS: {
     href: "https://news.wheelmap.org/wheelmap-widget/",
     icon: { kind: "lucide", Icon: Accessibility },
   },
-  {
-    servizio: "Cursor / Claude",
-    aCosa: "IDE AI e agent per adattare il fork; MCP opzionale",
-    obbligatorio: "No",
-    dove: "cursor.com · claude.ai",
-    href: "https://cursor.com",
-    icon: { kind: "lucide", Icon: Sparkles },
-  },
 ];
 
 function AccountIconMark({ icon }: { icon: AccountIcon }) {
@@ -295,7 +286,7 @@ export function RiusaPanel() {
     <section>
       <SectionIntro
         title="Riusa questo cruscotto"
-        description={`Guida completa per duplicare lo stack su un altro comune: dall’account GitHub alla messa online su Vercel, con account esterni (Telegram, Modal, Hugging Face, …), variabili d’ambiente e note su Cursor / Claude / MCP. Non serve replicare ogni pannello locale di ${COMUNE_NOME}.`}
+        description={`Guida completa per duplicare lo stack su un altro comune: dall’account GitHub alla messa online su Vercel, con account esterni (Telegram, Modal, Hugging Face, …) e variabili d’ambiente. Non serve replicare ogni pannello locale di ${COMUNE_NOME}.`}
       />
 
       <div className="max-w-3xl">
@@ -314,9 +305,9 @@ export function RiusaPanel() {
             via codice ISTAT. Flusso consigliato:{" "}
             <strong>
               account GitHub → fork → identità comunale → deploy Vercel →
-              (opzionale) moduli e MCP
+              (opzionale) moduli locali
             </strong>
-            .
+            . Non serve un MCP proprio: i KPI usano già il MCP pubblico AgID.
           </p>
           <nav aria-label="Indice guida riuso">
             <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
@@ -365,7 +356,7 @@ export function RiusaPanel() {
             </li>
             <li>
               <DocLink href={VERCEL_DEPLOY_URL} icon={<VercelMark />}>
-                Esempio deploy Vercel
+                Deploy su Vercel
               </DocLink>
             </li>
           </ul>
@@ -381,8 +372,7 @@ export function RiusaPanel() {
           <p>
             <strong>Completo / produzione:</strong> dominio custom, OpenWeather,
             bot Telegram DAE, assistente RAG (Modal + Hugging Face), token
-            GitHub per feedback/segnalazioni, adattamento moduli regionali,
-            eventuale MCP per Cursor o Claude.
+            GitHub per feedback/segnalazioni, adattamento moduli regionali.
           </p>
           <p className="text-[var(--pa-muted)]">
             Architettura dello stack:{" "}
@@ -663,54 +653,6 @@ git branch -M main && git push -u origin main`}
           <p>
             Un MVP utile è spesso «KPI nazionali + mappa + 1–2 fonti locali», non
             la parità totale con {COMUNE_NOME}.
-          </p>
-        </Section>
-
-        <Section title="Cursor, Claude e MCP" id="mcp">
-          <p>
-            <strong>Sì, si può costruire un MCP</strong> per Cursor o Claude: non
-            serve per i cittadini sul sito, ma è utile agli sviluppatori del
-            fork.
-          </p>
-          <ul className="list-disc space-y-2 pl-5">
-            <li>
-              <strong>Oggi:</strong> l’app è già <em>client</em> del MCP AgID (
-              <code>src/lib/mcp.ts</code>). In Cursor/Claude puoi anche aggiungere
-              direttamente l’URL{" "}
-              <code>https://cruscotto-italia-mcp.agid.workers.dev/mcp</code>{" "}
-              come server MCP e chiamare <code>comune_kpi</code> /{" "}
-              <code>comune_dashboard</code> col tuo ISTAT.
-            </li>
-            <li>
-              <strong>MCP del tuo cruscotto (consigliato per agent):</strong>{" "}
-              piccolo server che espone tool read-only sulle tue{" "}
-              <code>/api/*</code> (<code>get_kpi</code>, <code>get_meteo</code>,{" "}
-              <code>get_dae</code>, …) così l’IDE usa gli stessi dati arricchiti
-              del deploy.
-            </li>
-            <li>
-              <strong>Hybrid:</strong> AgID per i KPI nazionali + route locali
-              (DAE, GTFS, ARPAT…). Non esporre in MCP le operazioni che usano
-              token Telegram/GitHub in scrittura senza autenticazione.
-            </li>
-          </ul>
-          <p>
-            Per adattare il fork con Cursor: apri la cartella del repo, leggi{" "}
-            <code>AGENTS.md</code>, chiedi all’agent di aggiornare constants e
-            asset. Brief utile anche in Claude Projects / Cursor Rules: ISTAT,
-            nome comune, «nessun DB, disclaimer da mantenere».
-          </p>
-          <p className="text-[var(--pa-muted)]">
-            Dettaglio configurazione JSON e livelli A/B/C: sezione 12 di{" "}
-            <a
-              className="underline"
-              href={GITHUB_DOCS_RIUSO_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              docs/riuso-fork.md
-            </a>
-            .
           </p>
         </Section>
 

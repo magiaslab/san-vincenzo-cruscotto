@@ -2,7 +2,7 @@
 
 Guida passo-passo per duplicare questo progetto su un **altro comune italiano**,
 dall’account GitHub alla messa online su Vercel, con i servizi esterni opzionali
-(Telegram, Modal, Hugging Face, OpenWeather, …) e note per Cursor / Claude / MCP.
+(Telegram, Modal, Hugging Face, OpenWeather, …).
 
 La stessa guida è riassunta in-app su [`/#riusa`](https://www.cruscottosanvincenzo.it/#riusa)
 (tab **Progetto → Riusa / fork**). Redirect legacy: `/riusa`.
@@ -25,9 +25,8 @@ Env di esempio: [`.env.example`](../.env.example)
 9. [Passo F — Dominio e SEO](#9-passo-f--dominio-e-seo)
 10. [Catalogo variabili d’ambiente](#10-catalogo-variabili-dambiente)
 11. [Moduli opzionali](#11-moduli-opzionali)
-12. [Cursor, Claude e MCP](#12-cursor-claude-e-mcp)
-13. [Checklist finale e troubleshooting](#13-checklist-finale-e-troubleshooting)
-14. [Licenza e disclaimer](#14-licenza-e-disclaimer)
+12. [Checklist finale e troubleshooting](#12-checklist-finale-e-troubleshooting)
+13. [Licenza e disclaimer](#13-licenza-e-disclaimer)
 
 ---
 
@@ -52,7 +51,7 @@ Fine. Il resto di questa guida è opzionale.
 
 Dopo l’MVP: dominio custom, OpenWeather, bot Telegram DAE, assistente RAG
 (Modal + Hugging Face), token GitHub per feedback/segnalazioni, Wheelmap,
-adattamento moduli regionali (ARPAT, GTFS, allerte), eventuale MCP per Cursor/Claude.
+adattamento moduli regionali (ARPAT, GTFS, allerte).
 
 ---
 
@@ -64,6 +63,9 @@ adattamento moduli regionali (ARPAT, GTFS, allerte), eventuale MCP per Cursor/Cl
 | Proxy `/api/*` → MCP Cruscotto Italia (AgID) | Backend/DB/auth locali |
 | Shell dashboard (sidebar, KPI, mappe, grafici) | Feature flag runtime (`comune.example.json` è solo checklist) |
 | Pannelli che degradano se manca la fonte | Parità automatica di ogni pannello SV |
+
+Non serve costruire un MCP proprio per il fork: i KPI comunali arrivano già
+dal **MCP pubblico AgID** (`src/lib/mcp.ts` + codice ISTAT).
 
 **Nucleo nazionale (funziona ovunque in Italia con codice ISTAT):** demografia,
 economia, scuole MIUR (catastale), finanza, ecc. via AgID.
@@ -88,8 +90,6 @@ Nessuno di questi (tranne GitHub + Vercel per pubblicare) è obbligatorio per l�
 | **Modal** | Hosting RAG (modelli HF) | Opzionale (assistente) | [modal.com](https://modal.com) → `modal setup` |
 | **Hugging Face** | Download pesi modelli (pubblici) | Di solito no token | [huggingface.co](https://huggingface.co) (account utile; modelli usati sono pubblici) |
 | **Wheelmap / Sozialhelden** | Embed iframe accessibilità | Opzionale | Contatta [info@sozialhelden.de](mailto:info@sozialhelden.de) — [widget](https://news.wheelmap.org/wheelmap-widget/) |
-| **Cursor** (opzionale) | IDE AI + Agent per adattare il fork | No | [cursor.com](https://cursor.com) |
-| **Claude** (opzionale) | Chat / Claude Code + MCP | No | [claude.ai](https://claude.ai) |
 
 Fonti open **senza registrazione** usate dal progetto: Open-Meteo, RainViewer,
 ItaliaMeteo (via MCP), OpenStreetMap/Overpass, OpenAEDMap, ViaggiaTreno,
@@ -199,6 +199,8 @@ Dopo le modifiche: commit + push sul tuo repo.
 ## 8. Passo E — Deploy su Vercel
 
 1. Vai su [vercel.com](https://vercel.com) → **Add New… → Project**
+   (oppure usa il [Deploy Button](https://vercel.com/new/clone?repository-url=https://github.com/magiaslab/san-vincenzo-cruscotto)
+   sul repo / fork)
 2. Importa il repository forkato (autorizza GitHub se richiesto)
 3. Framework Preset: **Next.js** (già in `vercel.json`, region `fra1`)
 4. **Environment Variables**: per l’MVP lascia vuoto
@@ -359,75 +361,7 @@ MVP onesto: **KPI nazionali + mappa + 1–2 fonti locali**.
 
 ---
 
-## 12. Cursor, Claude e MCP
-
-### 12.1 Usare Cursor per adattare il fork
-
-1. Installa [Cursor](https://cursor.com) e apri la cartella del tuo fork
-2. `npm install` come sopra
-3. In chat Agent puoi chiedere es. *«Aggiorna constants.ts per il comune X
-   con ISTAT Y e coordinate Z»*
-4. Il file [`AGENTS.md`](../AGENTS.md) orienta gli agent cloud: progetto
-   read-only, smoke `/api/kpi`, niente DB locale
-
-Non serve configurare MCP AgID in Cursor per sviluppare: l’app Next.js è già
-**client MCP** verso AgID (`src/lib/mcp.ts`).
-
-### 12.2 Aggiungere Cruscotto Italia come MCP in Cursor / Claude
-
-Se vuoi interrogare i KPI **direttamente** dall’IDE (senza passare dal sito):
-
-Esempio configurazione MCP (Cursor: Settings → MCP, oppure file di config MCP
-del client):
-
-```json
-{
-  "mcpServers": {
-    "cruscotto-italia": {
-      "url": "https://cruscotto-italia-mcp.agid.workers.dev/mcp"
-    }
-  }
-}
-```
-
-Poi chiedi tool tipo `comune_kpi` / `comune_dashboard` passando il tuo
-`istat_code`. Il formato esatto dipende dalla versione del client MCP
-(Cursor / Claude Desktop); se il client richiede un comando stdio invece di URL
-HTTP, usa un bridge (es. `mcp-remote`) verso lo stesso endpoint.
-
-### 12.3 Si può costruire un MCP “del cruscotto” per Cursor o Claude?
-
-**Sì.** Tre livelli naturali:
-
-| Livello | Cosa espone | Quando ha senso |
-| --- | --- | --- |
-| **A. Thin wrapper AgID** | Stessi tool AgID con `istat_code` di default del tuo comune | IDE: domande demografiche/finanziarie rapide |
-| **B. Wrapper sulle `/api/*` del tuo deploy** | `get_kpi`, `get_meteo`, `get_dae`, `get_trasporti`, … | Agent che ragiona sui dati **già arricchiti** dal tuo sito |
-| **C. Hybrid** | AgID + route locali (DAE, GTFS, ARPAT, …) | Setup “completo” per sviluppatori del fork |
-
-**Non è necessario per l’MVP cittadino:** il sito funziona senza pubblicare un
-MCP. Un MCP è un **add-on per IDE/agent**, non per i visitatori del cruscotto.
-
-Idee minime per un server MCP tuo (es. Cloudflare Worker o piccolo Node):
-
-- Transport HTTP (come AgID) o stdio per Claude Desktop
-- Tools read-only che fanno `fetch` a `https://TUO-DOMINIO/api/kpi` ecc.
-- Non esporre tool che usano `TELEGRAM_*` / `GITHUB_TOKEN` in scrittura senza auth
-
-Se vuoi contribuire un `mcp/` di esempio in questo repo, apri una proposta via
-[Partecipa](https://www.cruscottosanvincenzo.it/#partecipa) o issue GitHub.
-
-### 12.4 Claude Projects / Custom instructions (opzionale)
-
-In Claude o Cursor Rules puoi incollare un brief del tipo:
-
-> Fork del Cruscotto San Vincenzo per il Comune di …. ISTAT ….
-> Stack Next.js 15 App Router. Identità in `src/lib/constants.ts`.
-> Nessun DB. KPI da MCP AgID. Non rimuovere disclaimer e attribuzioni.
-
----
-
-## 13. Checklist finale e troubleshooting
+## 12. Checklist finale e troubleshooting
 
 ### Prima di dichiarare “online”
 
@@ -455,7 +389,7 @@ In Claude o Cursor Rules puoi incollare un brief del tipo:
 
 ---
 
-## 14. Licenza e disclaimer
+## 13. Licenza e disclaimer
 
 Progetto **indipendente e non ufficiale**. Nel fork:
 
@@ -464,4 +398,4 @@ Progetto **indipendente e non ufficiale**. Nel fork:
 - Non presentare il sito come canale ufficiale dell’ente senza accordo
 
 Contatti riuso (autore originale): vedi footer del sito o repository GitHub.
-`}
+}
