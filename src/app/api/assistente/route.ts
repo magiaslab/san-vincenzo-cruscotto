@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ASSISTENTE_MODAL_URL_DEFAULT } from "@/lib/constants";
+import { matchFaq } from "@/lib/assistente-faq";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
@@ -17,12 +18,11 @@ function resolveModalUrl(): string {
 }
 
 /**
- * Proxy verso il RAG su Modal (modelli HF self-host).
- * Usa ASSISTENTE_MODAL_URL se impostata, altrimenti l'endpoint magiaslab di default.
+ * Proxy verso il RAG su Modal.
+ * Per domande note risponde in locale con il dato o il link alla sezione del cruscotto
+ * (evita allucinazioni del modello piccolo).
  */
 export async function POST(req: NextRequest) {
-  const modalUrl = resolveModalUrl();
-
   let body: AskBody;
   try {
     body = (await req.json()) as AskBody;
@@ -38,20 +38,41 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Domanda troppo lunga" }, { status: 400 });
   }
 
+  const faq = matchFaq(question);
+  if (faq) {
+    return NextResponse.json(
+      {
+        answer: faq.answer,
+        link: faq.link,
+        mode: "faq",
+        model: "local-faq",
+        sources: faq.sources,
+      },
+      { headers: { "Cache-Control": "no-store" } },
+    );
+  }
+
+  const modalUrl = resolveModalUrl();
   try {
     const upstream = await fetch(modalUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ question, k: body.k ?? 4 }),
+      body: JSON.stringify({ question, k: body.k ?? 3 }),
       cache: "no-store",
     });
 
     const text = await upstream.text();
-    let data: unknown;
+    let data: Record<string, unknown>;
     try {
-      data = JSON.parse(text);
+      data = JSON.parse(text) as Record<string, unknown>;
     } catch {
       data = { error: "Risposta Modal non JSON", raw: text.slice(0, 500) };
+    }
+
+    // Se Modal non ha un link, prova a ricavarlo dalle fonti
+    if (!data.link && Array.isArray(data.sources)) {
+      const link = linkFromSources(data.sources as Array<{ source?: string }>);
+      if (link) data.link = link;
     }
 
     return NextResponse.json(data, {
@@ -64,12 +85,36 @@ export async function POST(req: NextRequest) {
       {
         error: "upstream_error",
         message: "Impossibile contattare il servizio RAG su Modal.",
-        answer: "",
+        answer:
+          "Non riesco a raggiungere l’indice RAG. Prova le sezioni del cruscotto dal menu.",
+        link: { href: "/#panoramica", label: "Apri Panoramica" },
         sources: [],
       },
       { status: 502 },
     );
   }
+}
+
+function linkFromSources(
+  sources: Array<{ source?: string }>,
+): { href: string; label: string } | null {
+  const map: Array<[RegExp, string, string]> = [
+    [/porto/i, "/#porto", "Apri sezione Porto"],
+    [/carburant|banda|ev_pun|veicol|trasport|infra/i, "/#infra", "Apri sezione Mobilità"],
+    [/meteo|allert/i, "/#meteo", "Apri sezione Meteo"],
+    [/sanita|farmac/i, "/#sanita", "Apri sezione Sanità"],
+    [/turism|event/i, "/#turismo", "Apri sezione Turismo"],
+    [/ambient|aria|rifiut|balne/i, "/#ambiente", "Apri sezione Ambiente"],
+    [/finanz|siope|pnrr|redditi/i, "/#finanza", "Apri sezione Finanza"],
+    [/scuol|istruz|miur/i, "/#istruzione", "Apri sezione Istruzione"],
+  ];
+  for (const s of sources) {
+    const name = String(s.source ?? "");
+    for (const [re, href, label] of map) {
+      if (re.test(name)) return { href, label };
+    }
+  }
+  return null;
 }
 
 export async function GET() {
@@ -78,6 +123,7 @@ export async function GET() {
     configured: Boolean(modalUrl),
     using_default: !process.env.ASSISTENTE_MODAL_URL?.trim(),
     endpoint: modalUrl,
+    faq: true,
     models: {
       embed: "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
       gen: "HuggingFaceTB/SmolLM2-360M-Instruct",

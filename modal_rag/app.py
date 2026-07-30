@@ -201,17 +201,96 @@ def _clean_answer(text: str) -> str:
 
 
 def _extractive_fallback(contexts: list[dict[str, Any]]) -> str:
-    """Risposta affidabile dal chunk migliore (modelli piccoli spesso allucinano)."""
+    """Risposta affidabile: 1-2 frasi dal chunk migliore, niente dump lungo."""
     if not contexts:
-        return "Non ho trovato elementi sufficienti nel corpus per rispondere."
+        return "Non ho trovato il dato nel cruscotto. Usa il menu per aprire la sezione pertinente."
     best = contexts[0]
     body = re.sub(r"^#\s+.+\n+", "", best["text"]).strip()
-    body = re.sub(r"```json\s*", "", body)
+    body = re.sub(r"```json[\s\S]*?```", "", body)
     body = re.sub(r"```\s*", "", body)
-    body = re.sub(r"\s+", " ", body)
-    if len(body) > 420:
-        body = body[:420].rstrip() + "…"
-    return f"Dal documento «{best['title']}»: {body}"
+    # preferisci righe con numeri (KPI)
+    lines = [ln.strip(" -•\t") for ln in body.splitlines() if ln.strip()]
+    numeric = [ln for ln in lines if re.search(r"\d", ln)]
+    pick = numeric[:2] if numeric else lines[:2]
+    text = " ".join(pick) if pick else re.sub(r"\s+", " ", body)[:220]
+    text = re.sub(r"\s+", " ", text).strip()
+    if len(text) > 280:
+        text = text[:280].rstrip() + "…"
+    return text or f"Vedi il documento «{best['title']}» nel cruscotto."
+
+
+def _link_for_source(source: str) -> dict[str, str] | None:
+    name = (source or "").lower()
+    mapping = [
+        ("porto", "/#porto", "Apri sezione Porto"),
+        ("carburant", "/#infra", "Apri sezione Mobilità"),
+        ("banda", "/#infra", "Apri sezione Mobilità"),
+        ("ev_pun", "/#infra", "Apri sezione Mobilità"),
+        ("veicol", "/#infra", "Apri sezione Mobilità"),
+        ("meteo", "/#meteo", "Apri sezione Meteo"),
+        ("sanita", "/#sanita", "Apri sezione Sanità"),
+        ("turism", "/#turismo", "Apri sezione Turismo"),
+        ("ambient", "/#ambiente", "Apri sezione Ambiente"),
+        ("aria", "/#ambiente", "Apri sezione Ambiente"),
+        ("siope", "/#finanza", "Apri sezione Finanza"),
+        ("pnrr", "/#finanza", "Apri sezione Finanza"),
+        ("redditi", "/#finanza", "Apri sezione Finanza"),
+        ("scuol", "/#istruzione", "Apri sezione Istruzione"),
+        ("istruz", "/#istruzione", "Apri sezione Istruzione"),
+    ]
+    for key, href, label in mapping:
+        if key in name:
+            return {"href": href, "label": label}
+    return None
+
+
+_FAQ: list[tuple[str, list[str], str, str, str]] = [
+    (
+        "porto-capienza",
+        [r"capienza.*porto", r"posti\s*barca", r"porto.*posti", r"ormeggi"],
+        "Capienza del porto di San Vincenzo: circa 140 posti barca.",
+        "/#porto",
+        "Apri sezione Porto",
+    ),
+    (
+        "carburanti",
+        [r"carburant", r"benzina", r"gasolio"],
+        "Prezzi e impianti carburanti (MIMIT) sono in cima alla sezione Mobilità.",
+        "/#infra",
+        "Apri sezione Mobilità",
+    ),
+    (
+        "ev",
+        [r"colonnin", r"ricarica\s*ev", r"punti\s*di\s*ricarica"],
+        "I punti di ricarica EV sono nella sezione Mobilità (KPI e mappa).",
+        "/#infra",
+        "Apri sezione Mobilità",
+    ),
+]
+
+
+def _match_faq(question: str) -> dict[str, Any] | None:
+    q = (question or "").strip()
+    if not q:
+        return None
+    for _id, patterns, answer, href, label in _FAQ:
+        for pat in patterns:
+            if re.search(pat, q, re.I):
+                return {
+                    "answer": answer,
+                    "link": {"href": href, "label": label},
+                    "mode": "faq",
+                    "model": "local-faq",
+                    "sources": [
+                        {
+                            "title": _id,
+                            "source": f"faq:{_id}",
+                            "score": 1.0,
+                            "excerpt": answer,
+                        }
+                    ],
+                }
+    return None
 
 
 def _is_bad_answer(text: str) -> bool:
@@ -226,8 +305,8 @@ def _is_bad_answer(text: str) -> bool:
     )
     return (
         not text
-        or len(text) < 12
-        or text.count("{") > 3
+        or len(text) < 8
+        or text.count("{") > 2
         or "sezione kpi" in low
         or low.startswith("contesto")
         or refusal
@@ -281,13 +360,20 @@ class RagService:
         if len(ctx) > 2200:
             ctx = ctx[:2200]
         system = (
-            "Sei l'assistente del Cruscotto San Vincenzo (LI). "
-            "Rispondi SOLO in italiano, in 1-3 frasi brevi, usando esclusivamente il CONTESTO. "
-            "Cita numeri presenti nel contesto. Se non basta, scrivi esattamente: "
-            '"Non ho informazioni sufficienti nel corpus." '
-            "Non ripetere il contesto, non usare markdown, non inventare dati."
+            "Sei l'assistente del Cruscotto San Vincenzo. "
+            "Rispondi SOLO in italiano. "
+            "Formato obbligatorio: (1) il dato richiesto in UNA frase, oppure "
+            "(2) indica la sezione del cruscotto (es. Porto, Mobilità, Meteo). "
+            "Usa SOLO numeri presenti nel CONTESTO. Non inventare. "
+            "Vietato: elenchi lunghi, storie, markdown, ripetere il contesto. "
+            "Se manca il dato: scrivi esattamente "
+            '"Dato non in indice: apri la sezione corrispondente del cruscotto."'
         )
-        user = f"CONTESTO:\n{ctx}\n\nDOMANDA: {question}\n\nRisposta breve:"
+        user = (
+            f"CONTESTO:\n{ctx}\n\n"
+            f"DOMANDA: {question}\n\n"
+            "Risposta (solo dato o sezione):"
+        )
         messages = [
             {"role": "system", "content": system},
             {"role": "user", "content": user},
@@ -311,7 +397,7 @@ class RagService:
         with torch.inference_mode():
             out = self.model.generate(
                 **inputs,
-                max_new_tokens=120,
+                max_new_tokens=64,
                 do_sample=False,
                 pad_token_id=self.tokenizer.eos_token_id,
                 eos_token_id=self.tokenizer.eos_token_id,
@@ -323,15 +409,25 @@ class RagService:
         return text
 
     @modal.method()
-    def ask(self, question: str, k: int = 4) -> dict[str, Any]:
+    def ask(self, question: str, k: int = 3) -> dict[str, Any]:
         q = (question or "").strip()
         if not q:
-            return {"error": "Domanda vuota", "answer": "", "sources": []}
+            return {"error": "Domanda vuota", "answer": "", "sources": [], "link": None}
+        faq = _match_faq(q)
+        if faq:
+            return faq
         q_vec = self.embedder.encode([q], normalize_embeddings=True)[0]
-        contexts = _topk(q, q_vec, self.matrix, self.docs, k=max(1, min(k, 6)))
+        contexts = _topk(q, q_vec, self.matrix, self.docs, k=max(1, min(k, 4)))
         answer = self._generate(q, contexts)
+        link = None
+        for c in contexts:
+            link = _link_for_source(c.get("source", ""))
+            if link:
+                break
         return {
             "answer": answer,
+            "link": link,
+            "mode": "rag",
             "model": GEN_MODEL,
             "embed_model": EMBED_MODEL,
             "sources": [
@@ -339,7 +435,7 @@ class RagService:
                     "title": c["title"],
                     "source": c["source"],
                     "score": round(c["score"], 4),
-                    "excerpt": c["text"][:280],
+                    "excerpt": c["text"][:220],
                 }
                 for c in contexts
             ],

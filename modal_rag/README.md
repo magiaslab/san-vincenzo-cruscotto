@@ -62,4 +62,6 @@ modal deploy modal_rag/app.py
 
 - SmolLM2-360M è piccolo: risposte brevi, a volte grezze; resta ancorato al contesto RAG.
 - Per qualità migliore (sempre open e self-host): `Qwen/Qwen2.5-1.5B-Instruct` su T4.
+- Domande note: risposta **FAQ locale** (dato o link `#sezione`) in `/api/assistente`, senza passare dal LLM.
+- Contratto risposta: **solo il dato richiesto** oppure **link alla sezione del cruscotto**. Niente testi inventati.
 - Il corpus attuale è un estratto KPI/dashboard + testi del sito; non sostituisce i dataset grezzi di `dati.toscana.it`.

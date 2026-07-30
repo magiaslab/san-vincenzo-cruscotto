@@ -2,7 +2,7 @@
 
 import { useT } from "@/lib/i18n";
 import { FormEvent, useState } from "react";
-import { LoadingBlock, SectionIntro } from "@/components/ui";
+import { LoadingBlock, SectionIntro, SolidLink } from "@/components/ui";
 
 type Source = {
   title?: string;
@@ -11,17 +11,23 @@ type Source = {
   excerpt?: string;
 };
 
+type DashLink = {
+  href: string;
+  label: string;
+};
+
 type Msg = {
   role: "user" | "assistant";
   text: string;
+  link?: DashLink | null;
   sources?: Source[];
 };
 
 const SUGGESTIONS = [
+  "Qual è la capienza del porto?",
   "Quante colonnine EV ci sono a San Vincenzo?",
-  "Qual è la copertura FTTH?",
   "Dove trovo i prezzi dei carburanti?",
-  "Cosa mostra la sezione Porto?",
+  "Dove sono le allerte Protezione Civile?",
 ];
 
 export default function AssistenteChat({
@@ -33,7 +39,7 @@ export default function AssistenteChat({
   const [messages, setMessages] = useState<Msg[]>([
     {
       role: "assistant",
-      text: "Ciao: sono l’assistente RAG del cruscotto. Uso un modello open Hugging Face su Modal e rispondo solo con i dati indicizzati del sito.",
+      text: "Ciao: rispondo con il dato del cruscotto o con il link alla sezione dove trovarlo. Niente testi inventati.",
     },
   ]);
   const [input, setInput] = useState("");
@@ -55,6 +61,7 @@ export default function AssistenteChat({
         answer?: string;
         message?: string;
         error?: string;
+        link?: DashLink | null;
         sources?: Source[];
       };
       const text =
@@ -65,7 +72,12 @@ export default function AssistenteChat({
           : "Non sono riuscito a rispondere.");
       setMessages((m) => [
         ...m,
-        { role: "assistant", text, sources: data.sources },
+        {
+          role: "assistant",
+          text,
+          link: data.link ?? null,
+          sources: data.sources,
+        },
       ]);
     } catch {
       setMessages((m) => [
@@ -96,7 +108,12 @@ export default function AssistenteChat({
             onClick={() => void ask(s)}
             disabled={loading}
           >
-            {compact ? t(s).replace(" in San Vincenzo?", "?").replace(" a San Vincenzo?", "?").slice(0, 42) : t(s)}
+            {compact
+              ? t(s)
+                  .replace(" in San Vincenzo?", "?")
+                  .replace(" a San Vincenzo?", "?")
+                  .slice(0, 48)
+              : t(s)}
           </button>
         ))}
       </div>
@@ -121,13 +138,18 @@ export default function AssistenteChat({
               }`}
             >
               <p className="m-0 whitespace-pre-wrap">{t(m.text)}</p>
-              {m.sources && m.sources.length > 0 ? (
+              {m.link?.href ? (
+                <div className="mt-2">
+                  <SolidLink href={m.link.href} external={false}>
+                    {t(m.link.label)}
+                  </SolidLink>
+                </div>
+              ) : null}
+              {m.sources && m.sources.length > 0 && !m.link ? (
                 <ul className="mb-0 mt-2 list-disc pl-4 text-xs text-[var(--pa-muted)]">
-                  {m.sources.map((s, j) => (
+                  {m.sources.slice(0, 2).map((s, j) => (
                     <li key={j}>
                       <strong>{s.title || s.source}</strong>
-                      {s.score != null ? ` · score ${s.score}` : ""}
-                      {s.excerpt ? ` — ${s.excerpt.slice(0, 120)}…` : ""}
                     </li>
                   ))}
                 </ul>
@@ -135,7 +157,7 @@ export default function AssistenteChat({
             </div>
           ))}
           {loading ? (
-            <LoadingBlock label={t("Generazione risposta su Modal…")} />
+            <LoadingBlock label={t("Generazione risposta…")} />
           ) : null}
         </div>
 
@@ -144,13 +166,15 @@ export default function AssistenteChat({
           className="flex flex-col gap-2 border-t border-[var(--pa-border)] bg-white p-3 sm:flex-row sm:items-end"
         >
           <label className="m-0 flex-1 text-sm">
-            <span className="mb-1 block text-[var(--pa-muted)]">La tua domanda</span>
+            <span className="mb-1 block text-[var(--pa-muted)]">
+              {t("La tua domanda")}
+            </span>
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               rows={compact ? 2 : 2}
               className="w-full resize-y rounded-lg border border-[var(--pa-border)] px-3 py-2 text-[var(--pa-ink)]"
-              placeholder={t("Es. Quanti impianti carburanti ci sono?")}
+              placeholder={t("Es. Qual è la capienza del porto?")}
               disabled={loading}
             />
           </label>
@@ -160,7 +184,7 @@ export default function AssistenteChat({
             className="inline-flex min-h-11 items-center justify-center rounded-lg bg-[var(--pa-primary)] px-4 text-sm font-semibold text-white hover:bg-[var(--pa-primary-hover)] disabled:opacity-50"
             style={{ color: "#ffffff" }}
           >
-            Chiedi
+            {t("Chiedi")}
           </button>
         </form>
       </div>
@@ -175,30 +199,13 @@ export default function AssistenteChat({
     <section>
       <SectionIntro
         title={t("Assistente (RAG)")}
-        description={t("Domande in italiano sui dati del cruscotto. Embedding MiniLM multilingue + SmolLM2-360M su Modal (Hugging Face, self-host).")}
+        description={t(
+          "Risponde con il dato richiesto o con il link alla sezione del cruscotto. Niente testi inventati.",
+        )}
       />
       {chatBody}
       <p className="mt-3 text-xs text-[var(--pa-muted)]">
-        Modelli:{" "}
-        <a
-          href="https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline"
-        >
-          paraphrase-multilingual-MiniLM-L12-v2
-        </a>{" "}
-        +{" "}
-        <a
-          href="https://huggingface.co/HuggingFaceTB/SmolLM2-360M-Instruct"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline"
-        >
-          SmolLM2-360M-Instruct
-        </a>
-        . Deploy: <code>modal_rag/README.md</code> → workspace Modal{" "}
-        <code>magiaslab</code>.
+        Domande note → risposta locale. Altre → RAG su Modal (Hugging Face).
       </p>
     </section>
   );

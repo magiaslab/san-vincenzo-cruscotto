@@ -116,7 +116,9 @@ if (carb?.punti?.length) {
 write(
   "36_porto.md",
   "Porto turistico",
-  `Porto/approdo turistico comunale sulla Costa degli Etruschi, circa 140 posti barca.
+  `Capienza del porto di San Vincenzo: circa 140 posti barca.
+Sezione del cruscotto: Porto — apri /#porto
+Porto/approdo turistico comunale sulla Costa degli Etruschi.
 Webcam: https://lnx.comune.sanvincenzo.li.it/webcam/
 AIS: embed VesselFinder gratuito.`,
 );
