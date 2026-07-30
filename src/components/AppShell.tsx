@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { Menu, X, type LucideIcon } from "lucide-react";
+import { GlobalSearch } from "@/components/GlobalSearch";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import {
   AUTHOR,
@@ -254,7 +255,7 @@ export function AppShell({
                 />
               </Link>
 
-              <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5">
+              <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5 lg:max-w-[14rem] xl:max-w-none">
                 <h1
                   id={titleId}
                   className="m-0 truncate text-base font-bold leading-tight text-[var(--pa-ink)]"
@@ -277,7 +278,11 @@ export function AppShell({
                   </a>
                 </p>
               </div>
+              <GlobalSearch onNavigate={go} />
               <LanguageSelector compact />
+            </div>
+            <div className="border-t border-[var(--pa-border)] px-3 py-2 sm:hidden">
+              <GlobalSearch onNavigate={go} mobile />
             </div>
             <div className="bg-[var(--pa-primary)] px-3 py-2 text-xs font-semibold leading-snug text-white sm:px-4 sm:text-sm">
               {t(

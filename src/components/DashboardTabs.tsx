@@ -1234,7 +1234,16 @@ function Turismo({
             {t("Fonte: Ministero della Cultura - Catalogo generale beni culturali")}
           </p>
         </div>
-      ) : null}
+      ) : (
+        <div className="mt-4">
+          <DataUnavailable
+            message={t("Beni culturali")}
+            hint={t(
+              "Al momento non risultano luoghi dal Catalogo generale dei beni culturali per questo comune, oppure il dataset non ha restituito voci. Puoi proporre una fonte in Partecipa.",
+            )}
+          />
+        </div>
+      )}
 
       <div className="mt-4 panel bg-[#fff4e6]">
         <h3>{t("Eventi culturali Regione Toscana")}</h3>
@@ -2364,17 +2373,40 @@ function Sanita({ kpi }: { kpi: Kpi }) {
         description={t(
           "Farmacie di turno, mappa MDS, defibrillatori DAE su OpenStreetMap e anagrafe Ministero della Salute. Il terzo settore è in Società.",
         )}
+        sourceNote={t(
+          "Ospedali: nel territorio comunale non risultano strutture dall’anagrafe MDS; i punti di riferimento più vicini sono fuori comune.",
+        )}
       />
       <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3">
         <KpiCard label={t("Farmacie")} value={valueOrMissing(sanita?.n_farmacie, formatInteger)} icon={Heart} variant="info" />
         <KpiCard label={t("Parafarmacie")} value={valueOrMissing(sanita?.n_parafarmacie, formatInteger)} icon={Pill} />
         <KpiCard
           label={t("Ospedali")}
-          value="dato non disponibile"
-          unavailable={ospedali == null && sanita?.n_ospedali == null}
+          value={
+            typeof sanita?.n_ospedali === "number"
+              ? formatInteger(sanita.n_ospedali)
+              : "dato non disponibile"
+          }
+          unavailable={
+            !(typeof sanita?.n_ospedali === "number" && sanita.n_ospedali > 0) &&
+            ospedali == null
+          }
+          hint={t("Nessuna struttura ospedaliera nel comune (MDS)")}
           icon={Stethoscope}
         />
       </div>
+
+      {!(typeof sanita?.n_ospedali === "number" && sanita.n_ospedali > 0) &&
+      ospedali == null ? (
+        <div className="mb-4">
+          <DataUnavailable
+            message={t("Ospedali e pronto soccorso")}
+            hint={t(
+              "San Vincenzo non ha un ospedale nel territorio comunale. Per emergenze usa il 118; farmacie di turno e DAE sono mappati qui sotto. Se conosci una struttura da aggiungere, segnalala in Partecipa.",
+            )}
+          />
+        </div>
+      ) : null}
 
       <div className="mb-4">
         <FarmacieTurno />
@@ -2453,6 +2485,9 @@ function Ambiente({ kpi }: { kpi: Kpi }) {
       <SectionIntro
         title={t("Ambiente")}
         description={t("Balneazione ARPAT, aria, raccolta differenziata e consumo di suolo.")}
+        sourceNote={t(
+          "Aria: nessuna stazione ISPRA nel comune — mostriamo le più vicine. Balneazione: stagione ARPAT.",
+        )}
       />
 
       <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
@@ -2596,27 +2631,37 @@ function Ambiente({ kpi }: { kpi: Kpi }) {
       ) : null}
 
       {aria?.disponibile === false || ariaKpi?.ha_stazione === false ? (
-        <div className="mb-4 panel bg-[#fff8e6]">
-          <h3>{t("Qualità dell&apos;aria")}</h3>
-          <p className="mb-2 text-xs sm:text-sm">
-            {String(aria?.messaggio ?? "Nessuna stazione ISPRA presente nel comune.")}
-          </p>
-          {Array.isArray(aria?.stazioni_piu_vicine) ? (
-            <>
-              <p className="mb-2 text-xs font-semibold sm:text-sm">
-                {t("Stazioni più vicine:")}
-              </p>
-              <ul className="space-y-1 text-xs sm:text-sm">
-                {(
-                  aria.stazioni_piu_vicine as Array<Record<string, unknown>>
-                ).map((s) => (
-                  <li key={String(s.nome)}>
-                    <strong>{String(s.nome)}</strong> — {formatInteger(num(s.distanza_km))} km
+        <div className="mb-4">
+          <DataUnavailable
+            message={t("Qualità dell'aria")}
+            hint={String(
+              aria?.messaggio ??
+                t(
+                  "Nessuna stazione ISPRA nel territorio comunale. Di seguito le stazioni più vicine per orientamento.",
+                ),
+            )}
+            action={
+              Array.isArray(aria?.stazioni_piu_vicine) &&
+              (aria.stazioni_piu_vicine as Array<Record<string, unknown>>).length >
+                0 ? (
+                <ul className="m-0 list-none space-y-1 p-0 text-xs sm:text-sm">
+                  <li className="mb-1 font-semibold text-[var(--pa-ink)]">
+                    {t("Stazioni più vicine:")}
                   </li>
-                ))}
-              </ul>
-            </>
-          ) : null}
+                  {(
+                    aria!.stazioni_piu_vicine as Array<Record<string, unknown>>
+                  ).map((s) => (
+                    <li key={String(s.nome)} className="text-[var(--pa-muted)]">
+                      <strong className="text-[var(--pa-ink)]">
+                        {String(s.nome)}
+                      </strong>{" "}
+                      — {formatInteger(num(s.distanza_km))} km
+                    </li>
+                  ))}
+                </ul>
+              ) : undefined
+            }
+          />
         </div>
       ) : null}
 
@@ -2750,6 +2795,9 @@ function Meteo({ kpi }: { kpi: Kpi }) {
       <SectionIntro
         title={t("Meteo")}
         description={t("Allerte Protezione Civile, condizioni live (OpenWeather + ItaliaMeteo/Cineca + Open-Meteo), qualità dell’aria, previsioni e radar precipitazioni RainViewer su mappa.")}
+        sourceNote={t(
+          "Dati live: aggiornamento automatico dalle API meteo; le allerte seguono la Protezione Civile.",
+        )}
       />
       <div className="mb-3 flex flex-wrap items-center gap-2 sm:gap-3">
         <SolidButton onClick={() => void load()}>{t("Aggiorna ora")}</SolidButton>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -8,6 +8,7 @@ import {
   CheckCircle2,
   CircleHelp,
   Database,
+  ExternalLink,
   Lightbulb,
   MessageSquarePlus,
 } from "lucide-react";
@@ -18,8 +19,19 @@ import {
   OPENAEDMAP_URL,
   TELEGRAM_DAE_BOT_URL,
 } from "@/lib/constants";
+import { formatDateTime } from "@/lib/format";
 import { useT } from "@/lib/i18n";
-import { SectionIntro, SolidLink } from "@/components/ui";
+import { LoadingBlock, SectionIntro, SolidLink } from "@/components/ui";
+
+type PublicIssue = {
+  number: number;
+  title: string;
+  url: string;
+  state: "open" | "closed";
+  createdAt: string;
+  updatedAt: string;
+  labels: string[];
+};
 
 type FeedbackTipo = "miglioramento" | "bug" | "domanda" | "nuovo_dato";
 
@@ -67,6 +79,36 @@ export function PartecipaPanel() {
     number?: number;
     mode: string;
   } | null>(null);
+  const [issues, setIssues] = useState<PublicIssue[]>([]);
+  const [issuesLoading, setIssuesLoading] = useState(true);
+  const [issuesError, setIssuesError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setIssuesLoading(true);
+    fetch("/api/feedback?issues=1&limit=10")
+      .then((r) => r.json())
+      .then((json: { ok?: boolean; issues?: PublicIssue[]; error?: string }) => {
+        if (cancelled) return;
+        if (json.ok && Array.isArray(json.issues)) {
+          setIssues(json.issues);
+          setIssuesError(null);
+        } else {
+          setIssuesError(json.error || t("Elenco suggerimenti non disponibile"));
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setIssuesError(t("Elenco suggerimenti non disponibile"));
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setIssuesLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [t, done?.number]);
 
   const tipi: TipoOption[] = useMemo(
     () => [
@@ -482,13 +524,19 @@ export function PartecipaPanel() {
                 <CheckCircle2 className="text-[#008758]" size={20} aria-hidden />
                 {t("Grazie per il suggerimento")}
               </p>
+              {done.number ? (
+                <p className="mb-0 mt-2 text-sm font-semibold text-[var(--pa-ink)]">
+                  {t("Ticket registrato:")}{" "}
+                  <span className="text-[var(--pa-primary)]">#{done.number}</span>
+                </p>
+              ) : null}
               <p className="mb-0 mt-2 text-sm text-[var(--pa-muted)]">
                 {done.mode === "fallback"
                   ? t(
                       "Per completare l’invio apri il link GitHub (serve un account). Il form ha già preparato titolo e testo.",
                     )
                   : t(
-                      "La richiesta è stata pubblicata come issue. Puoi seguirla sul repository.",
+                      "La richiesta è stata pubblicata come issue. Puoi seguirla sul repository e nella lista qui sotto.",
                     )}
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
@@ -556,6 +604,80 @@ export function PartecipaPanel() {
               )}
             </div>
           ) : null}
+        </div>
+      </div>
+
+      <div className="mt-5 panel overflow-hidden p-0">
+        <div className="border-b border-[var(--pa-border)] bg-[var(--pa-surface-soft)] px-4 py-3 sm:px-5">
+          <h3 className="m-0 text-base font-bold text-[var(--pa-ink)]">
+            {t("Suggerimenti recenti")}
+          </h3>
+          <p className="m-0 mt-1 text-xs text-[var(--pa-muted)] sm:text-sm">
+            {t(
+              "Issue pubbliche aperte dal wizard. Lo stato (aperta/chiusa) si aggiorna su GitHub.",
+            )}
+          </p>
+        </div>
+        <div className="px-4 py-4 sm:px-5">
+          {issuesLoading ? <LoadingBlock label={t("Caricamento suggerimenti…")} /> : null}
+          {!issuesLoading && issuesError ? (
+            <p className="m-0 text-sm text-[var(--pa-muted)]">{issuesError}</p>
+          ) : null}
+          {!issuesLoading && !issuesError && issues.length === 0 ? (
+            <p className="m-0 text-sm text-[var(--pa-muted)]">
+              {t("Ancora nessun suggerimento pubblico. Sii il primo!")}
+            </p>
+          ) : null}
+          {!issuesLoading && issues.length > 0 ? (
+            <ul className="m-0 list-none space-y-2 p-0">
+              {issues.map((issue) => (
+                <li key={issue.number}>
+                  <a
+                    href={issue.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex flex-wrap items-start justify-between gap-2 rounded-lg border border-[var(--pa-border)] bg-white px-3 py-2.5 no-underline transition hover:border-[var(--pa-primary)] hover:bg-[var(--pa-surface-soft)]"
+                  >
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm font-semibold text-[var(--pa-ink)]">
+                        <span className="text-[var(--pa-primary)]">#{issue.number}</span>{" "}
+                        {issue.title}
+                      </span>
+                      <span className="mt-0.5 block text-xs text-[var(--pa-muted)]">
+                        {t("Aperta il")} {formatDateTime(issue.createdAt)}
+                      </span>
+                    </span>
+                    <span className="inline-flex items-center gap-1.5">
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide ${
+                          issue.state === "open"
+                            ? "bg-[color-mix(in_srgb,#008758_16%,white)] text-[#008758]"
+                            : "bg-[var(--pa-surface-soft)] text-[var(--pa-muted)]"
+                        }`}
+                      >
+                        {issue.state === "open" ? t("Aperta") : t("Chiusa")}
+                      </span>
+                      <ExternalLink
+                        size={14}
+                        className="text-[var(--pa-muted)]"
+                        aria-hidden
+                      />
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          <p className="mb-0 mt-3 text-xs text-[var(--pa-muted)]">
+            <a
+              href={`${GITHUB_REPO_URL}/issues?q=is%3Aissue+%5BSuggerimento%5D`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold underline"
+            >
+              {t("Vedi tutte su GitHub")}
+            </a>
+          </p>
         </div>
       </div>
     </section>

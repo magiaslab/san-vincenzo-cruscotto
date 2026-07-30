@@ -3,6 +3,7 @@ import {
   buildFallbackIssueUrl,
   createFeedbackIssue,
   feedbackConfigured,
+  listFeedbackIssues,
   type FeedbackPayload,
   type FeedbackTipo,
 } from "@/lib/feedback";
@@ -37,7 +38,27 @@ function clean(s: unknown, max: number): string {
   return s.replace(/\0/g, "").trim().slice(0, max);
 }
 
-export async function GET() {
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  if (searchParams.get("issues") === "1") {
+    const limit = Math.min(
+      20,
+      Math.max(1, Number(searchParams.get("limit") || 12) || 12),
+    );
+    const result = await listFeedbackIssues(limit);
+    if (!result.ok) {
+      return NextResponse.json(
+        { ok: false, error: result.error, issues: [] },
+        { status: 502 },
+      );
+    }
+    return NextResponse.json({
+      ok: true,
+      issues: result.issues,
+      repo: result.repo,
+    });
+  }
+
   return NextResponse.json({
     service: "feedback",
     configured: feedbackConfigured(),
