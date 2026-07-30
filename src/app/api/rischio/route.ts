@@ -8,7 +8,8 @@ import {
   type RischioData,
 } from "@/lib/rischio";
 
-export const revalidate = RISCHIO_REVALIDATE_SECONDS;
+/** 30 giorni — Next richiede un letterale numerico. */
+export const revalidate = 2592000;
 
 const CACHE_CONTROL = `public, s-maxage=${RISCHIO_REVALIDATE_SECONDS}, stale-while-revalidate=${RISCHIO_REVALIDATE_SECONDS * 2}`;
 

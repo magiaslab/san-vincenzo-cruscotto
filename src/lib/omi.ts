@@ -1,11 +1,11 @@
 /**
- * Tipi e loader dominio OMI (Agenzia Entrate – Osservatorio Mercato Immobiliare).
+ * Tipi e helper dominio OMI (Agenzia Entrate – Osservatorio Mercato Immobiliare).
  * Snapshot locale: `src/data/omi/*.json` (nessun login Fisconline).
  * La route `/api/omi` restituisce `OpenDataResult<OmiData>`.
+ *
+ * Nota: nessun import `node:fs` — il modulo è condiviso col client (`OmiPanel`).
  */
 
-import { readdirSync, readFileSync, existsSync } from "node:fs";
-import path from "node:path";
 import { ISTAT_CODE } from "@/lib/constants";
 import snapshot049018 from "@/data/omi/049018.json";
 
@@ -184,9 +184,7 @@ export function midRange(
   return (min + max) / 2;
 }
 
-export function findAbitazioniCivili(
-  zona: OmiZona,
-): OmiTipologia | null {
+export function findAbitazioniCivili(zona: OmiZona): OmiTipologia | null {
   const exact = zona.tipologie.find(
     (t) => t.tipologia.toLowerCase() === OMI_ABITAZIONI_CIVILI.toLowerCase(),
   );
@@ -198,7 +196,7 @@ export function findAbitazioniCivili(
   );
 }
 
-/** Zona principale: prima fascia B (centro/litorale) con abitazioni civili, altrimenti prima con AC. */
+/** Zona principale: B1 se presente, altrimenti prima fascia B con abitazioni civili. */
 export function pickZonaPrincipale(zone: OmiZona[]): OmiZona | null {
   if (zone.length === 0) return null;
   const withCivili = zone.filter((z) => findAbitazioniCivili(z));
@@ -231,76 +229,11 @@ export function buildStoricoFromSnapshots(
   return out.sort((a, b) => a.semestre.localeCompare(b.semestre));
 }
 
-function omiDataDir(): string {
-  return path.join(process.cwd(), "src", "data", "omi");
-}
-
-function readJsonFile(filePath: string): unknown | null {
-  try {
-    const text = readFileSync(filePath, "utf8");
-    return JSON.parse(text) as unknown;
-  } catch (err) {
-    console.warn("omi: lettura snapshot fallita", filePath, err);
-    return null;
-  }
-}
-
 /**
- * Carica snapshot locali: `049018.json` + eventuali `YYYY-S.json`.
- * Costruisce `storico` se più semestri sono presenti.
- * Fallback: import statico di `049018.json` (bundling Vercel-safe).
+ * Carica lo snapshot bundlato (`049018.json`, con `storico` già aggregato).
+ * I file `YYYY-S.json` restano per `npm run omi:update`.
  */
-export function loadOmiFromDisk(istatCode = OMI_ISTAT_CODE): OmiData | null {
-  const dir = omiDataDir();
-  const snaps: OmiSnapshotFile[] = [];
-
-  if (existsSync(dir)) {
-    try {
-      const files = readdirSync(dir).filter((f) => f.endsWith(".json"));
-      const semesterFiles = files
-        .filter((f) => /^\d{4}-[12]\.json$/.test(f))
-        .sort();
-      for (const name of semesterFiles) {
-        const raw = readJsonFile(path.join(dir, name));
-        const snap = normalizeSnapshot(raw);
-        if (snap) snaps.push(snap);
-      }
-      const primaryName = `${istatCode}.json`;
-      if (files.includes(primaryName)) {
-        const primary = normalizeSnapshot(
-          readJsonFile(path.join(dir, primaryName)),
-        );
-        if (primary) {
-          const storicoFromFiles = buildStoricoFromSnapshots(snaps);
-          const storico =
-            storicoFromFiles.length >= 2
-              ? storicoFromFiles
-              : primary.storico && primary.storico.length >= 2
-                ? primary.storico
-                : storicoFromFiles.length > 0
-                  ? storicoFromFiles
-                  : primary.storico;
-          return {
-            semestre: primary.semestre,
-            zone: primary.zone,
-            storico,
-          };
-        }
-      }
-    } catch (err) {
-      console.warn("omi: lettura directory fallita, uso import statico", err);
-    }
-  }
-
-  if (snaps.length > 0) {
-    const primary = snaps[snaps.length - 1]!;
-    return {
-      semestre: primary.semestre,
-      zone: primary.zone,
-      storico: buildStoricoFromSnapshots(snaps),
-    };
-  }
-
+export function loadOmiSnapshot(): OmiData | null {
   const bundled = normalizeSnapshot(snapshot049018);
   if (!bundled) return null;
   return {
@@ -308,6 +241,11 @@ export function loadOmiFromDisk(istatCode = OMI_ISTAT_CODE): OmiData | null {
     zone: bundled.zone,
     storico: bundled.storico,
   };
+}
+
+/** @deprecated alias — preferire `loadOmiSnapshot`. */
+export function loadOmiFromDisk(): OmiData | null {
+  return loadOmiSnapshot();
 }
 
 export function hasOmiPayload(data: OmiData): boolean {

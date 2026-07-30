@@ -10,7 +10,7 @@ import {
   type TurismoData,
 } from "@/lib/turismo-flussi";
 
-export const revalidate = TURISMO_REVALIDATE_SECONDS;
+export const revalidate = 604800;
 
 const CACHE_CONTROL = `public, s-maxage=${TURISMO_REVALIDATE_SECONDS}, stale-while-revalidate=${TURISMO_REVALIDATE_SECONDS * 2}`;
 
