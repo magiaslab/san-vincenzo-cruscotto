@@ -30,6 +30,26 @@ type Stop = {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type FeatureCollection = any;
 
+function isWgs84Point(lat: number, lon: number): boolean {
+  return (
+    Number.isFinite(lat) &&
+    Number.isFinite(lon) &&
+    Math.abs(lat) <= 90 &&
+    Math.abs(lon) <= 180
+  );
+}
+
+function MapReady() {
+  const map = useMap();
+  useEffect(() => {
+    const id = window.setTimeout(() => {
+      map.invalidateSize();
+    }, 80);
+    return () => window.clearTimeout(id);
+  }, [map]);
+  return null;
+}
+
 function FitLayers({
   stops,
   ciclabili,
@@ -42,17 +62,28 @@ function FitLayers({
   const map = useMap();
   useEffect(() => {
     const bounds = L.latLngBounds([]);
-    for (const s of stops) bounds.extend([s.lat, s.lon]);
+    for (const s of stops) {
+      if (isWgs84Point(s.lat, s.lon)) bounds.extend([s.lat, s.lon]);
+    }
     for (const fc of [ciclabili, pedonali]) {
-      if (!fc) continue;
+      if (!fc?.features?.length) continue;
       try {
-        bounds.extend(L.geoJSON(fc).getBounds());
+        const layer = L.geoJSON(fc);
+        const b = layer.getBounds();
+        if (b.isValid()) {
+          const c = b.getCenter();
+          if (isWgs84Point(c.lat, c.lng)) bounds.extend(b);
+        }
       } catch {
-        // ignore invalid geometry
+        // geometria non valida
       }
     }
-    if (!bounds.isValid()) return;
+    if (!bounds.isValid()) {
+      map.setView(MAP_CENTER, MAP_DEFAULT_ZOOM, { animate: false });
+      return;
+    }
     map.fitBounds(bounds, { padding: [28, 28], maxZoom: 15 });
+    window.setTimeout(() => map.invalidateSize(), 100);
   }, [map, stops, ciclabili, pedonali]);
   return null;
 }
@@ -78,20 +109,28 @@ export function TrasportiMap({
 }) {
   const t = useT();
   const bus = useMemo(
-    () => (showBus ? busStops.filter((s) => Number.isFinite(s.lat) && Number.isFinite(s.lon)) : []),
+    () =>
+      showBus
+        ? busStops.filter((s) => isWgs84Point(s.lat, s.lon))
+        : [],
     [busStops, showBus],
   );
   const train = useMemo(
     () =>
       showTrain
-        ? trainStops.filter((s) => Number.isFinite(s.lat) && Number.isFinite(s.lon))
+        ? trainStops.filter((s) => isWgs84Point(s.lat, s.lon))
         : [],
     [trainStops, showTrain],
   );
 
+  const safeCiclabili =
+    showCiclabili && ciclabili?.features?.length ? ciclabili : null;
+  const safePedonali =
+    showPedonali && pedonali?.features?.length ? pedonali : null;
+
   return (
     <div className="panel overflow-hidden p-0">
-      <div className={`relative z-0 h-[380px] w-full overflow-hidden sm:h-[460px]`}>
+      <div className="relative z-0 h-[380px] w-full overflow-hidden sm:h-[460px]">
         <MapContainer
           center={MAP_CENTER}
           zoom={MAP_DEFAULT_ZOOM}
@@ -102,14 +141,15 @@ export function TrasportiMap({
             attribution={`&copy; <a href="${OSM_COPYRIGHT_URL}">OpenStreetMap</a>`}
             url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
           />
+          <MapReady />
           <FitLayers
             stops={[...bus, ...train]}
-            ciclabili={showCiclabili ? ciclabili : null}
-            pedonali={showPedonali ? pedonali : null}
+            ciclabili={safeCiclabili}
+            pedonali={safePedonali}
           />
-          {showPedonali && pedonali ? (
+          {safePedonali ? (
             <GeoJSON
-              data={pedonali}
+              data={safePedonali}
               style={() => ({
                 color: "#5B2C6F",
                 weight: 1,
@@ -118,9 +158,9 @@ export function TrasportiMap({
               })}
             />
           ) : null}
-          {showCiclabili && ciclabili ? (
+          {safeCiclabili ? (
             <GeoJSON
-              data={ciclabili}
+              data={safeCiclabili}
               style={() => ({
                 color: "#008758",
                 weight: 2,

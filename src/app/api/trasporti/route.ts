@@ -14,6 +14,7 @@ import {
   RT_ORARITB_DATASET_URL,
   TRASPORTI_GTFS_SV_PATH,
 } from "@/lib/constants";
+import { ensureWgs84GeoJson } from "@/lib/geo/reproject";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -21,11 +22,16 @@ export const revalidate = 0;
 type FeatureCollection = {
   type: string;
   features?: unknown[];
+  crs?: unknown;
 };
 
 async function readPublicJson<T>(publicPath: string): Promise<T | null> {
   try {
-    const filePath = path.join(process.cwd(), "public", publicPath.replace(/^\//, ""));
+    const filePath = path.join(
+      process.cwd(),
+      "public",
+      publicPath.replace(/^\//, ""),
+    );
     const raw = await readFile(filePath, "utf8");
     return JSON.parse(raw) as T;
   } catch {
@@ -41,27 +47,34 @@ async function fetchGeoJson(
   source: "live" | "local" | null;
   feature_count: number;
 }> {
+  // Preferisci sempre il GeoJSON locale già in WGS84: il feed live ldpgis
+  // arriva in EPSG:3003 e rompe Leaflet se non riprojattato.
+  const local = ensureWgs84GeoJson(
+    await readPublicJson<FeatureCollection>(fallbackPath),
+  );
+  const localN = Array.isArray(local?.features) ? local!.features.length : 0;
+
   try {
     const res = await fetch(liveUrl, {
       headers: { Accept: "application/geo+json, application/json" },
       next: { revalidate: 86400 },
     });
     if (res.ok) {
-      const geojson = (await res.json()) as FeatureCollection;
-      const n = Array.isArray(geojson.features) ? geojson.features.length : 0;
+      const raw = (await res.json()) as FeatureCollection;
+      const geojson = ensureWgs84GeoJson(raw);
+      const n = Array.isArray(geojson?.features) ? geojson!.features.length : 0;
       if (n > 0) {
         return { geojson, source: "live", feature_count: n };
       }
     }
   } catch {
-    // fallback sotto
+    // fallback locale
   }
-  const local = await readPublicJson<FeatureCollection>(fallbackPath);
-  const n = Array.isArray(local?.features) ? local!.features.length : 0;
+
   return {
     geojson: local,
     source: local ? "local" : null,
-    feature_count: n,
+    feature_count: localN,
   };
 }
 
@@ -76,7 +89,11 @@ export async function GET() {
         `${REGIONE_TOSCANA_CKAN_API}/package_show?id=${RT_ORARITB_CKAN_ID}`,
         { next: { revalidate: 86400 } },
       )
-        .then(async (r) => (r.ok ? ((await r.json()) as { result?: Record<string, unknown> }) : null))
+        .then(async (r) =>
+          r.ok
+            ? ((await r.json()) as { result?: Record<string, unknown> })
+            : null,
+        )
         .catch(() => null),
     ]);
 
@@ -90,15 +107,18 @@ export async function GET() {
     const bus = (gtfs.bus as Record<string, unknown> | undefined) ?? {};
     const train = (gtfs.train as Record<string, unknown> | undefined) ?? {};
     const busStats = (bus.stats as Record<string, unknown> | undefined) ?? {};
-    const trainStats = (train.stats as Record<string, unknown> | undefined) ?? {};
+    const trainStats =
+      (train.stats as Record<string, unknown> | undefined) ?? {};
 
     const resources = Array.isArray(ckan?.result?.resources)
-      ? (ckan!.result!.resources as Array<Record<string, unknown>>).map((r) => ({
-          name: r.name ?? null,
-          format: r.format ?? null,
-          url: r.url ?? null,
-          size: r.size ?? null,
-        }))
+      ? (ckan!.result!.resources as Array<Record<string, unknown>>).map(
+          (r) => ({
+            name: r.name ?? null,
+            format: r.format ?? null,
+            url: r.url ?? null,
+            size: r.size ?? null,
+          }),
+        )
       : [];
 
     return NextResponse.json(
@@ -131,7 +151,9 @@ export async function GET() {
         },
         catalog: {
           dataset_url: RT_ORARITB_DATASET_URL,
-          title: (ckan?.result?.title as string | undefined) ?? "Orari trasporto pubblico",
+          title:
+            (ckan?.result?.title as string | undefined) ??
+            "Orari trasporto pubblico",
           resources,
           autolinee_gtfs_url: AUTOLINEE_GTFS_URL,
         },

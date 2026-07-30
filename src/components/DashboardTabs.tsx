@@ -2058,10 +2058,6 @@ function Infra({ kpi }: { kpi: Kpi }) {
         )}
       />
 
-      <div className="mb-6">
-        <TrasportiPanel embedded />
-      </div>
-
       <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
         <KpiCard label={t("Copertura FTTH")} value={valueOrMissing(banda?.copertura_ftth_pct ?? asRecord(agcom?.kpi)?.copertura_ftth_desi_pct, formatPercent)} hint={`FTTH 20m ${formatPercent(num(banda?.copertura_ftth_20m_pct ?? asRecord(agcom?.kpi)?.copertura_ftth_20m_pct))}`} />
         <KpiCard label={t("Punti ricarica EV")} value={valueOrMissing(punKpi?.n_totale, formatInteger)} hint={`${formatInteger(num(punKpi?.n_attivi))} attivi · ${formatDecimal(num(punKpi?.potenza_tot_kw ?? punKpi?.potenza_totale_kw), 0)} kW`} />
@@ -2070,9 +2066,6 @@ function Infra({ kpi }: { kpi: Kpi }) {
         <KpiCard label={t("% veicoli inquinanti")} value={valueOrMissing(veicoli?.pct_inquinanti ?? euro?.pct_inquinanti, formatPercent)} />
         <KpiCard label={t("Incidenti (ultimo anno)")} value={valueOrMissing(incidenti?.incidenti, formatInteger)} hint={incidenti ? `${formatInteger(num(incidenti.morti))} morti · ${formatInteger(num(incidenti.feriti))} feriti` : undefined} />
         <KpiCard label={t("Impianti carburanti")} value={valueOrMissing(carbKpi?.n_impianti ?? asRecord(kpi.carburanti_mimit)?.n_impianti, formatInteger)} />
-      </div>
-
-      <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
         <KpiCard
           label={t("Benzina self media")}
           value={valueOrMissing(
@@ -2168,6 +2161,14 @@ function Infra({ kpi }: { kpi: Kpi }) {
         </div>
       ) : null}
 
+      <div className="mb-4">
+        <CarburantiMap />
+      </div>
+
+      <div className="mb-6">
+        <TrasportiPanel embedded />
+      </div>
+
       {loading ? <LoadingBlock /> : null}
 
       <div className="mb-4 grid gap-3 sm:gap-4 lg:grid-cols-2">
@@ -2239,10 +2240,6 @@ function Infra({ kpi }: { kpi: Kpi }) {
 
       <div className="mb-4">
         <PunIdrMap />
-      </div>
-
-      <div className="mb-4">
-        <CarburantiMap />
       </div>
 
       <div className="mb-4">
