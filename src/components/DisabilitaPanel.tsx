@@ -23,6 +23,7 @@ import {
   COMUNE_STALLI_DISABILI_URL,
   ISTAT_DISABILITA_CIFRE_URL,
   WHEELMAP_URL,
+  WHEELMAP_WIDGET_INFO_URL,
   isRuntsInclusione,
 } from "@/lib/accessibilita";
 import {
@@ -35,6 +36,7 @@ import {
   SolidLink,
 } from "@/components/ui";
 import { formatInteger } from "@/lib/format";
+import WheelmapEmbed from "@/components/WheelmapEmbed";
 
 type RuntsEnte = {
   denom?: string;
@@ -120,7 +122,7 @@ export function AccessibilitaMap({
     <div className="panel overflow-hidden p-0">
       <div className="border-b border-[var(--pa-border)] px-4 py-3">
         <PanelHeading
-          title={t("Mappa accessibilità (OSM / Wheelmap)")}
+          title={t("Mappa OSM locale (stalli, bagni, wheelchair)")}
           description={`${punti.length} ${t("punti georeferenziati nel territorio")}. ${t("Verde = accessibile, arancio = limitato, rosso = no, blu = stallo, viola = bagno.")}`}
           icon={Accessibility}
           actions={<SolidLink href={WHEELMAP_URL}>Wheelmap</SolidLink>}
@@ -312,6 +314,14 @@ export default function DisabilitaPanel({
         </p>
       ) : null}
 
+      <div className="mb-4">
+        <WheelmapEmbed
+          embedToken={
+            process.env.NEXT_PUBLIC_WHEELMAP_EMBED_TOKEN?.trim() || null
+          }
+        />
+      </div>
+
       <div className="mb-3 flex flex-wrap gap-2">
         <FilterChip active={filter === "tutti"} onClick={() => setFilter("tutti")}>
           {t("Tutti")} ({data?.kpi.n_totale ?? 0})
@@ -435,6 +445,11 @@ export default function DisabilitaPanel({
             </li>
             <li>
               <OutlineLink href={WHEELMAP_URL}>Wheelmap</OutlineLink>
+            </li>
+            <li>
+              <OutlineLink href={WHEELMAP_WIDGET_INFO_URL}>
+                {t("Wheelmap Widget (embed ufficiale)")}
+              </OutlineLink>
             </li>
             <li>
               <OutlineLink href={ISTAT_DISABILITA_CIFRE_URL}>

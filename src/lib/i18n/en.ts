@@ -626,4 +626,11 @@ export const en: Record<string, string> = {
   "Stallo disabili": "Disabled parking bay",
   "Tutti": "All",
   "Verde = accessibile, arancio = limitato, rosso = no, blu = stallo, viola = bagno.": "Green = accessible, orange = limited, red = no, blue = parking, purple = toilet.",
+  "Info widget": "Widget info",
+  "L’iframe ufficiale richiede un embedToken da Sozialhelden (Wheelmap Widget). Sotto trovi già la mappa OSM con gli stessi dati wheelchair.": "The official iframe needs an embedToken from Sozialhelden (Wheelmap Widget). Below you already have the OSM map with the same wheelchair data.",
+  "Mappa OSM locale (stalli, bagni, wheelchair)": "Local OSM map (parking, toilets, wheelchair)",
+  "Mappa Wheelmap": "Wheelmap map",
+  "Per attivare l’embed: richiedi il widget a info@sozialhelden.de, poi imposta su Vercel la variabile NEXT_PUBLIC_WHEELMAP_EMBED_TOKEN.": "To enable the embed: request the widget from info@sozialhelden.de, then set NEXT_PUBLIC_WHEELMAP_EMBED_TOKEN on Vercel.",
+  "Wheelmap Widget (embed ufficiale)": "Wheelmap Widget (official embed)",
+  "Widget ufficiale centrato su San Vincenzo (semaforo accessibilità).": "Official widget centred on San Vincenzo (accessibility traffic light).",
 };
