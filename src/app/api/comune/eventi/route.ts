@@ -7,11 +7,16 @@ import {
 const CACHE_DURATION = 3600; // 1 ora
 
 export type EventoComune = {
+  id: string | null;
   titolo: string;
   periodo: string | null;
   orario: string | null;
   luogo: string | null;
   descrizione: string | null;
+  /** Link all’evento sul calendario Visit San Vincenzo (o esterno). */
+  url: string;
+  /** Eventuale sito/biglietto esterno (Eventbrite, cinema, ecc.). */
+  url_esterno: string | null;
 };
 
 function decodeHtml(s: string): string {
@@ -31,6 +36,13 @@ function stripTags(s: string): string {
   return decodeHtml(s.replace(/<[^>]+>/g, " "));
 }
 
+function absoluteVisitUrl(href: string): string {
+  if (href.startsWith("http://") || href.startsWith("https://")) return href;
+  if (href.startsWith("//")) return `https:${href}`;
+  if (href.startsWith("/")) return `https://visitsanvincenzo.it${href}`;
+  return href;
+}
+
 function parseVisitEvents(html: string): EventoComune[] {
   const parts = html.split('<div class="row event">').slice(1);
   const events: EventoComune[] = [];
@@ -47,12 +59,32 @@ function parseVisitEvents(html: string): EventoComune[] {
     const titolo = decodeHtml(titleM[1]);
     if (!titolo) continue;
 
+    const mapId = part.match(/href=["']#(\d+)["']/i)?.[1] ?? null;
+
+    const external =
+      [...part.matchAll(/href=["'](https?:\/\/[^"']+)["']/gi)]
+        .map((m) => absoluteVisitUrl(decodeHtml(m[1])))
+        .find(
+          (u) =>
+            !/visitsanvincenzo\.it/i.test(u) &&
+            !/google(apis)?\.com/i.test(u) &&
+            !/\.(jpg|jpeg|png|gif|webp|svg)(\?|$)/i.test(u) &&
+            !/\/media\//i.test(u),
+        ) ?? null;
+
+    const url = mapId
+      ? `${VISIT_SAN_VINCENZO_EVENTI_URL}#${mapId}`
+      : VISIT_SAN_VINCENZO_EVENTI_URL;
+
     events.push({
+      id: mapId,
       titolo,
       periodo: dateM ? decodeHtml(dateM[1]) : null,
       orario: metas[0] ?? null,
       luogo: metas[1] ?? null,
       descrizione: descM ? stripTags(descM[1]).slice(0, 280) : null,
+      url,
+      url_esterno: external,
     });
   }
 
@@ -63,7 +95,8 @@ export async function GET() {
   try {
     const res = await fetch(VISIT_SAN_VINCENZO_EVENTI_URL, {
       headers: {
-        "User-Agent": "Cruscotto-San-Vincenzo/1.0 (+https://github.com/magiaslab/san-vincenzo-cruscotto)",
+        "User-Agent":
+          "Cruscotto-San-Vincenzo/1.0 (+https://github.com/magiaslab/san-vincenzo-cruscotto)",
         Accept: "text/html",
       },
       next: { revalidate: CACHE_DURATION },
