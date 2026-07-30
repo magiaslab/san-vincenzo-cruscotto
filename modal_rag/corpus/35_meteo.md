@@ -21,4 +21,7 @@ Meteo da Cruscotto Italia / ItaliaMeteo:
   "ww_desc": "Cielo sereno"
 }
 ```
-Il cruscotto aggiunge anche previsioni Open-Meteo e radar RainViewer.
+Il cruscotto aggiunge anche:
+- allerte Protezione Civile (zona Etruria-Costa Nord / E2) via allertameteo.app;
+- OpenWeather (current, forecast 5 giorni, qualità aria);
+- previsioni Open-Meteo e radar RainViewer.

@@ -51,7 +51,7 @@ export const SITE_NAME = `Cruscotto ${COMUNE_NOME}`;
 export const SITE_TITLE_DEFAULT = `${SITE_NAME} | Dati aperti (${COMUNE_PROVINCIA})`;
 
 export const SITE_DESCRIPTION =
-  `Dashboard indipendente dei dati aperti del Comune di ${COMUNE_NOME} (${COMUNE_PROVINCIA}, ${COMUNE_REGIONE}). KPI, mobilità, sanità, scuole, meteo e finanza pubblica da Cruscotto Italia (AgID) e fonti open data. Progetto non ufficiale.`;
+  `Dashboard indipendente dei dati aperti del Comune di ${COMUNE_NOME} (${COMUNE_PROVINCIA}, ${COMUNE_REGIONE}). KPI, mobilità e TPL, accessibilità, sanità, scuole, meteo e allerte, finanza pubblica da Cruscotto Italia (AgID) e fonti open data. Progetto non ufficiale.`;
 
 export const SITE_KEYWORDS = [
   `cruscotto ${COMUNE_NOME}`,
@@ -65,11 +65,17 @@ export const SITE_KEYWORDS = [
   `ISTAT ${ISTAT_CODE}`,
   "farmacie di turno",
   "carburanti",
+  "colonnine EV",
   "FTTH",
   "balneazione ARPAT",
   "accessibilità",
   "disabilità",
   "Wheelmap",
+  "GTFS",
+  "trasporti",
+  "allerte meteo",
+  "OpenWeather",
+  "Protezione Civile",
 ] as const;
 
 export const OG_IMAGE = {
