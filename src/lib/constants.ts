@@ -152,6 +152,12 @@ export const AUTOLINEE_GTFS_URL =
   "https://regionetoscana.smartregion.toscana.it/mobility/artifacts/gtfs" as const;
 export const TRASPORTI_GTFS_SV_PATH = "/data/trasporti-gtfs-sv.json" as const;
 
+/** Board live treni (proxy ViaggiaTreno) — stazione FS San Vincenzo. */
+export const TRASPORTI_TRENI_LIVE_API = "/api/trasporti/treni" as const;
+export const VIAGGIATRENO_ATTRIBUTION_URL =
+  "https://www.viaggiatreno.it/" as const;
+
+
 /** Aree ciclabili / pedonali (open data comunale via dati.toscana.it / ldpgis). */
 export const CICLABILI_DATASET_URL =
   "https://dati.toscana.it/dataset/aree-di-circolazione-ciclabili28" as const;

@@ -29,6 +29,8 @@ Apri [http://localhost:3000](http://localhost:3000).
 | `GET /api/kpi` | Proxy `comune_kpi`, cache 24h |
 | `GET /api/dettaglio?sezioni=siope,anac,…` | Sotto-sezioni di `comune_dashboard` |
 | `GET /api/mappa` | Layer GeoJSON (civici, EV, beni, sanità) |
+| `GET /api/trasporti` | GTFS TPL + ciclabili/pedonali |
+| `GET /api/trasporti/treni` | Partenze/arrivi live FS + ritardi (ViaggiaTreno) |
 | `GET /api/meteo` | Meteo live KPI (no-store) |
 | `GET /api/meteo/forecast` | Previsioni Open-Meteo (48h + 7 giorni) |
 | `GET /api/meteo/radar` | Metadati frame radar RainViewer |

@@ -124,34 +124,61 @@ with zipfile.ZipFile(zip_dir/'trenitalia.zip') as zf:
       stops.append({'stop_id': s['stop_id'], 'name': name, 'lat': lat, 'lon': lon, 'dist_km': round(d,2)})
   stops.sort(key=lambda x:x['dist_km'])
   target_ids={s['stop_id'] for s in stops if 'vincenzo' in s['name'].lower() or s['dist_km']<=2.5}
-  trip_ids=set(); deps=[]
+  trip_ids=set(); stop_events=[]
   for row in dict_reader(zf,'stop_times.txt'):
     if row['stop_id'] not in target_ids: continue
     trip_ids.add(row['trip_id'])
-    deps.append({'stop_id': row['stop_id'], 'time': row.get('departure_time') or row.get('arrival_time'), 'trip_id': row['trip_id']})
+    arr=row.get('arrival_time') or None
+    dep=row.get('departure_time') or None
+    stop_events.append({'stop_id': row['stop_id'], 'arrival_time': arr, 'departure_time': dep, 'trip_id': row['trip_id']})
   trip_meta={}; route_ids=set()
   for t in dict_reader(zf,'trips.txt'):
     if t['trip_id'] in trip_ids:
       route_ids.add(t['route_id'])
-      trip_meta[t['trip_id']]={'route_id': t['route_id'], 'headsign': t.get('trip_headsign') or None}
+      trip_meta[t['trip_id']]={
+        'route_id': t['route_id'],
+        'headsign': t.get('trip_headsign') or None,
+        'trip_short_name': t.get('trip_short_name') or None,
+        'direction_id': t.get('direction_id') or None,
+      }
   routes=[]
   for r in dict_reader(zf,'routes.txt'):
     if r['route_id'] in route_ids:
       routes.append({'route_id': r['route_id'], 'short_name': r.get('route_short_name') or '', 'long_name': r.get('route_long_name') or '', 'type': r.get('route_type')})
-  enriched=[]
-  for d in deps:
-    tm=trip_meta.get(d['trip_id'], {})
+  def enrich(ev, time_field, role):
+    tm=trip_meta.get(ev['trip_id'], {})
     rid=tm.get('route_id')
     rn=next((x for x in routes if x['route_id']==rid), None)
-    enriched.append({'stop_id': d['stop_id'], 'time': d['time'], 'route': (rn or {}).get('short_name') or (rn or {}).get('long_name') or rid, 'headsign': tm.get('headsign')})
-  enriched.sort(key=lambda x: x['time'] or '')
-  seen=set(); sample=[]
-  for e in enriched:
-    k=(e['time'], e['headsign'], e['route'])
-    if k in seen: continue
-    seen.add(k); sample.append(e)
-    if len(sample)>=60: break
-  train={'agency':'Trenitalia','source':'https://dati.toscana.it/dataset/rt-oraritb','stops':stops,'routes':routes,'departures_sample':sample,'stats':{'stops':len(stops),'routes':len(routes),'departures_listed':len(sample)}}
+    t=ev.get(time_field) or ev.get('departure_time') or ev.get('arrival_time')
+    if not t: return None
+    return {
+      'stop_id': ev['stop_id'],
+      'time': t,
+      'arrival_time': ev.get('arrival_time'),
+      'departure_time': ev.get('departure_time'),
+      'role': role,
+      'route': (rn or {}).get('short_name') or (rn or {}).get('long_name') or rid,
+      'headsign': tm.get('headsign'),
+      'trip_short_name': tm.get('trip_short_name'),
+    }
+  deps=[]; arrs=[]
+  for ev in stop_events:
+    d=enrich(ev,'departure_time','departure')
+    a=enrich(ev,'arrival_time','arrival')
+    if d: deps.append(d)
+    if a: arrs.append(a)
+  def sample_rows(rows, limit=60):
+    rows=sorted(rows, key=lambda x: x['time'] or '')
+    seen=set(); out=[]
+    for e in rows:
+      k=(e['time'], e.get('headsign'), e.get('route'), e.get('role'))
+      if k in seen: continue
+      seen.add(k); out.append(e)
+      if len(out)>=limit: break
+    return out
+  dep_sample=sample_rows(deps)
+  arr_sample=sample_rows(arrs)
+  train={'agency':'Trenitalia','source':'https://dati.toscana.it/dataset/rt-oraritb','stops':stops,'routes':routes,'departures_sample':dep_sample,'arrivals_sample':arr_sample,'stats':{'stops':len(stops),'routes':len(routes),'departures_listed':len(dep_sample),'arrivals_listed':len(arr_sample)}}
 
 out={'generated_at': datetime.now(timezone.utc).isoformat(), 'center':{'lat':LAT,'lon':LON}, 'dataset':'https://dati.toscana.it/dataset/rt-oraritb', 'bus':bus, 'train':train}
 print(json.dumps(out, ensure_ascii=False, separators=(',',':')))

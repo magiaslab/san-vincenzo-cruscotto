@@ -7,6 +7,8 @@ import {
   CICLABILI_DATASET_URL,
   PEDONALI_DATASET_URL,
   RT_ORARITB_DATASET_URL,
+  TRASPORTI_TRENI_LIVE_API,
+  VIAGGIATRENO_ATTRIBUTION_URL,
 } from "@/lib/constants";
 import { formatDecimal, formatInteger } from "@/lib/format";
 import { useT } from "@/lib/i18n";
@@ -45,11 +47,35 @@ type RouteRow = {
   type?: string | null;
 };
 
-type Departure = {
+type GtfsCall = {
   stop_id?: string;
   time?: string | null;
+  arrival_time?: string | null;
+  departure_time?: string | null;
   route?: string | null;
   headsign?: string | null;
+  trip_short_name?: string | null;
+};
+
+type LiveRow = {
+  kind?: "partenze" | "arrivi";
+  numero?: string;
+  categoria?: string | null;
+  verso?: string | null;
+  orario?: string | null;
+  ritardo_min?: number | null;
+  binario?: string | null;
+  soppresso?: boolean;
+};
+
+type TreniLivePayload = {
+  partenze?: LiveRow[];
+  arrivi?: LiveRow[];
+  fetched_at?: string;
+  source?: string;
+  source_url?: string;
+  note?: string;
+  error?: string;
 };
 
 type TrasportiPayload = {
@@ -63,7 +89,8 @@ type TrasportiPayload = {
   train?: {
     stops?: Stop[];
     routes?: RouteRow[];
-    departures_sample?: Departure[];
+    departures_sample?: GtfsCall[];
+    arrivals_sample?: GtfsCall[];
     agency?: string;
   };
   ciclabili?: {
@@ -81,6 +108,8 @@ type TrasportiPayload = {
   note?: string;
   error?: string;
 };
+
+type BoardMode = "partenze" | "arrivi";
 
 function hhmm(time: string | null | undefined): string {
   if (!time) return "—";
@@ -104,6 +133,42 @@ function timeToMinutes(time: string | null | undefined): number | null {
   return (h % 24) * 60 + m;
 }
 
+function rankUpcoming<T extends { time?: string | null }>(
+  rows: T[],
+  limit = 16,
+): T[] {
+  const now = nowMinutes();
+  return rows
+    .map((d) => ({ d, mins: timeToMinutes(d.time) }))
+    .filter((x) => x.mins != null)
+    .sort((a, b) => {
+      const da = ((a.mins! - now) + 24 * 60) % (24 * 60);
+      const db = ((b.mins! - now) + 24 * 60) % (24 * 60);
+      return da - db;
+    })
+    .map((x) => x.d)
+    .slice(0, limit);
+}
+
+function formatRitardo(
+  min: number | null | undefined,
+  t: (s: string) => string,
+): { label: string; className: string } {
+  if (min == null || !Number.isFinite(min)) {
+    return { label: "—", className: "text-[var(--pa-muted)]" };
+  }
+  if (min <= 0) {
+    return {
+      label: t("In orario"),
+      className: "font-semibold text-[var(--pa-success)]",
+    };
+  }
+  return {
+    label: `+${Math.round(min)} min`,
+    className: "font-semibold text-[var(--pa-danger)]",
+  };
+}
+
 export function TrasportiPanel({
   embedded = false,
 }: {
@@ -112,15 +177,18 @@ export function TrasportiPanel({
 }) {
   const t = useT();
   const [data, setData] = useState<TrasportiPayload | null>(null);
+  const [live, setLive] = useState<TreniLivePayload | null>(null);
   const [loading, setLoading] = useState(true);
+  const [liveLoading, setLiveLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [stopQuery, setStopQuery] = useState("");
+  const [boardMode, setBoardMode] = useState<BoardMode>("partenze");
   const [showBus, setShowBus] = useState(true);
   const [showTrain, setShowTrain] = useState(true);
   const [showCiclabili, setShowCiclabili] = useState(true);
   const [showPedonali, setShowPedonali] = useState(true);
 
-  const load = useCallback(async () => {
+  const loadGtfs = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -137,6 +205,33 @@ export function TrasportiPanel({
     }
   }, []);
 
+  const loadLive = useCallback(async () => {
+    setLiveLoading(true);
+    try {
+      const res = await fetch(`${TRASPORTI_TRENI_LIVE_API}?_=${Date.now()}`, {
+        cache: "no-store",
+      });
+      const json = (await res.json()) as TreniLivePayload;
+      if (!res.ok) {
+        setLive({
+          partenze: [],
+          arrivi: [],
+          error: json.error || "live failed",
+        });
+        return;
+      }
+      setLive(json);
+    } catch {
+      setLive({ partenze: [], arrivi: [], error: "live failed" });
+    } finally {
+      setLiveLoading(false);
+    }
+  }, []);
+
+  const load = useCallback(async () => {
+    await Promise.all([loadGtfs(), loadLive()]);
+  }, [loadGtfs, loadLive]);
+
   useEffect(() => {
     void load();
   }, [load]);
@@ -144,7 +239,8 @@ export function TrasportiPanel({
   const busStops = data?.bus?.stops ?? [];
   const trainStops = data?.train?.stops ?? [];
   const routes = data?.bus?.routes ?? [];
-  const trainDeps = data?.train?.departures_sample ?? [];
+  const gtfsDeps = data?.train?.departures_sample ?? [];
+  const gtfsArrs = data?.train?.arrivals_sample ?? [];
 
   const filteredStops = useMemo(() => {
     const q = stopQuery.trim().toLowerCase();
@@ -158,19 +254,24 @@ export function TrasportiPanel({
     return list.slice(0, 40);
   }, [busStops, stopQuery]);
 
-  const upcomingTrains = useMemo(() => {
-    const now = nowMinutes();
-    const ranked = trainDeps
-      .map((d) => ({ d, mins: timeToMinutes(d.time) }))
-      .filter((x) => x.mins != null)
-      .sort((a, b) => {
-        const da = ((a.mins! - now) + 24 * 60) % (24 * 60);
-        const db = ((b.mins! - now) + 24 * 60) % (24 * 60);
-        return da - db;
-      })
-      .map((x) => x.d);
-    return ranked.slice(0, 16);
-  }, [trainDeps]);
+  const livePartenze = live?.partenze ?? [];
+  const liveArrivi = live?.arrivi ?? [];
+  const hasLive =
+    !live?.error && (livePartenze.length > 0 || liveArrivi.length > 0);
+
+  const upcomingGtfsDeps = useMemo(
+    () => rankUpcoming(gtfsDeps, 16),
+    [gtfsDeps],
+  );
+  const upcomingGtfsArrs = useMemo(
+    () => rankUpcoming(gtfsArrs, 16),
+    [gtfsArrs],
+  );
+
+  const boardLiveRows =
+    boardMode === "partenze" ? livePartenze : liveArrivi;
+  const boardGtfsRows =
+    boardMode === "partenze" ? upcomingGtfsDeps : upcomingGtfsArrs;
 
   return (
     <section>
@@ -181,7 +282,7 @@ export function TrasportiPanel({
           </h2>
           <p className="mb-0 mt-1 text-sm text-[var(--pa-muted)]">
             {t(
-              "Orari TPL (GTFS Regione Toscana), fermate e linee Autolinee Toscane, partenze FS da S.Vincenzo, aree ciclabili e pedonali comunali.",
+              "Orari TPL (GTFS Regione Toscana), fermate e linee Autolinee Toscane, partenze e arrivi FS da S.Vincenzo (con ritardi live), aree ciclabili e pedonali comunali.",
             )}
           </p>
         </div>
@@ -189,19 +290,24 @@ export function TrasportiPanel({
         <SectionIntro
           title={t("Trasporti")}
           description={t(
-            "Orari TPL (GTFS Regione Toscana), fermate e linee Autolinee Toscane, partenze FS da S.Vincenzo, aree ciclabili e pedonali comunali.",
+            "Orari TPL (GTFS Regione Toscana), fermate e linee Autolinee Toscane, partenze e arrivi FS da S.Vincenzo (con ritardi live), aree ciclabili e pedonali comunali.",
           )}
         />
       )}
 
       <div className="mb-3 flex flex-wrap items-center gap-2 sm:gap-3">
         <SolidButton onClick={() => void load()}>{t("Aggiorna ora")}</SolidButton>
-        {loading ? (
+        {loading || liveLoading ? (
           <span className="text-xs text-[var(--pa-muted)] sm:text-sm">
             {t("Aggiornamento…")}
           </span>
         ) : null}
-        {data?.generated_at ? (
+        {live?.fetched_at ? (
+          <span className="text-xs text-[var(--pa-muted)] sm:text-sm">
+            {t("Live treni:")}{" "}
+            {new Date(String(live.fetched_at)).toLocaleString("it-IT")}
+          </span>
+        ) : data?.generated_at ? (
           <span className="text-xs text-[var(--pa-muted)] sm:text-sm">
             GTFS: {new Date(String(data.generated_at)).toLocaleString("it-IT")}
           </span>
@@ -226,7 +332,7 @@ export function TrasportiPanel({
         <KpiCard
           label={t("Stazioni FS vicine")}
           value={valueOrMissing(data?.kpi?.stazioni_fs, formatInteger)}
-          hint={t("Partenze campione da S.Vincenzo")}
+          hint={t("Partenze e arrivi da S.Vincenzo")}
           icon={Train}
         />
         <KpiCard
@@ -279,33 +385,141 @@ export function TrasportiPanel({
         )}
       </div>
 
-      {upcomingTrains.length > 0 ? (
-        <div className="mb-4 panel overflow-x-auto p-0">
-          <div className="px-3 pt-3 sm:px-4 sm:pt-4">
-            <h3 className="m-0 flex items-center gap-2">
-              <Train
-                size={20}
-                className="shrink-0 text-[var(--pa-primary)]"
-                aria-hidden
-              />
-              {t("Partenze FS da S.Vincenzo (campione GTFS)")}
-            </h3>
-            <p className="mb-0 mt-1 text-xs text-[var(--pa-muted)] sm:text-sm">
-              {t(
-                "Orari indicativi dal feed Trenitalia: verificare sempre sul canale ufficiale.",
-              )}
-            </p>
+      <div className="mb-4 panel overflow-x-auto p-0">
+        <div className="px-3 pt-3 sm:px-4 sm:pt-4">
+          <h3 className="m-0 flex items-center gap-2">
+            <Train
+              size={20}
+              className="shrink-0 text-[var(--pa-primary)]"
+              aria-hidden
+            />
+            {t("Treni FS — S.Vincenzo")}
+          </h3>
+          <p className="mb-0 mt-1 text-xs text-[var(--pa-muted)] sm:text-sm">
+            {hasLive
+              ? t(
+                  "Orari e ritardi live (ViaggiaTreno). Verificare sempre sul canale ufficiale Trenitalia/RFI.",
+                )
+              : t(
+                  "Orari indicativi dal feed GTFS Trenitalia (live non disponibile al momento). Verificare sempre sul canale ufficiale.",
+                )}
+          </p>
+          <div
+            className="mt-3 inline-flex rounded-lg border border-[var(--pa-border)] bg-[var(--pa-surface-soft)] p-1"
+            role="tablist"
+            aria-label={t("Partenze o arrivi")}
+          >
+            {(
+              [
+                ["partenze", t("Partenze")],
+                ["arrivi", t("Arrivi")],
+              ] as const
+            ).map(([id, label]) => {
+              const active = boardMode === id;
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => setBoardMode(id)}
+                  className={`min-h-11 rounded-md px-3 text-sm font-semibold transition ${
+                    active
+                      ? "bg-[var(--pa-primary)] text-white"
+                      : "text-[var(--pa-ink)] hover:bg-white"
+                  }`}
+                >
+                  {label}
+                </button>
+              );
+            })}
           </div>
+        </div>
+
+        {liveLoading && !live ? (
+          <div className="px-3 py-4 sm:px-4">
+            <LoadingBlock label={t("Caricamento treni…")} />
+          </div>
+        ) : hasLive ? (
           <table className="mt-2 min-w-full text-left text-xs sm:text-sm">
             <thead className="bg-[#e8f2fc] text-[#17324d]">
               <tr>
                 <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Ora")}</th>
-                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Destinazione")}</th>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">
+                  {boardMode === "partenze"
+                    ? t("Destinazione")
+                    : t("Provenienza")}
+                </th>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Treno")}</th>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Ritardo")}</th>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Binario")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {boardLiveRows.slice(0, 20).map((row, i) => {
+                const rit = formatRitardo(row.ritardo_min, t);
+                const trainLabel = [row.categoria, row.numero]
+                  .filter(Boolean)
+                  .join(" ");
+                return (
+                  <tr
+                    key={`${row.numero}-${row.orario}-${i}`}
+                    className={`border-t border-[#eef2f5] ${
+                      row.soppresso ? "opacity-60" : ""
+                    }`}
+                  >
+                    <td className="px-2 py-1.5 font-semibold sm:px-3 sm:py-2">
+                      {row.orario || "—"}
+                    </td>
+                    <td className="px-2 py-1.5 sm:px-3 sm:py-2">
+                      {row.verso || "—"}
+                      {row.soppresso ? (
+                        <span className="ml-2 text-[var(--pa-danger)]">
+                          {t("Soppresso")}
+                        </span>
+                      ) : null}
+                    </td>
+                    <td className="px-2 py-1.5 sm:px-3 sm:py-2">
+                      {trainLabel || "—"}
+                    </td>
+                    <td className={`px-2 py-1.5 sm:px-3 sm:py-2 ${rit.className}`}>
+                      {row.soppresso ? "—" : rit.label}
+                    </td>
+                    <td className="px-2 py-1.5 sm:px-3 sm:py-2">
+                      {row.binario || "—"}
+                    </td>
+                  </tr>
+                );
+              })}
+              {boardLiveRows.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={5}
+                    className="px-2 py-3 text-[var(--pa-muted)] sm:px-3"
+                  >
+                    {boardMode === "partenze"
+                      ? t("Nessuna partenza nella fascia oraria corrente.")
+                      : t("Nessun arrivo nella fascia oraria corrente.")}
+                  </td>
+                </tr>
+              ) : null}
+            </tbody>
+          </table>
+        ) : (
+          <table className="mt-2 min-w-full text-left text-xs sm:text-sm">
+            <thead className="bg-[#e8f2fc] text-[#17324d]">
+              <tr>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Ora")}</th>
+                <th className="px-2 py-1.5 sm:px-3 sm:py-2">
+                  {boardMode === "partenze"
+                    ? t("Destinazione")
+                    : t("Provenienza / direzione")}
+                </th>
                 <th className="px-2 py-1.5 sm:px-3 sm:py-2">{t("Linea")}</th>
               </tr>
             </thead>
             <tbody>
-              {upcomingTrains.map((d, i) => (
+              {boardGtfsRows.map((d, i) => (
                 <tr
                   key={`${d.time}-${d.headsign}-${i}`}
                   className="border-t border-[#eef2f5]"
@@ -321,10 +535,20 @@ export function TrasportiPanel({
                   </td>
                 </tr>
               ))}
+              {boardGtfsRows.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={3}
+                    className="px-2 py-3 text-[var(--pa-muted)] sm:px-3"
+                  >
+                    {t("Nessun orario GTFS disponibile.")}
+                  </td>
+                </tr>
+              ) : null}
             </tbody>
           </table>
-        </div>
-      ) : null}
+        )}
+      </div>
 
       {routes.length > 0 ? (
         <div className="mb-4 panel overflow-x-auto p-0">
@@ -420,6 +644,15 @@ export function TrasportiPanel({
 
       <p className="mt-2 text-[11px] text-[#5b6f82] sm:text-xs">
         Fonti:{" "}
+        <a
+          href={VIAGGIATRENO_ATTRIBUTION_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline"
+        >
+          ViaggiaTreno
+        </a>
+        {" · "}
         <a
           href={RT_ORARITB_DATASET_URL}
           target="_blank"

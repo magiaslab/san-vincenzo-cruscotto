@@ -347,6 +347,26 @@ export default function AttribuzioniPage() {
               <li>
                 <a
                   className="text-[#0066CC] underline"
+                  href="https://dati.toscana.it/dataset/rt-oraritb"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Regione Toscana — Orari TPL (GTFS)
+                </a>{" "}
+                — bus e treni programmati;{" "}
+                <a
+                  className="text-[#0066CC] underline"
+                  href="https://www.viaggiatreno.it/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  ViaggiaTreno
+                </a>{" "}
+                — partenze/arrivi live e ritardi FS (fonte non ufficiale)
+              </li>
+              <li>
+                <a
+                  className="text-[#0066CC] underline"
                   href={OPENWEATHER_ATTRIBUTION_URL}
                   target="_blank"
                   rel="noopener noreferrer"
