@@ -26,6 +26,7 @@ Preferire `var(--pa-*)` o classi Tailwind che le referenziano rispetto a hex rip
 - Shell: sidebar desktop + drawer mobile (`AppShell`)
 - Nav raggruppata: In evidenza · Territorio e mare · Economia e società · Progetto
   (Partecipa, Come funziona, Riusa/fork, Attribuzioni — tab in-dashboard)
+- Deep link sezione: `#sanita`, `#infra`, `#come-funziona`, …
 - Panoramica: hub a compiti cittadini, poi instantanea KPI, resto in `<details>`
 
 ## Components
