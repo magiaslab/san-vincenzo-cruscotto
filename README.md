@@ -7,7 +7,7 @@ Progetto **indipendente e non ufficiale**, realizzato da [Alessandro Cipriani](m
 ## Riuso / fork
 
 Guida completa (GitHub → Vercel → dominio, account esterni, Telegram, Modal/HF,
-env): [`docs/riuso-fork.md`](docs/riuso-fork.md).
+env, Cursor/Claude): [`docs/riuso-fork.md`](docs/riuso-fork.md).
 
 In-app: tab **Progetto → Riusa / fork** (`/#riusa`). Checklist:
 [`config/comune.example.json`](config/comune.example.json). Env:

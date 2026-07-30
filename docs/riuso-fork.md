@@ -2,7 +2,8 @@
 
 Guida passo-passo per duplicare questo progetto su un **altro comune italiano**,
 dall’account GitHub alla messa online su Vercel, con i servizi esterni opzionali
-(Telegram, Modal, Hugging Face, OpenWeather, …).
+(Telegram, Modal, Hugging Face, OpenWeather, …) e indicazioni per usare
+Cursor o Claude ad adattare il fork.
 
 La stessa guida è riassunta in-app su [`/#riusa`](https://www.cruscottosanvincenzo.it/#riusa)
 (tab **Progetto → Riusa / fork**). Redirect legacy: `/riusa`.
@@ -25,8 +26,9 @@ Env di esempio: [`.env.example`](../.env.example)
 9. [Passo F — Dominio e SEO](#9-passo-f--dominio-e-seo)
 10. [Catalogo variabili d’ambiente](#10-catalogo-variabili-dambiente)
 11. [Moduli opzionali](#11-moduli-opzionali)
-12. [Checklist finale e troubleshooting](#12-checklist-finale-e-troubleshooting)
-13. [Licenza e disclaimer](#13-licenza-e-disclaimer)
+12. [Usare Cursor o Claude sul fork](#12-usare-cursor-o-claude-sul-fork)
+13. [Checklist finale e troubleshooting](#13-checklist-finale-e-troubleshooting)
+14. [Licenza e disclaimer](#14-licenza-e-disclaimer)
 
 ---
 
@@ -90,6 +92,8 @@ Nessuno di questi (tranne GitHub + Vercel per pubblicare) è obbligatorio per l�
 | **Modal** | Hosting RAG (modelli HF) | Opzionale (assistente) | [modal.com](https://modal.com) → `modal setup` |
 | **Hugging Face** | Download pesi modelli (pubblici) | Di solito no token | [huggingface.co](https://huggingface.co) (account utile; modelli usati sono pubblici) |
 | **Wheelmap / Sozialhelden** | Embed iframe accessibilità | Opzionale | Contatta [info@sozialhelden.de](mailto:info@sozialhelden.de) — [widget](https://news.wheelmap.org/wheelmap-widget/) |
+| **Cursor** (opzionale) | IDE AI / Agent per adattare il fork | No | [cursor.com](https://cursor.com) |
+| **Claude** (opzionale) | Chat o Claude Code per adattare il fork | No | [claude.ai](https://claude.ai) |
 
 Fonti open **senza registrazione** usate dal progetto: Open-Meteo, RainViewer,
 ItaliaMeteo (via MCP), OpenStreetMap/Overpass, OpenAEDMap, ViaggiaTreno,
@@ -361,7 +365,49 @@ MVP onesto: **KPI nazionali + mappa + 1–2 fonti locali**.
 
 ---
 
-## 12. Checklist finale e troubleshooting
+## 12. Usare Cursor o Claude sul fork
+
+Cursor e Claude aiutano a **personalizzare il codice** (constants, asset, moduli).
+Non serve costruire un MCP del cruscotto: i KPI arrivano già dal MCP AgID.
+
+### Cursor
+
+1. Installa [Cursor](https://cursor.com) e apri la cartella del tuo fork
+2. `npm install && npm run dev`
+3. In chat Agent, esempi utili:
+   - *«Aggiorna `src/lib/constants.ts` per il comune X, ISTAT Y, coordinate lat/lon Z»*
+   - *«Sostituisci stemma e riferimenti a San Vincenzo con …»*
+   - *«Disattiva o adatta i pannelli porto / ARPAT / GTFS Toscana»*
+4. Il file [`AGENTS.md`](../AGENTS.md) orienta gli agent: progetto read-only lato
+   dati, smoke `curl localhost:3000/api/kpi`, niente database locale
+
+### Claude (chat o Claude Code)
+
+1. Apri il repo in Claude Code, oppure carica/incolla i file chiave in un Project
+2. Usa un brief fisso (Custom instructions / Project instructions), ad esempio:
+
+   > Fork del Cruscotto San Vincenzo per il Comune di …. ISTAT ….
+   > Stack Next.js 15 App Router. Identità in `src/lib/constants.ts`.
+   > Nessun DB. KPI da MCP AgID. Non rimuovere disclaimer e attribuzioni.
+   > Checklist: `config/comune.example.json` e `docs/riuso-fork.md`.
+
+3. Chiedi le stesse modifiche elencate per Cursor; verifica sempre con
+   `npm run lint` e lo smoke `/api/kpi`
+
+### Opzionale: MCP AgID nell’IDE
+
+Se vuoi interrogare i KPI **direttamente** da Cursor/Claude (oltre al sito),
+puoi aggiungere come server MCP l’URL pubblico AgID:
+
+`https://cruscotto-italia-mcp.agid.workers.dev/mcp`
+
+Tool tipici: `comune_kpi` / `comune_dashboard` con il tuo `istat_code`.
+Il formato dipende dal client (URL HTTP o bridge stdio). **Non** è necessario
+per far funzionare il cruscotto online.
+
+---
+
+## 13. Checklist finale e troubleshooting
 
 ### Prima di dichiarare “online”
 
@@ -389,7 +435,7 @@ MVP onesto: **KPI nazionali + mappa + 1–2 fonti locali**.
 
 ---
 
-## 13. Licenza e disclaimer
+## 14. Licenza e disclaimer
 
 Progetto **indipendente e non ufficiale**. Nel fork:
 

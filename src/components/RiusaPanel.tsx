@@ -90,6 +90,7 @@ const TOC: { id: string; label: string }[] = [
   { id: "minimo", label: "Identità comune" },
   { id: "env", label: "Variabili d’ambiente" },
   { id: "moduli", label: "Moduli opzionali" },
+  { id: "cursor-claude", label: "Cursor e Claude" },
   { id: "limiti", label: "Checklist e limiti" },
 ];
 
@@ -202,6 +203,14 @@ const ACCOUNTS: {
     href: "https://news.wheelmap.org/wheelmap-widget/",
     icon: { kind: "lucide", Icon: Accessibility },
   },
+  {
+    servizio: "Cursor / Claude",
+    aCosa: "IDE o chat AI per adattare il fork (opzionale)",
+    obbligatorio: "No",
+    dove: "cursor.com · claude.ai",
+    href: "https://cursor.com",
+    icon: { kind: "lucide", Icon: Sparkles },
+  },
 ];
 
 function AccountIconMark({ icon }: { icon: AccountIcon }) {
@@ -286,7 +295,7 @@ export function RiusaPanel() {
     <section>
       <SectionIntro
         title="Riusa questo cruscotto"
-        description={`Guida completa per duplicare lo stack su un altro comune: dall’account GitHub alla messa online su Vercel, con account esterni (Telegram, Modal, Hugging Face, …) e variabili d’ambiente. Non serve replicare ogni pannello locale di ${COMUNE_NOME}.`}
+        description={`Guida completa per duplicare lo stack su un altro comune: dall’account GitHub alla messa online su Vercel, account esterni, variabili d’ambiente e come usare Cursor o Claude per adattare il fork. Non serve replicare ogni pannello locale di ${COMUNE_NOME}.`}
       />
 
       <div className="max-w-3xl">
@@ -653,6 +662,48 @@ git branch -M main && git push -u origin main`}
           <p>
             Un MVP utile è spesso «KPI nazionali + mappa + 1–2 fonti locali», non
             la parità totale con {COMUNE_NOME}.
+          </p>
+        </Section>
+
+        <Section title="Usare Cursor o Claude" id="cursor-claude">
+          <p>
+            Cursor e Claude aiutano a personalizzare il fork (constants, stemma,
+            moduli locali).{" "}
+            <strong>Non serve costruire un MCP proprio</strong>: i KPI usano già
+            il MCP pubblico AgID.
+          </p>
+          <ul className="list-disc space-y-2 pl-5">
+            <li>
+              <strong>Cursor:</strong> apri la cartella del fork →{" "}
+              <code>npm install && npm run dev</code> → in Agent chiedi ad es.
+              «Aggiorna <code>constants.ts</code> per il comune X, ISTAT Y,
+              coordinate Z» o «adatta/rimuovi porto e ARPAT». Vedi{" "}
+              <code>AGENTS.md</code>.
+            </li>
+            <li>
+              <strong>Claude:</strong> Claude Code sul repo, oppure Project con
+              brief fisso: ISTAT, nome comune, «nessun DB, disclaimer da
+              mantenere, checklist in <code>docs/riuso-fork.md</code>».
+            </li>
+            <li>
+              <strong>Opzionale:</strong> in Cursor/Claude puoi anche collegare
+              l’MCP AgID (
+              <code>https://cruscotto-italia-mcp.agid.workers.dev/mcp</code>)
+              per interrogare i KPI dall’IDE — non è necessario per il sito
+              online.
+            </li>
+          </ul>
+          <p className="text-[var(--pa-muted)]">
+            Dettaglio e prompt di esempio: sezione 12 di{" "}
+            <a
+              className="underline"
+              href={GITHUB_DOCS_RIUSO_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              docs/riuso-fork.md
+            </a>
+            .
           </p>
         </Section>
 
