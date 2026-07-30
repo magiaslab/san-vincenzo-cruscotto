@@ -1,62 +1,447 @@
-# Riusare / forkare il Cruscotto
+# Riusare / forkare il Cruscotto — guida completa
 
-Guida breve per duplicare questo progetto per un altro comune italiano.
-La stessa guida è pubblicata in-app su [`/riusa`](../src/app/riusa/page.tsx) → `/riusa`.
+Guida passo-passo per duplicare questo progetto su un **altro comune italiano**,
+dall’account GitHub alla messa online su Vercel, con i servizi esterni opzionali
+(Telegram, Modal, Hugging Face, OpenWeather, …) e indicazioni per usare
+Cursor o Claude ad adattare il fork.
 
-## Cosa si ottiene dal fork
+La stessa guida è riassunta in-app su [`/#riusa`](https://www.cruscottosanvincenzo.it/#riusa)
+(tab **Progetto → Riusa / fork**). Redirect legacy: `/riusa`.
 
-- Stack Next.js 15 + TypeScript + Tailwind già pronto
-- Proxy `/api/*` verso MCP **Cruscotto Italia (AgID)** e altre fonti open
-- Shell dashboard (sidebar, KPI, mappe, grafici)
-- **Non** è un multi-tenant: un deploy = un comune
+Checklist dati: [`config/comune.example.json`](../config/comune.example.json)  
+Env di esempio: [`.env.example`](../.env.example)
 
-## Come duplicare
+---
 
-1. **Fork** su GitHub: <https://github.com/magiaslab/san-vincenzo-cruscotto/fork>
-2. Oppure **nuovo repo** vuoto + mirror:
-   ```bash
-   git clone --depth 1 https://github.com/magiaslab/san-vincenzo-cruscotto.git mio-cruscotto
-   cd mio-cruscotto
-   rm -rf .git
-   git init
-   git remote add origin git@github.com:TUO_USER/mio-cruscotto.git
-   git add -A && git commit -m "Fork iniziale cruscotto comunale"
-   git push -u origin main
-   ```
-3. Deploy su Vercel collegando il nuovo repo (preset Next.js).
+## Indice
 
-Riferimento checklist dati: [`config/comune.example.json`](../config/comune.example.json).
+1. [Due percorsi: principiante vs esperto](#1-due-percorsi-principiante-vs-esperto)
+2. [Cosa ottieni (e cosa no)](#2-cosa-ottieni-e-cosa-no)
+3. [Account e tool esterni](#3-account-e-tool-esterni)
+4. [Passo A — Account GitHub](#4-passo-a--account-github)
+5. [Passo B — Fork o mirror del repository](#5-passo-b--fork-o-mirror-del-repository)
+6. [Passo C — Ambiente locale](#6-passo-c--ambiente-locale)
+7. [Passo D — Identità del comune (minimo)](#7-passo-d--identità-del-comune-minimo)
+8. [Passo E — Deploy su Vercel](#8-passo-e--deploy-su-vercel)
+9. [Passo F — Dominio e SEO](#9-passo-f--dominio-e-seo)
+10. [Catalogo variabili d’ambiente](#10-catalogo-variabili-dambiente)
+11. [Moduli opzionali](#11-moduli-opzionali)
+12. [Usare Cursor o Claude sul fork](#12-usare-cursor-o-claude-sul-fork)
+13. [Checklist finale e troubleshooting](#13-checklist-finale-e-troubleshooting)
+14. [Licenza e disclaimer](#14-licenza-e-disclaimer)
 
-## Minimo per cambiare comune
+---
 
-In `src/lib/constants.ts` (e SEO correlato):
+## 1. Due percorsi: principiante vs esperto
 
-| Campo | Esempio SV | Dove |
-| --- | --- | --- |
-| `ISTAT_CODE` | `049018` | constants + MCP |
-| `COMUNE_NOME` / `PROVINCIA` / `REGIONE` | San Vincenzo / LI / Toscana | UI + SEO |
-| `MAP_CENTER`, `METEO_LAT/LON` | 43.085, 10.54 | mappe / meteo |
-| `MIUR_COMUNE_CATASTALE` | `I390` | scuole |
-| `FARMACIE_DI_TURNO_COD` | `49018` (= ISTAT senza 0) | farmacie |
-| Stemma | `public/stemma-*.png` | header |
-| `NEXT_PUBLIC_SITE_URL` | URL del tuo dominio | SEO / PWA |
+### Percorso rapido (MVP, ~mezz’ora di lavoro attivo)
 
-Poi: `npm install && npm run dev` → smoke test `curl -s localhost:3000/api/kpi`.
+Obiettivo: sito online con KPI AgID del tuo comune, senza bot né AI.
 
-## Moduli personalizzati (opzionali)
+1. Crea account **GitHub** e **Vercel** (gratis).
+2. **Fork** di questo repo.
+3. Su Vercel: Import Project → repo forkato → Deploy (nessuna env obbligatoria).
+4. In locale o direttamente su GitHub: modifica `src/lib/constants.ts`
+   (`ISTAT_CODE`, nome, coordinate, stemma).
+5. Push → Vercel ridistribuisce → apri l’URL `*.vercel.app`.
+6. Smoke test: `https://TUO-PROGETTO.vercel.app/api/kpi` deve mostrare
+   demografia del tuo codice ISTAT.
 
-Non obbligatori per un MVP. Cercare e adattare o disattivare:
+Fine. Il resto di questa guida è opzionale.
 
-| Area | Cosa guardare |
+### Percorso completo (esperto / produzione)
+
+Dopo l’MVP: dominio custom, OpenWeather, bot Telegram DAE, assistente RAG
+(Modal + Hugging Face), token GitHub per feedback/segnalazioni, Wheelmap,
+adattamento moduli regionali (ARPAT, GTFS, allerte).
+
+---
+
+## 2. Cosa ottieni (e cosa no)
+
+| Incluso | Non incluso |
 | --- | --- |
-| Allerte | `ALLERTA_METEO_*`, `src/app/api/meteo/allerte` |
-| Trasporti / treni | `scripts/build-trasporti-gtfs.mjs`, `FS_STAZIONE_*`, `/api/trasporti/treni` |
-| DAE | `scripts/sync-dae-geojson.mjs`, `public/data/dae-*.geojson`, bot Telegram |
-| Open data comunale | URL `ldpgis` / eventi / webcam porto |
-| Ambiente regionale | ARPAT, turismo Regione, GTFS regionale |
-| Assistente | `modal_rag/`, `ASSISTENTE_MODAL_URL` |
-| Copy | stringhe con il nome del comune in `src/lib/i18n/en.ts` e pannelli |
+| Next.js 15 + TypeScript + Tailwind | Multi-tenant (un deploy = un comune) |
+| Proxy `/api/*` → MCP Cruscotto Italia (AgID) | Backend/DB/auth locali |
+| Shell dashboard (sidebar, KPI, mappe, grafici) | Feature flag runtime (`comune.example.json` è solo checklist) |
+| Pannelli che degradano se manca la fonte | Parità automatica di ogni pannello SV |
 
-## Licenza e disclaimer
+Non serve costruire un MCP proprio per il fork: i KPI comunali arrivano già
+dal **MCP pubblico AgID** (`src/lib/mcp.ts` + codice ISTAT).
 
-Progetto indipendente non ufficiale. Mantieni attribuzioni AgID / fonti open e il disclaimer “non affiliato”. Vedi `/attribuzioni`.
+**Nucleo nazionale (funziona ovunque in Italia con codice ISTAT):** demografia,
+economia, scuole MIUR (catastale), finanza, ecc. via AgID.
+
+**Moduli “locali” di San Vincenzo:** porto/webcam, eventi Visit, ldpgis,
+balneazione ARPAT, GTFS Toscana, allerte regionali, bot DAE — vanno adattati
+o disattivati per il tuo territorio.
+
+---
+
+## 3. Account e tool esterni
+
+Nessuno di questi (tranne GitHub + Vercel per pubblicare) è obbligatorio per l’MVP.
+
+| Servizio | Serve a | Obbligatorio? | Registrazione |
+| --- | --- | --- | --- |
+| **GitHub** | Codice, fork, Issues (Partecipa), commit GeoJSON DAE | Sì per fork/deploy | [github.com/signup](https://github.com/signup) |
+| **Vercel** | Hosting Next.js (regione `fra1`) | Sì per online | [vercel.com/signup](https://vercel.com/signup) (login con GitHub) |
+| **AgID Cruscotto Italia MCP** | KPI comunali | No account: endpoint pubblico | `https://cruscotto-italia-mcp.agid.workers.dev/mcp` |
+| **OpenWeather** | Meteo current/forecast/AQI | Opzionale | [API keys](https://home.openweathermap.org/api_keys) |
+| **Telegram + BotFather** | Bot segnalazione DAE | Opzionale | App Telegram → chat [@BotFather](https://t.me/BotFather) |
+| **Modal** | Hosting RAG (modelli HF) | Opzionale (assistente) | [modal.com](https://modal.com) → `modal setup` |
+| **Hugging Face** | Download pesi modelli (pubblici) | Di solito no token | [huggingface.co](https://huggingface.co) (account utile; modelli usati sono pubblici) |
+| **Wheelmap / Sozialhelden** | Embed iframe accessibilità | Opzionale | Contatta [info@sozialhelden.de](mailto:info@sozialhelden.de) — [widget](https://news.wheelmap.org/wheelmap-widget/) |
+| **Cursor** (opzionale) | IDE AI / Agent per adattare il fork | No | [cursor.com](https://cursor.com) |
+| **Claude** (opzionale) | Chat o Claude Code per adattare il fork | No | [claude.ai](https://claude.ai) |
+
+Fonti open **senza registrazione** usate dal progetto: Open-Meteo, RainViewer,
+ItaliaMeteo (via MCP), OpenStreetMap/Overpass, OpenAEDMap, ViaggiaTreno,
+farmaciediturno.org, MIUR, ecc. — i relativi pannelli falliscono in modo
+indipendente se la fonte è giù.
+
+---
+
+## 4. Passo A — Account GitHub
+
+1. Vai su [github.com/signup](https://github.com/signup) e crea un account
+   (o usa un’organizzazione).
+2. Abilita **2FA** (Settings → Password and authentication): consigliato
+   prima di creare token.
+3. (Opzionale, più avanti) Personal Access Token:
+   - Settings → Developer settings → Personal access tokens
+   - Per **Partecipa** (crea issue): scope `issues` (write) sul tuo repo
+   - Per **persistenza DAE** su Vercel: scope `contents` (write) sul tuo repo
+   - Non committare mai il token: solo env su Vercel / `.env.local`
+
+---
+
+## 5. Passo B — Fork o mirror del repository
+
+### Opzione A — Fork (consigliata)
+
+1. Apri <https://github.com/magiaslab/san-vincenzo-cruscotto>
+2. Pulsante **Fork** → scegli account/org → Create fork
+3. Otterrai `https://github.com/TUO_USER/san-vincenzo-cruscotto` (o rinominalo)
+
+### Opzione B — Mirror in un repo nuovo
+
+```bash
+git clone --depth 1 https://github.com/magiaslab/san-vincenzo-cruscotto.git mio-cruscotto
+cd mio-cruscotto
+rm -rf .git
+git init
+git remote add origin git@github.com:TUO_USER/mio-cruscotto.git
+git add -A && git commit -m "Fork iniziale cruscotto comunale"
+git branch -M main
+git push -u origin main
+```
+
+Poi clona in locale il **tuo** remote e lavora lì.
+
+---
+
+## 6. Passo C — Ambiente locale
+
+Prerequisiti: **Node.js 20+** e npm (o pnpm/yarn).
+
+```bash
+git clone https://github.com/TUO_USER/TUO-REPO.git
+cd TUO-REPO
+npm install
+cp .env.example .env.local   # opzionale: lascia vuoto per l’MVP
+npm run dev
+```
+
+Apri <http://localhost:3000>. Smoke test nucleo:
+
+```bash
+curl -s localhost:3000/api/kpi | head -c 400
+```
+
+Deve rispondere JSON con anagrafica/demografia (dopo il cambio ISTAT:
+il tuo comune).
+
+Comandi utili: `npm run build`, `npm run lint` (unico quality gate oltre al build).
+
+---
+
+## 7. Passo D — Identità del comune (minimo)
+
+Usa [`config/comune.example.json`](../config/comune.example.json) come checklist:
+**non è caricato a runtime**. Copia i valori a mano.
+
+### File principale: `src/lib/constants.ts`
+
+| Campo | Esempio SV | Note |
+| --- | --- | --- |
+| `ISTAT_CODE` | `049018` | 6 cifre ISTAT; cuore delle chiamate MCP |
+| `COMUNE_NOME` / `COMUNE_PROVINCIA` / `COMUNE_REGIONE` | San Vincenzo / LI / Toscana | UI + SEO |
+| `MAP_CENTER`, `METEO_LAT` / `METEO_LON` | 43.085, 10.54 | Mappe e meteo |
+| `MIUR_COMUNE_CATASTALE` | `I390` | Scuole |
+| `FARMACIE_DI_TURNO_COD` | `49018` | ISTAT senza lo zero iniziale |
+| Stemma | `public/stemma-….png` + path in constants | Header / PWA |
+| Brand GitHub / URL | costanti `GITHUB_*`, deploy | Aggiorna al tuo fork |
+
+### Altri punti da aggiornare presto
+
+| Area | Dove |
+| --- | --- |
+| Host SEO di fallback | `src/lib/seo.ts` → `CANONICAL_HOST` |
+| Stazione FS (treni) | `src/lib/viaggiatreno.ts` |
+| OG image | `public/og-image.jpg` (o equivalente) |
+| GeoJSON / GTFS locali | `public/data/*` |
+| Copy con nome comune | pannelli, `src/lib/i18n/en.ts`, `assistente-faq.ts` |
+| Corpus RAG | `modal_rag/corpus/*` (se usi l’assistente) |
+
+Trovare il codice ISTAT: portale ISTAT / Wikipedia del comune / Cruscotto Italia.
+
+Dopo le modifiche: commit + push sul tuo repo.
+
+---
+
+## 8. Passo E — Deploy su Vercel
+
+1. Vai su [vercel.com](https://vercel.com) → **Add New… → Project**
+   (oppure usa il [Deploy Button](https://vercel.com/new/clone?repository-url=https://github.com/magiaslab/san-vincenzo-cruscotto)
+   sul repo / fork)
+2. Importa il repository forkato (autorizza GitHub se richiesto)
+3. Framework Preset: **Next.js** (già in `vercel.json`, region `fra1`)
+4. **Environment Variables**: per l’MVP lascia vuoto
+5. Deploy → attendi build → apri l’URL `https://….vercel.app`
+6. Verifica: `https://….vercel.app/api/kpi` e navigazione sidebar
+
+Ogni push su `main`/`master` (branch di produzione) ridistribuisce.
+CI GitHub: solo lint (`.github/workflows/lint.yml`), non il deploy.
+
+CLI alternativa:
+
+```bash
+npx vercel          # preview
+npx vercel --prod   # produzione
+```
+
+---
+
+## 9. Passo F — Dominio e SEO
+
+1. In Vercel → Project → **Settings → Domains** → aggiungi `tuodominio.it`
+   e/o `www.tuodominio.it`
+2. Configura DNS come indicato da Vercel (A / CNAME)
+3. Imposta su Vercel (Production):
+
+   ```bash
+   NEXT_PUBLIC_SITE_URL=https://www.tuodominio.it
+   ```
+
+   Le variabili `NEXT_PUBLIC_*` richiedono **redeploy** dopo il salvataggio.
+4. Aggiorna `CANONICAL_HOST` in `src/lib/seo.ts` se non usi solo l’env
+5. Controlla `/manifest.webmanifest`, Open Graph e che il footer punti al
+   tuo dominio/contatti
+
+---
+
+## 10. Catalogo variabili d’ambiente
+
+Vedi anche [`.env.example`](../.env.example). Su Vercel: Settings → Environment Variables.
+
+| Variabile | Obbligatoria | Servizio | Effetto se assente |
+| --- | --- | --- | --- |
+| _(nessuna)_ | — | AgID MCP | KPI funzionano comunque |
+| `NEXT_PUBLIC_SITE_URL` | Consigliata in prod | SEO / PWA / bot | Fallback a URL Vercel o host hardcoded |
+| `OPENWEATHER_API_KEY` | No | OpenWeather | `/api/meteo/openweather` in errore; restano Open-Meteo / ItaliaMeteo |
+| `ASSISTENTE_MODAL_URL` | No | Modal RAG | Usa default magiaslab (non adatto a un altro comune) |
+| `TELEGRAM_BOT_TOKEN` | Per bot DAE | Telegram | Webhook rifiuta; CTA poco utile |
+| `TELEGRAM_WEBHOOK_SECRET` | Consigliata | Auth webhook | Meno sicuro |
+| `TELEGRAM_ADMIN_CHAT_IDS` | Per moderazione | Telegram | Nessuna approvazione admin |
+| `NEXT_PUBLIC_TELEGRAM_BOT_URL` | No | Deep link CTA | Default bot SV |
+| `GITHUB_TOKEN` / `GH_TOKEN` | Per DAE su Vercel | GitHub Contents | Approvazioni DAE non persistono (filesystem efimero) |
+| `GITHUB_REPO` / `GITHUB_BRANCH` | No | GitHub | Default repo originale — **cambiali nel fork** |
+| `GITHUB_FEEDBACK_TOKEN` | No | GitHub Issues | Form Partecipa: fallback “apri issue” manuale |
+| `NEXT_PUBLIC_WHEELMAP_EMBED_TOKEN` | No | Wheelmap | Solo mappa OSM locale |
+| `TURISMO_CSV_FALLBACK_URL` | No | Turismo | Solo se CKAN in ritardo |
+
+**Non committare** `.env.local` né token. Mai in screenshot o issue pubbliche.
+
+---
+
+## 11. Moduli opzionali
+
+### 11.1 OpenWeather
+
+1. Registrati su OpenWeather → crea API key (piano free)
+2. Vercel: `OPENWEATHER_API_KEY=…` → Redeploy
+3. Verifica sezione Meteo / endpoint `/api/meteo/openweather`
+
+### 11.2 Bot Telegram DAE
+
+Dettaglio storico/analisi: [`docs/dae-telegram-bot.md`](dae-telegram-bot.md).
+Persistenza attuale: GeoJSON `public/data/dae-segnalazioni.geojson` + commit
+GitHub (non Upstash).
+
+1. In Telegram: [@BotFather](https://t.me/BotFather) → `/newbot` → salva il token
+2. Avvia il bot, scrivi `/start`, poi chiama
+   `https://api.telegram.org/bot<TOKEN>/getUpdates` e copia il tuo `chat.id`
+3. Env Vercel:
+
+   ```bash
+   TELEGRAM_BOT_TOKEN=…
+   TELEGRAM_WEBHOOK_SECRET=stringa-casuale-lunga
+   TELEGRAM_ADMIN_CHAT_IDS=123456789
+   NEXT_PUBLIC_TELEGRAM_BOT_URL=https://t.me/NomeDelTuoBot
+   GITHUB_TOKEN=ghp_…          # contents:write sul TUO repo
+   GITHUB_REPO=TUO_USER/TUO-REPO
+   GITHUB_BRANCH=master        # o main
+   ```
+
+4. Dopo il deploy, imposta il webhook:
+
+   ```bash
+   curl -X POST "https://api.telegram.org/bot<TOKEN>/setWebhook" \
+     -H 'content-type: application/json' \
+     -d '{
+       "url": "https://TUO-DOMINIO/api/telegram/webhook",
+       "secret_token": "STESSO_DI_TELEGRAM_WEBHOOK_SECRET"
+     }'
+   ```
+
+5. Locale senza webhook: `npm run telegram:poll` (serve `TELEGRAM_BOT_TOKEN`)
+6. Sync base DAE OSM: adatta lo script `dae:sync` al bbox/comune e rigenera
+   `public/data/dae-*.geojson`
+
+### 11.3 Assistente RAG (Modal + Hugging Face)
+
+Vedi [`modal_rag/README.md`](../modal_rag/README.md).
+
+1. Account [Modal](https://modal.com) → `pip install modal` → `modal setup`
+2. Adatta/rigenera il corpus per il tuo comune:
+
+   ```bash
+   npm run rag:corpus    # o: node modal_rag/build_corpus.mjs
+   ```
+
+3. Deploy:
+
+   ```bash
+   modal deploy modal_rag/app.py
+   ```
+
+4. Copia l’URL POST `…-web-ask.modal.run` in Vercel:
+
+   ```bash
+   ASSISTENTE_MODAL_URL=https://TUO_WORKSPACE--….modal.run
+   ```
+
+5. Aggiorna FAQ in `src/lib/assistente-faq.ts` (nome comune, link `#sezione`)
+6. **Non** lasciare il default che punta all’app Modal di San Vincenzo
+
+Hugging Face: i modelli (`paraphrase-multilingual-MiniLM-L12-v2`,
+`SmolLM2-360M-Instruct`) sono pubblici; Modal li scarica al cold start.
+Account HF opzionale; eventuale token HF solo se usi modelli gated.
+
+### 11.4 Partecipa (GitHub Issues)
+
+1. Token con `issues:write` sul tuo repo
+2. `GITHUB_TOKEN` o `GITHUB_FEEDBACK_TOKEN` + `GITHUB_REPO=TUO_USER/TUO-REPO`
+3. Senza token il form propone di aprire l’issue a mano sul browser
+
+### 11.5 Wheelmap
+
+1. Richiedi embed token a Sozialhelden
+2. `NEXT_PUBLIC_WHEELMAP_EMBED_TOKEN=…` → Redeploy
+3. Senza token resta la mappa accessibilità OSM locale
+
+### 11.6 Trasporti / treni / GTFS / allerte / turismo
+
+| Area | Cosa adattare |
+| --- | --- |
+| Treni | Codice stazione in `viaggiatreno.ts`; board `/api/trasporti/treni` |
+| GTFS bus | `scripts/build-trasporti-gtfs.mjs`, file in `public/data/` |
+| Allerte | `ALLERTA_METEO_*` in constants, `/api/meteo/allerte` |
+| ARPAT / turismo / eventi | URL regionali in constants; CKAN Toscana non è universale |
+| Porto / webcam | Pannelli e API `porto` — tipicamente da rimuovere fuori SV |
+
+MVP onesto: **KPI nazionali + mappa + 1–2 fonti locali**.
+
+---
+
+## 12. Usare Cursor o Claude sul fork
+
+Cursor e Claude aiutano a **personalizzare il codice** (constants, asset, moduli).
+Non serve costruire un MCP del cruscotto: i KPI arrivano già dal MCP AgID.
+
+### Cursor
+
+1. Installa [Cursor](https://cursor.com) e apri la cartella del tuo fork
+2. `npm install && npm run dev`
+3. In chat Agent, esempi utili:
+   - *«Aggiorna `src/lib/constants.ts` per il comune X, ISTAT Y, coordinate lat/lon Z»*
+   - *«Sostituisci stemma e riferimenti a San Vincenzo con …»*
+   - *«Disattiva o adatta i pannelli porto / ARPAT / GTFS Toscana»*
+4. Il file [`AGENTS.md`](../AGENTS.md) orienta gli agent: progetto read-only lato
+   dati, smoke `curl localhost:3000/api/kpi`, niente database locale
+
+### Claude (chat o Claude Code)
+
+1. Apri il repo in Claude Code, oppure carica/incolla i file chiave in un Project
+2. Usa un brief fisso (Custom instructions / Project instructions), ad esempio:
+
+   > Fork del Cruscotto San Vincenzo per il Comune di …. ISTAT ….
+   > Stack Next.js 15 App Router. Identità in `src/lib/constants.ts`.
+   > Nessun DB. KPI da MCP AgID. Non rimuovere disclaimer e attribuzioni.
+   > Checklist: `config/comune.example.json` e `docs/riuso-fork.md`.
+
+3. Chiedi le stesse modifiche elencate per Cursor; verifica sempre con
+   `npm run lint` e lo smoke `/api/kpi`
+
+### Opzionale: MCP AgID nell’IDE
+
+Se vuoi interrogare i KPI **direttamente** da Cursor/Claude (oltre al sito),
+puoi aggiungere come server MCP l’URL pubblico AgID:
+
+`https://cruscotto-italia-mcp.agid.workers.dev/mcp`
+
+Tool tipici: `comune_kpi` / `comune_dashboard` con il tuo `istat_code`.
+Il formato dipende dal client (URL HTTP o bridge stdio). **Non** è necessario
+per far funzionare il cruscotto online.
+
+---
+
+## 13. Checklist finale e troubleshooting
+
+### Prima di dichiarare “online”
+
+- [ ] Fork/mirror sul tuo GitHub
+- [ ] `ISTAT_CODE` e anagrafica aggiornati; smoke `/api/kpi` corretto
+- [ ] Stemma e nome in header/footer
+- [ ] Deploy Vercel verde
+- [ ] `NEXT_PUBLIC_SITE_URL` (e dominio) se non usi solo `*.vercel.app`
+- [ ] `GITHUB_REPO` aggiornato se usi Partecipa o bot DAE
+- [ ] Disclaimer “progetto non ufficiale” e tab Attribuzioni ancora presenti
+- [ ] Moduli SV non pertinenti: nascosti, adattati o lasciati degradare in modo chiaro
+- [ ] Nessun secret in git
+
+### Problemi frequenti
+
+| Sintomo | Cosa controllare |
+| --- | --- |
+| KPI vuoti / errore | Egress rete; endpoint MCP AgID; `ISTAT_CODE` valido |
+| Meteo OpenWeather ko | Chiave attiva (attivazione a volte ritardata) |
+| Assistente risponde di San Vincenzo | Hai lasciato `ASSISTENTE_MODAL_URL` di default → deploy Modal tuo + corpus |
+| Approvazione DAE “non trovata” / sparisce | Manca `GITHUB_TOKEN` con `contents:write` su Vercel |
+| Webhook Telegram 401 | `TELEGRAM_WEBHOOK_SECRET` ≠ `secret_token` di `setWebhook` |
+| Wheelmap iframe bianco | Token embed assente/bloccato |
+| SEO / OG sbagliati | `NEXT_PUBLIC_SITE_URL` + redeploy; cache social debugger |
+
+---
+
+## 14. Licenza e disclaimer
+
+Progetto **indipendente e non ufficiale**. Nel fork:
+
+- Mantieni attribuzioni AgID / fonti open (tab **Attribuzioni e regole**)
+- Mantieni il disclaimer di non affiliazione al Comune / AgID / Governo
+- Non presentare il sito come canale ufficiale dell’ente senza accordo
+
+Contatti riuso (autore originale): vedi footer del sito o repository GitHub.
+}

@@ -31,8 +31,9 @@ export const AUTHOR = {
 /** Repository e deploy di questo cruscotto. */
 export const GITHUB_REPO_URL =
   "https://github.com/magiaslab/san-vincenzo-cruscotto" as const;
+/** Deploy Button Vercel (clone del repo → nuovo progetto). Non usare URL dashboard team (spesso 404 se non autenticati). */
 export const VERCEL_DEPLOY_URL =
-  "https://vercel.com/magiaslab/san-vincenzo-cruscotto" as const;
+  "https://vercel.com/new/clone?repository-url=https://github.com/magiaslab/san-vincenzo-cruscotto" as const;
 
 /** Centro approssimativo del comune (per mappa iniziale). */
 export const MAP_CENTER: [number, number] = [43.085, 10.54];
