@@ -55,6 +55,7 @@ import { PartecipaPanel } from "@/components/PartecipaPanel";
 import { ComeFunzionaPanel } from "@/components/ComeFunzionaPanel";
 import { RiusaPanel } from "@/components/RiusaPanel";
 import { AttribuzioniPanel } from "@/components/AttribuzioniPanel";
+import { ServiziUtiliCards } from "@/components/ServiziUtiliCards";
 import { TurismoFlussiPanel } from "@/components/TurismoFlussiPanel";
 import { RischioPanel } from "@/components/RischioPanel";
 import { OmiPanel } from "@/components/OmiPanel";
@@ -496,6 +497,11 @@ function Panoramica({
           </button>
         ))}
       </div>
+
+      <ServiziUtiliCards
+        onNavigate={onNavigate}
+        meteoFallback={asRecord(kpi.meteo_italiameteo)}
+      />
 
       <h3 className="mb-2 mt-0 text-sm font-bold text-[var(--pa-ink)]">
         {t("Instantanea del comune")}
