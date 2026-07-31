@@ -136,12 +136,16 @@ export function AppShell({
   );
 
   const nav = (
-    <nav aria-label={t("Sezioni del cruscotto")} className="flex h-full flex-col">
+    <nav
+      aria-label={t("Sezioni del cruscotto")}
+      className="flex min-h-0 flex-1 flex-col"
+    >
       <div className="hidden shrink-0 border-b border-[var(--pa-border)] lg:block">
         {brandBlock}
       </div>
 
-      <div className="flex-1 space-y-3 overflow-y-auto p-2 pt-3">
+      {/* min-h-0: senza, il flex non restringe e overflow-y non arriva alle ultime voci */}
+      <div className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain p-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
         {groups.map((group) => (
           <div key={group.label}>
             <p className="m-0 px-3 pb-1 text-[11px] font-bold uppercase tracking-wide text-[var(--pa-muted)]">
@@ -181,7 +185,7 @@ export function AppShell({
       <SkipLink />
 
       <div className="flex min-h-0 flex-1">
-        <aside className="sticky top-0 z-30 hidden h-screen w-64 shrink-0 border-r border-[var(--pa-border)] bg-[var(--pa-surface)] lg:block">
+        <aside className="sticky top-0 z-30 hidden h-dvh max-h-dvh w-64 shrink-0 flex-col overflow-hidden border-r border-[var(--pa-border)] bg-[var(--pa-surface)] lg:flex">
           {nav}
         </aside>
 
@@ -198,9 +202,9 @@ export function AppShell({
               role="dialog"
               aria-modal="true"
               aria-label={t("Menu sezioni")}
-              className="absolute inset-y-0 left-0 flex w-[min(18rem,88vw)] flex-col bg-[var(--pa-surface)] shadow-xl"
+              className="absolute inset-y-0 left-0 flex max-h-dvh w-[min(18rem,88vw)] flex-col overflow-hidden bg-[var(--pa-surface)] shadow-xl"
             >
-              <div className="flex h-[var(--shell-topbar-h)] items-center justify-between border-b border-[var(--pa-border)] px-3">
+              <div className="flex h-[var(--shell-topbar-h)] shrink-0 items-center justify-between border-b border-[var(--pa-border)] px-3">
                 <span className="text-sm font-bold text-[var(--pa-ink)]">{t("Menu")}</span>
                 <button
                   ref={closeBtnRef}
