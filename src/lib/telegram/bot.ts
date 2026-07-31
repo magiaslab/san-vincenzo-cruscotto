@@ -234,14 +234,15 @@ async function handleUbicazioneReply(msg: TelegramMessage) {
   const saved = await upsertSegnalazione(feature);
 
   if (!saved.ok) {
-    console.error("upsertSegnalazione failed", id, saved.via);
+    console.error("upsertSegnalazione failed", id, saved.via, saved.detail);
     await notifyAdmins(
       [
         "<b>⚠️ Segnalazione DAE NON salvata</b>",
         `ID: <code>${id}</code>`,
         `Ubicazione: ${ubicazione}`,
         `Coord: <code>${coords.lat.toFixed(6)}, ${coords.lon.toFixed(6)}</code>`,
-        "Persistenza fallita (serve GITHUB_TOKEN con contents:write su Vercel).",
+        `Dettaglio: ${saved.detail ?? saved.via}`,
+        "Serve <code>GITHUB_TOKEN</code> con <code>issues:write</code> su Vercel.",
       ].join("\n"),
     );
     await sendMessage(
@@ -271,8 +272,18 @@ async function handleUbicazioneReply(msg: TelegramMessage) {
   const notified = await notifyAdmins(adminText, {
     inline_keyboard: [
       [
-        { text: "✅ Approva overlay", callback_data: `dae:ok:${id}` },
-        { text: "❌ Rifiuta", callback_data: `dae:no:${id}` },
+        {
+          text: "✅ Approva overlay",
+          callback_data: saved.issueNumber
+            ? `dae:ok:${id}:${saved.issueNumber}`
+            : `dae:ok:${id}`,
+        },
+        {
+          text: "❌ Rifiuta",
+          callback_data: saved.issueNumber
+            ? `dae:no:${id}:${saved.issueNumber}`
+            : `dae:no:${id}`,
+        },
       ],
       [{ text: "🗺️ Apri mappa", url: feature.properties.osm_url }],
     ],
@@ -296,7 +307,7 @@ async function handleUbicazioneReply(msg: TelegramMessage) {
 
 async function handleCallback(cq: TelegramCallbackQuery) {
   const data = cq.data ?? "";
-  const m = data.match(/^dae:(ok|no):(.+)$/);
+  const m = data.match(/^dae:(ok|no):([^:]+)(?::(\d+))?$/);
   if (!m || !cq.message) {
     await answerCallbackQuery(cq.id);
     return;
@@ -306,17 +317,23 @@ async function handleCallback(cq: TelegramCallbackQuery) {
     await answerCallbackQuery(cq.id, "Solo moderatori");
     return;
   }
-  const [, action, id] = m;
+  const [, action, id, issueNumRaw] = m;
+  const issueNumber = issueNumRaw ? Number(issueNumRaw) : undefined;
   const status = action === "ok" ? "approved_overlay" : "rejected";
-  const feat = await setSegnalazioneStatus(id, status);
+  const feat = await setSegnalazioneStatus(
+    id,
+    status,
+    undefined,
+    Number.isFinite(issueNumber) ? issueNumber : undefined,
+  );
   if (!feat) {
     await answerCallbackQuery(cq.id, "Segnalazione non trovata");
     await sendMessage(
       chatId,
       [
         `Segnalazione <code>${id}</code> non trovata nello store (o persistenza fallita).`,
-        "Su Vercel serve <code>GITHUB_TOKEN</code> con permesso <code>contents:write</code>;",
-        "senza token le segnalazioni non sopravvivono tra una richiesta e l’altra.",
+        "Su Vercel serve <code>GITHUB_TOKEN</code> con permesso <code>issues:write</code>",
+        "(le segnalazioni sono salvate come GitHub Issues con label <code>dae-segnalazione</code>).",
       ].join("\n"),
     );
     return;

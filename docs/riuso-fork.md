@@ -289,7 +289,7 @@ GitHub (non Upstash).
    TELEGRAM_WEBHOOK_SECRET=stringa-casuale-lunga
    TELEGRAM_ADMIN_CHAT_IDS=123456789
    NEXT_PUBLIC_TELEGRAM_BOT_URL=https://t.me/NomeDelTuoBot
-   GITHUB_TOKEN=ghp_…          # contents:write sul TUO repo
+   GITHUB_TOKEN=ghp_…          # issues:write sul TUO repo
    GITHUB_REPO=TUO_USER/TUO-REPO
    GITHUB_BRANCH=master        # o main
    ```
@@ -428,7 +428,7 @@ per far funzionare il cruscotto online.
 | KPI vuoti / errore | Egress rete; endpoint MCP AgID; `ISTAT_CODE` valido |
 | Meteo OpenWeather ko | Chiave attiva (attivazione a volte ritardata) |
 | Assistente risponde di San Vincenzo | Hai lasciato `ASSISTENTE_MODAL_URL` di default → deploy Modal tuo + corpus |
-| Approvazione DAE “non trovata” / sparisce | Manca `GITHUB_TOKEN` con `contents:write` su Vercel |
+| Approvazione DAE “non trovata” / sparisce | Manca `GITHUB_TOKEN` con `issues:write` su Vercel |
 | Webhook Telegram 401 | `TELEGRAM_WEBHOOK_SECRET` ≠ `secret_token` di `setWebhook` |
 | Wheelmap iframe bianco | Token embed assente/bloccato |
 | SEO / OG sbagliati | `NEXT_PUBLIC_SITE_URL` + redeploy; cache social debugger |
