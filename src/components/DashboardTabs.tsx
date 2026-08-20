@@ -50,6 +50,7 @@ import { FarmacieTurno } from "@/components/FarmacieTurno";
 import { Footer } from "@/components/Footer";
 import { ScuoleMiurPanel } from "@/components/ScuoleMiurPanel";
 import { AllerteMeteoPanel } from "@/components/AllerteMeteoPanel";
+import { AllertaHomeBanner } from "@/components/AllertaHomeBanner";
 import { TrasportiPanel } from "@/components/TrasportiPanel";
 import { PartecipaPanel } from "@/components/PartecipaPanel";
 import { ComeFunzionaPanel } from "@/components/ComeFunzionaPanel";
@@ -412,6 +413,8 @@ function Panoramica({
         title={t("Cosa ti serve oggi?")}
         description={`${t("Dati aperti di")} ${String(anagrafica?.nome ?? "San Vincenzo")}: ${t("parti dai servizi utili, poi esplora le sezioni dedicate.")}`}
       />
+
+      <AllertaHomeBanner onOpenMeteo={() => onNavigate("meteo")} />
 
       <div className="mb-5 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
         {(
