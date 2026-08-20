@@ -460,6 +460,11 @@ export const en: Record<string, string> = {
   "Progetto non ufficiale: non affiliato ad AgID, al Governo italiano o al Comune di San Vincenzo.": "Unofficial project: not affiliated with AgID, the Italian Government, or the Municipality of San Vincenzo.",
   "Provincia": "Province",
   "Provincia di Livorno": "Province of Livorno",
+  "Provincia di": "Province of",
+  "Aria, raccolta differenziata e consumo di suolo.":
+    "Air quality, separate waste collection and land consumption.",
+  "Aria e rifiuti da fonti open; stazioni ISPRA più vicine se assenti in comune.":
+    "Air and waste from open sources; nearest ISPRA stations if none in the municipality.",
   "punti georeferenziati (anagrafe Ministero della Salute).": "georeferenced points (Ministry of Health registry).",
   "Punti ricarica EV": "EV charging points",
   "Qual è la copertura FTTH?": "What is the FTTH coverage?",

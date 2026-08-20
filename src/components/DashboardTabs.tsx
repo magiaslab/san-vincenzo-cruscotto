@@ -218,7 +218,7 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    label: "Territorio e mare",
+    label: "Territorio",
     items: [
       { id: "turismo", label: "Turismo", Icon: Palmtree },
       { id: "porto", label: "Porto", Icon: Ship },
@@ -2515,14 +2515,23 @@ function Ambiente({ kpi }: { kpi: Kpi }) {
     let cancelled = false;
     setLoading(true);
 
-    Promise.all([
-      fetch("/api/arpat/balneazione").then((r) => (r.ok ? r.json() : null)),
-      fetch("/api/arpat/aria").then((r) => (r.ok ? r.json() : null)),
-    ])
+    const tasks: Promise<unknown>[] = [
+      isFeatureEnabled("balneazione")
+        ? fetch("/api/arpat/balneazione").then((r) => (r.ok ? r.json() : null))
+        : Promise.resolve(null),
+      isFeatureEnabled("arpat_aria")
+        ? fetch("/api/arpat/aria").then((r) => (r.ok ? r.json() : null))
+        : Promise.resolve(null),
+    ];
+    Promise.all(tasks)
       .then(([baln, ar]) => {
         if (!cancelled) {
-          setBalneazione(baln);
-          setAria(ar);
+          setBalneazione(
+            isFeatureEnabled("balneazione")
+              ? (baln as Record<string, unknown> | null)
+              : null,
+          );
+          setAria(ar as Record<string, unknown> | null);
         }
       })
       .catch((err) => {
@@ -2556,30 +2565,50 @@ function Ambiente({ kpi }: { kpi: Kpi }) {
     <section>
       <SectionIntro
         title={t("Ambiente")}
-        description={t("Balneazione ARPAT, aria, raccolta differenziata e consumo di suolo.")}
-        sourceNote={t(
-          "Aria: nessuna stazione ISPRA nel comune — mostriamo le più vicine. Balneazione: stagione ARPAT.",
-        )}
+        description={
+          isFeatureEnabled("balneazione")
+            ? t("Balneazione ARPAT, aria, raccolta differenziata e consumo di suolo.")
+            : t("Aria, raccolta differenziata e consumo di suolo.")
+        }
+        sourceNote={
+          isFeatureEnabled("balneazione")
+            ? t(
+                "Aria: nessuna stazione ISPRA nel comune — mostriamo le più vicine. Balneazione: stagione ARPAT.",
+              )
+            : t(
+                "Aria e rifiuti da fonti open; stazioni ISPRA più vicine se assenti in comune.",
+              )
+        }
       />
 
       <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
-        <KpiCard
-          label={t("Aree balneazione")}
-          value={valueOrMissing(balneazione?.aree_totali, formatInteger)}
-          hint={`${formatDecimal(num(balneazione?.km_costa_controllati), 1)} km costa`}
-          icon={Waves}
-          variant="info"
-        />
-        <KpiCard
-          label={t("Classificazione eccellente")}
-          value={valueOrMissing(
-            balneazione?.classificazione_eccellente_pct,
-            formatPercent,
-          )}
-          hint={`Anno ${String(balneazione?.anno ?? "2024")}`}
-          icon={Droplets}
-          variant="success"
-        />
+        {isFeatureEnabled("balneazione") ? (
+          <>
+            <KpiCard
+              label={t("Aree balneazione")}
+              value={valueOrMissing(balneazione?.aree_totali, formatInteger)}
+              hint={`${formatDecimal(num(balneazione?.km_costa_controllati), 1)} km costa`}
+              icon={Waves}
+              variant="info"
+            />
+            <KpiCard
+              label={t("Classificazione eccellente")}
+              value={valueOrMissing(
+                balneazione?.classificazione_eccellente_pct,
+                formatPercent,
+              )}
+              hint={`Anno ${String(balneazione?.anno ?? "2024")}`}
+              icon={Droplets}
+              variant="success"
+            />
+            <KpiCard
+              label={t("Superamenti limiti 2024")}
+              value={valueOrMissing(balneazione?.superamenti_2024, formatInteger)}
+              icon={Droplets}
+              variant={num(balneazione?.superamenti_2024) === 0 ? "success" : "warning"}
+            />
+          </>
+        ) : null}
         <KpiCard
           label={t("Raccolta differenziata")}
           value={valueOrMissing(ambiente?.raccolta_differenziata_pct, formatPercent)}
@@ -2599,12 +2628,6 @@ function Ambiente({ kpi }: { kpi: Kpi }) {
           variant="warning"
         />
         <KpiCard
-          label={t("Superamenti limiti 2024")}
-          value={valueOrMissing(balneazione?.superamenti_2024, formatInteger)}
-          icon={Droplets}
-          variant={num(balneazione?.superamenti_2024) === 0 ? "success" : "warning"}
-        />
-        <KpiCard
           label={t("Stazione qualità aria")}
           value={
             aria?.disponibile === false || ariaKpi?.ha_stazione === false
@@ -2615,7 +2638,6 @@ function Ambiente({ kpi }: { kpi: Kpi }) {
           icon={Wind}
         />
       </div>
-
       {loading || loadingTerr ? <LoadingBlock label={t("Caricamento dati ambientali…")} /> : null}
 
       <div className="mb-4 grid gap-3 sm:gap-4 lg:grid-cols-2">
