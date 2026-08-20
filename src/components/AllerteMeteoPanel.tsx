@@ -25,7 +25,12 @@ type DayNorm = {
     idraulico: string | null;
     temporali: string | null;
     idrogeologico: string | null;
+    vento?: string | null;
+    mareggiate?: string | null;
+    neve?: string | null;
+    ghiaccio?: string | null;
   };
+  rischi_attivi?: string[];
 };
 
 type AllertePayload = {
@@ -111,6 +116,10 @@ function DayCard({
             [t("Idraulico"), day.dettagli.idraulico],
             [t("Temporali"), day.dettagli.temporali],
             [t("Idrogeologico"), day.dettagli.idrogeologico],
+            [t("Vento"), day.dettagli.vento],
+            [t("Mareggiate"), day.dettagli.mareggiate],
+            [t("Neve"), day.dettagli.neve],
+            [t("Ghiaccio"), day.dettagli.ghiaccio],
           ] as const
         ).map(([label, value]) => (
           <div key={label} className="grid gap-0.5 sm:grid-cols-[8rem_1fr]">
@@ -123,7 +132,7 @@ function DayCard({
   );
 }
 
-/** Sezione allerte Protezione Civile per San Vincenzo (zona Etruria-Costa Nord). */
+/** Sezione allerte DPC + Regione Toscana per San Vincenzo (zona E2 / Etruria-Costa Nord). */
 export function AllerteMeteoPanel() {
   const t = useT();
   const [data, setData] = useState<AllertePayload | null>(null);
@@ -176,7 +185,7 @@ export function AllerteMeteoPanel() {
                   aria-hidden
                 />
               )}
-              {t("Allerte Protezione Civile")}
+              {t("Allerte meteo")}
             </h3>
             <p className="mb-0 mt-1 text-xs text-[var(--pa-muted)] sm:text-sm">
               {t("San Vincenzo")}
