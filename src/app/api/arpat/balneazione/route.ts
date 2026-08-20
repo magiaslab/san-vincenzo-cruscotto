@@ -1,17 +1,29 @@
 import { NextResponse } from "next/server";
+import { COMUNE_NOME, COMUNE_PROVINCIA } from "@/lib/constants";
+import { isFeatureEnabled } from "@/lib/comune-config";
 
 const CACHE_DURATION = 3600; // 1 ora
 
 export async function GET() {
+  if (!isFeatureEnabled("balneazione")) {
+    return NextResponse.json(
+      {
+        disponibile: false,
+        aree: [],
+        error: "Modulo balneazione disattivato per questo comune",
+      },
+      { status: 404 },
+    );
+  }
+
   try {
-    // Dati balneazione ARPAT per San Vincenzo
-    // La banca dati è disponibile ma richiede parsing HTML o download CSV
-    // Per ora restituiamo un placeholder con struttura dati
+    // Placeholder strutturato: in produzione va sostituito con scrape/CSV ARPAT
+    // o fonte regionale equivalente configurata in regione_opendata.
     
     const data = {
       anno: 2024,
-      comune: "San Vincenzo",
-      provincia: "Livorno",
+      comune: COMUNE_NOME,
+      provincia: COMUNE_PROVINCIA,
       aree_totali: 3,
       km_costa_controllati: 4.2,
       classificazione_eccellente_pct: 100,

@@ -9,11 +9,17 @@ import { inflateSync } from "node:zlib";
  * SIR `risks_395/{YYYYMMDD}_{rischio}.png` nel centroid della zona E2.
  */
 
-export const TOSCANA_ZONE_E2 = "E2" as const;
-export const TOSCANA_ZONE_LABEL = "Etruria-Costa Nord" as const;
+import { COMUNE } from "@/lib/comune-config";
 
-/** Centroid poligono E2 sulla mappa SIR 250×264 (usemap Regione Toscana). */
-export const E2_SAMPLE = { x: 98, y: 152 } as const;
+export const TOSCANA_ZONE_E2 = (COMUNE.allerte.toscana_zona || "E2") as string;
+export const TOSCANA_ZONE_LABEL =
+  COMUNE.allerte.toscana_zona_label || "Etruria-Costa Nord";
+
+/** Centroid poligono zona sulla mappa SIR 250×264 (usemap Regione Toscana). */
+export const E2_SAMPLE = {
+  x: COMUNE.allerte.toscana_sample[0] ?? 98,
+  y: COMUNE.allerte.toscana_sample[1] ?? 152,
+} as const;
 
 export const SIR_RISKS_BASE =
   "https://www.sir.toscana.it/supports/images/risks_395" as const;

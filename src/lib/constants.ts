@@ -1,21 +1,28 @@
+import {
+  allertameteoApiUrl,
+  allertameteoPageUrl,
+  COMUNE,
+  getForkMaintainer,
+  isUpstreamDeploy,
+} from "@/lib/comune-config";
+import { PROJECT_ORIGIN } from "@/lib/project-origin";
+
 export const STEMMA = {
-  src: "/stemma-san-vincenzo.png",
-  width: 399,
-  height: 500,
-  alt: "Stemma del Comune di San Vincenzo",
-  attribution:
-    "Stemma di San Vincenzo, disegno di Massimo Ghirardi, per gentile concessione di Araldicacivica.it — CC BY-NC-ND 3.0 IT",
-  licenseUrl: "https://creativecommons.org/licenses/by-nc-nd/3.0/it/",
-  sourceUrl:
-    "https://upload.wikimedia.org/wikipedia/it/8/81/San_Vincenzo_%28Italia%29-Stemma.png",
+  src: COMUNE.brand.stemma_path,
+  width: COMUNE.brand.stemma_width,
+  height: COMUNE.brand.stemma_height,
+  alt: COMUNE.brand.stemma_alt,
+  attribution: COMUNE.brand.stemma_attribution,
+  licenseUrl: COMUNE.brand.stemma_license_url,
+  sourceUrl: COMUNE.brand.stemma_source_url,
 } as const;
 
-/** Codice ISTAT del Comune di San Vincenzo (LI) — unico comune supportato. */
-export const ISTAT_CODE = "049018" as const;
+/** Codice ISTAT del comune configurato in `config/comune.json`. */
+export const ISTAT_CODE = COMUNE.istat_code;
 
-export const COMUNE_NOME = "San Vincenzo";
-export const COMUNE_PROVINCIA = "LI";
-export const COMUNE_REGIONE = "Toscana";
+export const COMUNE_NOME = COMUNE.nome;
+export const COMUNE_PROVINCIA = COMUNE.provincia;
+export const COMUNE_REGIONE = COMUNE.regione;
 
 export const MCP_ENDPOINT = "https://cruscotto-italia-mcp.agid.workers.dev/mcp";
 
@@ -23,27 +30,41 @@ export const CRUSCOTTO_ITALIA_URL = "https://cruscotto-italia.dati.gov.it/";
 export const OSM_COPYRIGHT_URL = "https://www.openstreetmap.org/copyright";
 export const CATASTO_GEOJSON_URL = `https://cruscotto-italia.dati.gov.it/data/catasto_full/${ISTAT_CODE}_ple.geojson.gz`;
 
+/**
+ * Contatti “locali” del deploy: autore originale sull’upstream,
+ * maintainer del fork altrimenti (fallback all’autore originale).
+ */
+const forkMaintainer = getForkMaintainer();
 export const AUTHOR = {
-  name: "Alessandro Cipriani",
-  email: "cipriani.alessandro@gmail.com",
+  name:
+    !isUpstreamDeploy() && forkMaintainer?.name
+      ? forkMaintainer.name
+      : PROJECT_ORIGIN.author.name,
+  email:
+    !isUpstreamDeploy() && forkMaintainer?.email
+      ? forkMaintainer.email
+      : PROJECT_ORIGIN.author.email,
 } as const;
 
-/** Repository e deploy di questo cruscotto. */
-export const GITHUB_REPO_URL =
-  "https://github.com/magiaslab/san-vincenzo-cruscotto" as const;
-/** Deploy Button Vercel (clone del repo → nuovo progetto). Non usare URL dashboard team (spesso 404 se non autenticati). */
-export const VERCEL_DEPLOY_URL =
-  "https://vercel.com/new/clone?repository-url=https://github.com/magiaslab/san-vincenzo-cruscotto" as const;
+/** Repository del progetto ORIGINALE (fork button, docs, attribuzioni). */
+export const GITHUB_REPO_URL = PROJECT_ORIGIN.github_repo_url;
+/** Deploy Button Vercel → clone del repo originale. */
+export const VERCEL_DEPLOY_URL = PROJECT_ORIGIN.vercel_deploy_url;
+
+/** Repo GitHub di QUESTO deploy (Issues Partecipa / DAE). Default = origin. */
+export const GITHUB_FORK_REPO_URL =
+  (!isUpstreamDeploy() && forkMaintainer?.github_repo_url) ||
+  PROJECT_ORIGIN.github_repo_url;
 
 /** Centro approssimativo del comune (per mappa iniziale). */
-export const MAP_CENTER: [number, number] = [43.085, 10.54];
-export const MAP_DEFAULT_ZOOM = 13;
+export const MAP_CENTER: [number, number] = COMUNE.geo.map_center;
+export const MAP_DEFAULT_ZOOM = COMUNE.geo.map_default_zoom;
 
-/** Mappa globale OpenAEDMap centrata su San Vincenzo. */
-export const OPENAEDMAP_URL = "https://openaedmap.org/it/#map=14/43.085/10.54";
+/** Mappa globale OpenAEDMap centrata sul comune. */
+export const OPENAEDMAP_URL = `https://openaedmap.org/it/#map=14/${MAP_CENTER[0]}/${MAP_CENTER[1]}`;
 
 /** GeoJSON locale dei DAE comunali (export OpenStreetMap / OpenAEDMap). */
-export const DAE_GEOJSON_PATH = "/data/dae-san-vincenzo.geojson";
+export const DAE_GEOJSON_PATH = COMUNE.urls.dae_geojson;
 
 /**
  * Deep-link bot Telegram per segnalare nuovi DAE.
@@ -57,8 +78,8 @@ export const TELEGRAM_DAE_BOT_URL =
 export const DAE_SEGNALAZIONI_API = "/api/dae/segnalazioni";
 
 /** Coordinate meteo (centro comune) per Open-Meteo / overlay radar. */
-export const METEO_LAT = 43.085;
-export const METEO_LON = 10.54;
+export const METEO_LAT = COMUNE.geo.meteo[0];
+export const METEO_LON = COMUNE.geo.meteo[1];
 
 export const OPEN_METEO_URL = "https://api.open-meteo.com/v1/forecast";
 export const OPEN_METEO_ATTRIBUTION_URL = "https://open-meteo.com/";
@@ -70,15 +91,15 @@ export const RAINVIEWER_ATTRIBUTION_URL = "https://www.rainviewer.com/";
 export const OPENWEATHER_BASE_URL = "https://api.openweathermap.org/data/2.5";
 export const OPENWEATHER_ATTRIBUTION_URL = "https://openweathermap.org/";
 
-/** Allerte meteo-idro Protezione Civile (San Vincenzo → zona Etruria-Costa Nord / E2). */
+/** Allerte meteo-idro Protezione Civile (comune configurato). */
 export const ALLERTA_METEO_APP_URL = "https://allertameteo.app/" as const;
-export const ALLERTA_METEO_SV_PAGE_URL =
-  "https://allertameteo.app/toscana/livorno/san-vincenzo" as const;
-export const ALLERTA_METEO_SV_API_URL =
-  "https://allertameteo.app/api/alert/San%20Vincenzo" as const;
-export const CFR_TOSCANA_URL = "https://www.cfr.toscana.it/" as const;
+export const ALLERTA_METEO_SV_PAGE_URL = allertameteoPageUrl();
+export const ALLERTA_METEO_SV_API_URL = allertameteoApiUrl();
+export const CFR_TOSCANA_URL =
+  COMUNE.regione_opendata.cfr_url || "https://www.cfr.toscana.it/";
 export const REGIONE_TOSCANA_ALLERTA_URL =
-  "https://www.regione.toscana.it/allertameteo" as const;
+  COMUNE.regione_opendata.allerta_url ||
+  "https://www.regione.toscana.it/allertameteo";
 export const DPC_CRITICITA_REPO_URL =
   "https://github.com/pcm-dpc/DPC-Bollettini-Criticita-Idrogeologica-Idraulica" as const;
 export const DPC_ALLERTAMENTO_URL =
@@ -100,7 +121,7 @@ export const CHART_COLORS = [
   "#1A5276",
 ] as const;
 
-/** Lookup minimi per comuni frequenti nel pendolarismo di San Vincenzo. */
+/** Lookup minimi per comuni frequenti nel pendolarismo (estendibile nel fork). */
 export const COMUNI_LOOKUP: Record<string, string> = {
   "049001": "Bibbona",
   "049002": "Campiglia Marittima",
@@ -115,25 +136,23 @@ export const COMUNI_LOOKUP: Record<string, string> = {
   "048017": "Follonica",
   "050026": "Pisa",
   "053009": "Grosseto",
+  "051004": "Bibbiena",
+  "051017": "Poppi",
+  "051002": "Arezzo",
 };
 
-/** URL fonti open data aggiuntive */
-export const SAN_VINCENZO_OPENDATA_URL = "https://cloud.ldpgis.it/sanvincenzoopen/";
-export const COMUNE_SAN_VINCENZO_URL = "https://www.comune.sanvincenzo.li.it/";
-export const COMUNE_EVENTI_URL =
-  "https://www.comune.sanvincenzo.li.it/Vivere-il-comune/Eventi";
-export const VISIT_SAN_VINCENZO_EVENTI_URL =
-  "https://visitsanvincenzo.it/it/calendario-eventi/";
-export const BIBLIOTECA_COMUNALE_URL =
-  "https://www.comune.sanvincenzo.li.it/Vivere-il-comune/Luoghi/Biblioteca-Comunale-Giorgio-Calandra";
-export const BIBLIOTECA_OPAC_URL =
-  "https://opacsol.comune.livorno.it/SebinaOpac/library/SAN%20VINCENZO%20-%20Biblioteca%20comunale/LIASA";
-export const ARPAT_BASE_URL = "https://www.arpat.toscana.it";
-export const ARPAT_OPENDATA_URL = "https://www.arpat.toscana.it/opendata";
-export const ARPAT_BALNEAZIONE_URL =
-  "https://www.arpat.toscana.it/tema-ambientale/balneazione/";
-export const REGIONE_TOSCANA_OPENDATA_URL = "https://dati.toscana.it/";
-export const REGIONE_TOSCANA_CKAN_API = "https://dati.toscana.it/api/3/action";
+/** URL fonti open data aggiuntive (da `config/comune.json`). */
+export const SAN_VINCENZO_OPENDATA_URL = COMUNE.urls.opendata;
+export const COMUNE_SAN_VINCENZO_URL = COMUNE.urls.comune;
+export const COMUNE_EVENTI_URL = COMUNE.urls.eventi_comune;
+export const VISIT_SAN_VINCENZO_EVENTI_URL = COMUNE.urls.eventi_calendario;
+export const BIBLIOTECA_COMUNALE_URL = COMUNE.urls.biblioteca;
+export const BIBLIOTECA_OPAC_URL = COMUNE.urls.biblioteca_opac;
+export const ARPAT_BASE_URL = COMUNE.regione_opendata.arpat_base_url;
+export const ARPAT_OPENDATA_URL = `${ARPAT_BASE_URL.replace(/\/$/, "")}/opendata`;
+export const ARPAT_BALNEAZIONE_URL = `${ARPAT_BASE_URL.replace(/\/$/, "")}/tema-ambientale/balneazione/`;
+export const REGIONE_TOSCANA_OPENDATA_URL = COMUNE.regione_opendata.portal_url;
+export const REGIONE_TOSCANA_CKAN_API = COMUNE.regione_opendata.ckan_api;
 
 /**
  * CSV/ODS opzionale più recente per flussi turistici comunali (mensile).
@@ -143,41 +162,39 @@ export const TURISMO_CSV_FALLBACK_URL =
   process.env.TURISMO_CSV_FALLBACK_URL?.trim() || "";
 
 export const REGIONE_TOSCANA_TURISMO_STATS_URL =
-  "https://www.regione.toscana.it/statistiche/dati-statistici/turismo" as const;
+  COMUNE.regione_opendata.turismo_stats_url ||
+  "https://www.regione.toscana.it/statistiche/dati-statistici/turismo";
 
-/** Orari TPL regionale (GTFS) — dataset Regione Toscana. */
+/** Orari TPL regionale (GTFS) — dataset Regione (configurabile). */
 export const RT_ORARITB_DATASET_URL =
-  "https://dati.toscana.it/dataset/rt-oraritb" as const;
-export const RT_ORARITB_CKAN_ID = "rt-oraritb" as const;
+  COMUNE.regione_opendata.gtfs_dataset_url ||
+  "https://dati.toscana.it/dataset/rt-oraritb";
+export const RT_ORARITB_CKAN_ID =
+  COMUNE.regione_opendata.gtfs_ckan_id || "rt-oraritb";
 export const AUTOLINEE_GTFS_URL =
   "https://regionetoscana.smartregion.toscana.it/mobility/artifacts/gtfs" as const;
-export const TRASPORTI_GTFS_SV_PATH = "/data/trasporti-gtfs-sv.json" as const;
+export const TRASPORTI_GTFS_SV_PATH = COMUNE.urls.trasporti_gtfs_local;
 
-/** Board live treni (proxy ViaggiaTreno) — stazione FS San Vincenzo. */
+/** Board live treni (proxy ViaggiaTreno) — stazione FS configurata. */
 export const TRASPORTI_TRENI_LIVE_API = "/api/trasporti/treni" as const;
 export const VIAGGIATRENO_ATTRIBUTION_URL =
   "https://www.viaggiatreno.it/" as const;
 
-
-/** Aree ciclabili / pedonali (open data comunale via dati.toscana.it / ldpgis). */
+/** Aree ciclabili / pedonali (open data comunale / regionale). */
 export const CICLABILI_DATASET_URL =
   "https://dati.toscana.it/dataset/aree-di-circolazione-ciclabili28" as const;
 export const PEDONALI_DATASET_URL =
   "https://dati.toscana.it/dataset/aree-di-circolazione-pedonale29" as const;
-export const CICLABILI_GEOJSON_LIVE_URL =
-  "https://sanvincenzo.ldpgis.it/metarepo2/api/datasets/area_di_circolazione_ciclabile/resources/139/GeoJSON" as const;
-export const PEDONALI_GEOJSON_LIVE_URL =
-  "https://sanvincenzo.ldpgis.it/metarepo2/api/datasets/area_di_circolazione_pedonale/resources/138/GeoJSON" as const;
-export const CICLABILI_GEOJSON_PATH =
-  "/data/ciclabili-san-vincenzo.geojson" as const;
-export const PEDONALI_GEOJSON_PATH =
-  "/data/pedonali-san-vincenzo.geojson" as const;
+export const CICLABILI_GEOJSON_LIVE_URL = COMUNE.urls.ciclabili_geojson;
+export const PEDONALI_GEOJSON_LIVE_URL = COMUNE.urls.pedonali_geojson;
+export const CICLABILI_GEOJSON_PATH = COMUNE.urls.ciclabili_geojson_local;
+export const PEDONALI_GEOJSON_PATH = COMUNE.urls.pedonali_geojson_local;
 export const MINISTERO_CULTURA_URL = "https://dati.beniculturali.it/";
 export const MINISTERO_CULTURA_API = "https://opendata.beniculturali.it";
 export const CARTO_ATTRIBUTION_URL = "https://carto.com/";
 
 /** Codice comune per API Ministero Cultura */
-export const COMUNE_ISTAT_CULTURA = "049018";
+export const COMUNE_ISTAT_CULTURA = ISTAT_CODE;
 
 /**
  * Prezzi colonnine EV aggregati (OpenChargeMap + OSM) via PienoFurbo.
@@ -190,8 +207,8 @@ export const PIENOFURBO_COLONNINE_SEARCH_URL =
 export const OPENCHARGEMAP_URL = "https://openchargemap.org/" as const;
 export const PUN_IDR_URL = "https://www.piattaformaunicanazionale.it/idr" as const;
 
-/** Farmacie di turno (San Vincenzo) — codice farmaciediturno.org = ISTAT senza lo 0 iniziale. */
-export const FARMACIE_DI_TURNO_COD = "49018" as const;
+/** Farmacie di turno — codice farmaciediturno.org = ISTAT senza lo 0 iniziale. */
+export const FARMACIE_DI_TURNO_COD = COMUNE.farmacie_di_turno_cod;
 export const FARMACIE_DI_TURNO_URL =
   `https://www.farmaciediturno.org/ricercaditurno.asp?cod=${FARMACIE_DI_TURNO_COD}` as const;
 export const FARMACIE_DI_TURNO_BASE = "https://www.farmaciediturno.org";
@@ -210,4 +227,7 @@ export const MIUR_ESPLORA_URL =
 export const MIUR_CATALOG_BASE =
   "https://dati.istruzione.it/opendata/opendata/catalogo/elements1" as const;
 /** Codice catastale comune (campo CODICECOMUNESCUOLA nei CSV MIUR). */
-export const MIUR_COMUNE_CATASTALE = "I390" as const;
+export const MIUR_COMUNE_CATASTALE = COMUNE.miur_codice_catastale;
+
+/** User-Agent HTTP per scrape/proxy (configurabile). */
+export const HTTP_USER_AGENT = COMUNE.brand.user_agent;

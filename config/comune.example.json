@@ -1,33 +1,93 @@
 {
-  "$schema_comment": "Esempio di identità comunale per un fork. Non è ancora caricato a runtime: copia i valori in src/lib/constants.ts (e asset correlati).",
-  "istat_code": "049018",
-  "nome": "San Vincenzo",
-  "provincia": "LI",
-  "regione": "Toscana",
-  "miur_codice_catastale": "I390",
-  "farmacie_di_turno_cod": "49018",
+  "$schema_comment": "Template per QUALSIASI comune italiano. Copia come config/comune.json (file caricato a runtime). I crediti al progetto originale restano in src/lib/project-origin.ts — non modificarli. Indica te stesso in fork.*.",
+  "istat_code": "000000",
+  "nome": "NomeComune",
+  "nome_aliases": ["nomecomune"],
+  "provincia": "XX",
+  "regione": "NomeRegione",
+  "miur_codice_catastale": "XXXX",
+  "farmacie_di_turno_cod": "00000",
+  "residenti_fallback": 0,
   "geo": {
-    "map_center": [43.085, 10.54],
-    "meteo": [43.085, 10.54],
+    "map_center": [41.9, 12.5],
+    "meteo": [41.9, 12.5],
     "map_default_zoom": 13
   },
   "ferrovie": {
-    "stazione_viaggiatreno": "S06030",
-    "nota": "Codice stazione FS su ViaggiaTreno (senza suffisso _1 del GTFS)."
+    "stazione_viaggiatreno": "",
+    "stazione_nome": "",
+    "nota": "Codice FS da https://www.viaggiatreno.it (autocompletaStazione). Vuoto + features.treni=false se non c’è stazione."
+  },
+  "allerte": {
+    "allertameteo_comune": "NomeComune",
+    "allertameteo_page_path": "",
+    "toscana_zona": "",
+    "toscana_zona_label": "",
+    "toscana_sample": [0, 0],
+    "nota": "allertameteo.app funziona a livello nazionale. allerte_toscana_sir solo in Toscana con zona+sample."
+  },
+  "urls": {
+    "comune": "https://www.comune.nomecomune.xx.it/",
+    "opendata": "",
+    "eventi_comune": "",
+    "eventi_calendario": "",
+    "eventi_calendario_kind": "link",
+    "biblioteca": "",
+    "biblioteca_opac": "",
+    "ciclabili_geojson": "",
+    "pedonali_geojson": "",
+    "dae_geojson": "/data/dae.geojson",
+    "ciclabili_geojson_local": "",
+    "pedonali_geojson_local": "",
+    "trasporti_gtfs_local": ""
   },
   "brand": {
-    "stemma_path": "/stemma-san-vincenzo.png",
-    "site_url": "https://www.cruscottosanvincenzo.it"
+    "stemma_path": "/stemma.png",
+    "stemma_width": 400,
+    "stemma_height": 500,
+    "stemma_alt": "Stemma del Comune",
+    "stemma_attribution": "",
+    "stemma_license_url": "",
+    "stemma_source_url": "",
+    "site_url": "https://tuodominio.it",
+    "user_agent": "Cruscotto-NomeComune/1.0"
   },
-  "moduli_locali": {
-    "nota": "Disattiva o sostituisci se non applicabili al tuo comune.",
-    "arpat_balneazione": true,
-    "allerte_toscana": true,
-    "gtfs_regione_toscana": true,
-    "porto_webcam": true,
-    "eventi_visit_comune": true,
-    "opendata_ldpgis": true,
-    "dae_telegram_bot": true,
-    "assistente_rag": true
+  "regione_opendata": {
+    "portal_url": "https://dati.gov.it/",
+    "ckan_api": "",
+    "turismo_stats_url": "",
+    "gtfs_dataset_url": "",
+    "gtfs_ckan_id": "",
+    "eventi_ckan_id": "",
+    "allerta_url": "",
+    "cfr_url": "",
+    "arpat_base_url": "",
+    "nota": "Cerca il portale open data della tua Regione (spesso dati.<regione>.it / CKAN), GTFS TPL, turismo ISTAT, allerte PC. Catalogo nazionale: https://www.dati.gov.it/ — elenco portali: https://www.dati.gov.it/view-dataset?organization=regioni"
+  },
+  "features": {
+    "porto": false,
+    "balneazione": false,
+    "treni": false,
+    "gtfs_locale": false,
+    "ciclabili_pedonali": false,
+    "eventi_comune": true,
+    "eventi_regionali": false,
+    "turismo_flussi": true,
+    "allerte": true,
+    "allerte_toscana_sir": false,
+    "dae": true,
+    "dae_telegram": false,
+    "assistente_rag": false,
+    "biblioteca": false,
+    "arpat_aria": false
+  },
+  "eventi_filtro_extra": [],
+  "fork": {
+    "is_upstream": false,
+    "maintainer_name": "Tuo Nome",
+    "maintainer_email": "tuo@email.it",
+    "maintainer_url": "https://tuosito.it",
+    "github_repo_url": "https://github.com/TUO_USER/TUO-REPO",
+    "_comment": "NON modificare src/lib/project-origin.ts: lì restano i crediti di Alessandro Cipriani / magiaslab."
   }
 }

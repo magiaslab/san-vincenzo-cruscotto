@@ -4,12 +4,10 @@ import type { ReactNode } from "react";
 import {
   ARPAT_BALNEAZIONE_URL,
   ARPAT_OPENDATA_URL,
-  AUTHOR,
   CARTO_ATTRIBUTION_URL,
   COMUNE_NOME,
   CRUSCOTTO_ITALIA_URL,
   FARMACIE_DI_TURNO_URL,
-  GITHUB_REPO_URL,
   MINISTERO_CULTURA_URL,
   MIUR_ESPLORA_URL,
   MIUR_OPENDATA_URL,
@@ -23,8 +21,9 @@ import {
   REGIONE_TOSCANA_ALLERTA_URL,
   REGIONE_TOSCANA_OPENDATA_URL,
   STEMMA,
-  VERCEL_DEPLOY_URL,
 } from "@/lib/constants";
+import { getForkMaintainer } from "@/lib/comune-config";
+import { PROJECT_ORIGIN } from "@/lib/project-origin";
 import { AccessibilitaCompliance } from "@/components/AccessibilitaCompliance";
 import { GitHubMark, VercelMark } from "@/components/BrandMarks";
 import {
@@ -53,6 +52,7 @@ function Section({
 }
 
 export function AttribuzioniPanel() {
+  const forkMaintainer = getForkMaintainer();
   return (
     <section>
       <SectionIntro
@@ -64,35 +64,70 @@ export function AttribuzioniPanel() {
         <Section title="Progetto non ufficiale">
           <p>
             Questo sito è un <strong>progetto indipendente</strong>, non
-            affiliato ad AgID, al Governo italiano o al Comune di San Vincenzo.
+            affiliato ad AgID, al Governo italiano o al Comune di {COMUNE_NOME}.
             Riaggrega dati pubblici aperti provenienti da Cruscotto Italia e
             dalle fonti citate di seguito.
           </p>
           <p>
-            Realizzato da{" "}
+            Basato sul{" "}
             <a
               className="text-[#0066CC] underline"
-              href={`mailto:${AUTHOR.email}`}
+              href={PROJECT_ORIGIN.site_url}
+              target="_blank"
+              rel="noopener noreferrer"
             >
-              {AUTHOR.name}
+              Cruscotto {PROJECT_ORIGIN.comune_demo}
+            </a>{" "}
+            di{" "}
+            <a
+              className="text-[#0066CC] underline"
+              href={`mailto:${PROJECT_ORIGIN.author.email}`}
+            >
+              {PROJECT_ORIGIN.author.name}
+            </a>
+            {" — "}
+            <a
+              className="text-[#0066CC] underline"
+              href={PROJECT_ORIGIN.github_repo_url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              repository originale
             </a>
             .
+            {forkMaintainer ? (
+              <>
+                {" "}
+                Questo fork per {COMUNE_NOME} è curato da{" "}
+                {forkMaintainer.email ? (
+                  <a
+                    className="text-[#0066CC] underline"
+                    href={`mailto:${forkMaintainer.email}`}
+                  >
+                    {forkMaintainer.name}
+                  </a>
+                ) : (
+                  <strong>{forkMaintainer.name}</strong>
+                )}
+                .
+              </>
+            ) : null}
           </p>
           <ul className="m-0 flex list-none flex-wrap gap-3 p-0">
             <li>
               <a
-                href={GITHUB_REPO_URL}
+                href={PROJECT_ORIGIN.github_repo_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-[var(--pa-border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--pa-ink)] no-underline transition hover:border-[var(--pa-primary)] hover:text-[var(--pa-primary)]"
               >
                 <GitHubMark />
-                <span>Repository GitHub</span>
+                <span>Repo originale</span>
               </a>
             </li>
             <li>
               <a
-                href={VERCEL_DEPLOY_URL}
+                href={PROJECT_ORIGIN.vercel_deploy_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-[var(--pa-border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--pa-ink)] no-underline transition hover:border-[var(--pa-primary)] hover:text-[var(--pa-primary)]"

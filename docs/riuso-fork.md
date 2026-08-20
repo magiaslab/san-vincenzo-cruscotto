@@ -41,8 +41,8 @@ Obiettivo: sito online con KPI AgID del tuo comune, senza bot né AI.
 1. Crea account **GitHub** e **Vercel** (gratis).
 2. **Fork** di questo repo.
 3. Su Vercel: Import Project → repo forkato → Deploy (nessuna env obbligatoria).
-4. In locale o direttamente su GitHub: modifica `src/lib/constants.ts`
-   (`ISTAT_CODE`, nome, coordinate, stemma).
+4. In locale o su GitHub: adatta `config/comune.json` (ISTAT, nome, coordinate,
+   `features`, `fork.maintainer_*`). Non modificare `src/lib/project-origin.ts`.
 5. Push → Vercel ridistribuisce → apri l’URL `*.vercel.app`.
 6. Smoke test: `https://TUO-PROGETTO.vercel.app/api/kpi` deve mostrare
    demografia del tuo codice ISTAT.
@@ -61,20 +61,24 @@ adattamento moduli regionali (ARPAT, GTFS, allerte).
 
 | Incluso | Non incluso |
 | --- | --- |
-| Next.js 15 + TypeScript + Tailwind | Multi-tenant (un deploy = un comune) |
+| Next.js 15 + TypeScript + Tailwind | Multi-tenant runtime (un deploy = un comune) |
 | Proxy `/api/*` → MCP Cruscotto Italia (AgID) | Backend/DB/auth locali |
-| Shell dashboard (sidebar, KPI, mappe, grafici) | Feature flag runtime (`comune.example.json` è solo checklist) |
-| Pannelli che degradano se manca la fonte | Parità automatica di ogni pannello SV |
+| Shell dashboard (sidebar, KPI, mappe, grafici) | Parità automatica di ogni pannello “costa / Toscana” |
+| **`config/comune.json` a runtime** + `features.*` per spegnere moduli | — |
 
 Non serve costruire un MCP proprio per il fork: i KPI comunali arrivano già
 dal **MCP pubblico AgID** (`src/lib/mcp.ts` + codice ISTAT).
 
 **Nucleo nazionale (funziona ovunque in Italia con codice ISTAT):** demografia,
-economia, scuole MIUR (catastale), finanza, ecc. via AgID.
+economia, scuole MIUR (catastale), finanza, meteo (Open-Meteo / RainViewer /
+OpenWeather), allerte via allertameteo.app, ecc.
 
-**Moduli “locali” di San Vincenzo:** porto/webcam, eventi Visit, ldpgis,
-balneazione ARPAT, GTFS Toscana, allerte regionali, bot DAE — vanno adattati
-o disattivati per il tuo territorio.
+**Moduli opzionali** (porto, balneazione, GTFS locale, eventi scrape, SIR Toscana,
+bot DAE…): si **spengono** con `features` in `config/comune.json` oppure si
+ricollegano agli URL della tua Regione.
+
+**Crediti:** non modificare `src/lib/project-origin.ts` (Alessandro Cipriani /
+magiaslab). Nei fork indica te stesso in `config/comune.json` → `fork`.
 
 ---
 
@@ -168,33 +172,44 @@ Comandi utili: `npm run build`, `npm run lint` (unico quality gate oltre al buil
 
 ## 7. Passo D — Identità del comune (minimo)
 
-Usa [`config/comune.example.json`](../config/comune.example.json) come checklist:
-**non è caricato a runtime**. Copia i valori a mano.
+### File principale: `config/comune.json` (runtime)
 
-### File principale: `src/lib/constants.ts`
+1. Copia [`config/comune.example.json`](../config/comune.example.json) sopra
+   `config/comune.json` (o modifica quello esistente).
+2. Compila almeno: `istat_code`, `nome`, `provincia`, `regione`,
+   `geo.map_center`, `geo.meteo`, `miur_codice_catastale`,
+   `farmacie_di_turno_cod`, `brand.*`, `fork.*`.
+3. Spegnere ciò che non hai: `"porto": false`, `"balneazione": false`,
+   `"treni": false`, `"allerte_toscana_sir": false`, ecc.
+4. **Non toccare** `src/lib/project-origin.ts` (crediti e link al progetto
+   originale). In `fork` metti `is_upstream: false` e i tuoi contatti.
 
-| Campo | Esempio SV | Note |
-| --- | --- | --- |
-| `ISTAT_CODE` | `049018` | 6 cifre ISTAT; cuore delle chiamate MCP |
-| `COMUNE_NOME` / `COMUNE_PROVINCIA` / `COMUNE_REGIONE` | San Vincenzo / LI / Toscana | UI + SEO |
-| `MAP_CENTER`, `METEO_LAT` / `METEO_LON` | 43.085, 10.54 | Mappe e meteo |
-| `MIUR_COMUNE_CATASTALE` | `I390` | Scuole |
-| `FARMACIE_DI_TURNO_COD` | `49018` | ISTAT senza lo zero iniziale |
-| Stemma | `public/stemma-….png` + path in constants | Header / PWA |
-| Brand GitHub / URL | costanti `GITHUB_*`, deploy | Aggiorna al tuo fork |
+`src/lib/constants.ts` legge da `comune.json`: mappe, meteo, allerte,
+farmacie, stemma, URL eventi/turismo puntano al **tuo** comune, non restano
+su San Vincenzo.
 
-### Altri punti da aggiornare presto
+### Come trovare i dati
 
-| Area | Dove |
+| Campo | Dove cercarlo |
 | --- | --- |
-| Host SEO di fallback | `src/lib/seo.ts` → `CANONICAL_HOST` |
-| Stazione FS (treni) | `src/lib/viaggiatreno.ts` |
-| OG image | `public/og-image.jpg` (o equivalente) |
-| GeoJSON / GTFS locali | `public/data/*` |
-| Copy con nome comune | pannelli, `src/lib/i18n/en.ts`, `assistente-faq.ts` |
-| Corpus RAG | `modal_rag/corpus/*` (se usi l’assistente) |
+| Codice ISTAT (6 cifre) | ISTAT / Wikipedia / Cruscotto Italia `search_comune` |
+| Codice catastale MIUR | Portale Unico Scuola / CSV anagrafe scuole |
+| Farmacie di turno | ISTAT senza lo zero iniziale su farmaciediturno.org |
+| Stazione FS | `https://www.viaggiatreno.it/.../autocompletaStazione/NOME` |
+| Allerte | `https://allertameteo.app/api/alert/NomeComune` (nazionale) |
+| Open data regionali | [dati.gov.it](https://www.dati.gov.it/) → organizzazioni Regioni; spesso CKAN `https://dati.<regione>.it/api/3/action` |
+| Turismo / GTFS / eventi | Dataset della tua Regione (non copiare i path Toscana se non sei in Toscana) |
 
-Trovare il codice ISTAT: portale ISTAT / Wikipedia del comune / Cruscotto Italia.
+### Checklist moduli (`features`)
+
+| Feature | Se `false` |
+| --- | --- |
+| `porto` | Nasconde tab Porto e API webcam |
+| `balneazione` | Nasconde card mare e API ARPAT balneazione |
+| `treni` | Disattiva board ViaggiaTreno |
+| `eventi_comune` / `eventi_regionali` | Niente scrape calendario / CKAN eventi |
+| `allerte_toscana_sir` | Solo allertameteo.app (ok fuori Toscana) |
+| `gtfs_locale` / `ciclabili_pedonali` | Niente file GTFS/GeoJSON locali SV |
 
 Dopo le modifiche: commit + push sul tuo repo.
 

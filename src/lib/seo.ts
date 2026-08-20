@@ -5,9 +5,29 @@ import {
   COMUNE_REGIONE,
   ISTAT_CODE,
 } from "@/lib/constants";
+import { COMUNE } from "@/lib/comune-config";
+import { PROJECT_ORIGIN } from "@/lib/project-origin";
 
-/** Host pubblico preferito (apex reindirizza a www; i crawler OG spesso non seguono i 308). */
-const CANONICAL_HOST = "www.cruscottosanvincenzo.it";
+/** Host pubblico preferito. Nei fork: `NEXT_PUBLIC_SITE_URL` o `brand.site_url`. */
+function resolveCanonicalHost(): string {
+  const fromBrand = COMUNE.brand.site_url?.trim();
+  if (fromBrand) {
+    try {
+      return new URL(
+        fromBrand.startsWith("http") ? fromBrand : `https://${fromBrand}`,
+      ).host;
+    } catch {
+      /* fall through */
+    }
+  }
+  try {
+    return new URL(PROJECT_ORIGIN.site_url).host;
+  } catch {
+    return "www.cruscottosanvincenzo.it";
+  }
+}
+
+const CANONICAL_HOST = resolveCanonicalHost();
 
 function normalizeSiteUrl(raw: string): string {
   const trimmed = raw.trim().replace(/\/$/, "");

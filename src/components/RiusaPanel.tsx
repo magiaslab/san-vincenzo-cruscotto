@@ -1,7 +1,6 @@
 "use client";
 
 import type { ReactNode } from "react";
-import Link from "next/link";
 import {
   Accessibility,
   BookOpen,
@@ -19,21 +18,29 @@ import {
   VercelMark,
 } from "@/components/BrandMarks";
 import {
-  AUTHOR,
   COMUNE_NOME,
   CRUSCOTTO_ITALIA_URL,
-  GITHUB_REPO_URL,
   ISTAT_CODE,
-  VERCEL_DEPLOY_URL,
 } from "@/lib/constants";
+import { COMUNE } from "@/lib/comune-config";
+import {
+  PROJECT_ORIGIN,
+  PROJECT_ORIGIN_CONFIG_EXAMPLE_URL,
+  PROJECT_ORIGIN_DOCS_RIUSO_URL,
+  PROJECT_ORIGIN_ENV_EXAMPLE_URL,
+  PROJECT_ORIGIN_FORK_URL,
+} from "@/lib/project-origin";
 import { SectionIntro } from "@/components/ui";
 
-const GITHUB_FORK_URL = `${GITHUB_REPO_URL}/fork`;
-const GITHUB_DOCS_RIUSO_URL = `${GITHUB_REPO_URL}/blob/master/docs/riuso-fork.md`;
-const GITHUB_CONFIG_EXAMPLE_URL = `${GITHUB_REPO_URL}/blob/master/config/comune.example.json`;
-const GITHUB_ENV_EXAMPLE_URL = `${GITHUB_REPO_URL}/blob/master/.env.example`;
-const GITHUB_MODAL_RAG_URL = `${GITHUB_REPO_URL}/blob/master/modal_rag/README.md`;
-const GITHUB_DAE_DOCS_URL = `${GITHUB_REPO_URL}/blob/master/docs/dae-telegram-bot.md`;
+const GITHUB_FORK_URL = PROJECT_ORIGIN_FORK_URL;
+const GITHUB_DOCS_RIUSO_URL = PROJECT_ORIGIN_DOCS_RIUSO_URL;
+const GITHUB_CONFIG_EXAMPLE_URL = PROJECT_ORIGIN_CONFIG_EXAMPLE_URL;
+const GITHUB_ENV_EXAMPLE_URL = PROJECT_ORIGIN_ENV_EXAMPLE_URL;
+const GITHUB_MODAL_RAG_URL = `${PROJECT_ORIGIN.github_repo_url}/blob/master/modal_rag/README.md`;
+const GITHUB_DAE_DOCS_URL = `${PROJECT_ORIGIN.github_repo_url}/blob/master/docs/dae-telegram-bot.md`;
+const GITHUB_REPO_URL = PROJECT_ORIGIN.github_repo_url;
+const VERCEL_DEPLOY_URL = PROJECT_ORIGIN.vercel_deploy_url;
+const AUTHOR = PROJECT_ORIGIN.author;
 
 function Section({
   title,
@@ -96,34 +103,39 @@ const TOC: { id: string; label: string }[] = [
 
 const CORE_FIELDS: { campo: string; esempio: string; dove: string }[] = [
   {
-    campo: "ISTAT_CODE",
+    campo: "istat_code",
     esempio: ISTAT_CODE,
-    dove: "src/lib/constants.ts → MCP Cruscotto Italia",
+    dove: "config/comune.json → MCP Cruscotto Italia (qualsiasi comune IT)",
   },
   {
-    campo: "COMUNE_NOME / PROVINCIA / REGIONE",
-    esempio: `${COMUNE_NOME} / LI / Toscana`,
-    dove: "constants, header, SEO, footer",
+    campo: "nome / provincia / regione",
+    esempio: `${COMUNE.nome} / ${COMUNE.provincia} / ${COMUNE.regione}`,
+    dove: "config/comune.json → header, SEO, footer",
   },
   {
-    campo: "MAP_CENTER · METEO_LAT/LON",
-    esempio: "43.085, 10.54",
-    dove: "mappe Leaflet, meteo, radar",
+    campo: "geo.map_center · geo.meteo",
+    esempio: `${COMUNE.geo.map_center.join(", ")}`,
+    dove: "mappe Leaflet, meteo, radar (non restano su San Vincenzo)",
   },
   {
-    campo: "MIUR_COMUNE_CATASTALE",
-    esempio: "I390",
+    campo: "miur_codice_catastale",
+    esempio: COMUNE.miur_codice_catastale || "es. I390",
     dove: "scuole MIUR",
   },
   {
-    campo: "FARMACIE_DI_TURNO_COD",
-    esempio: "49018 (ISTAT senza lo 0)",
+    campo: "farmacie_di_turno_cod",
+    esempio: COMUNE.farmacie_di_turno_cod || "ISTAT senza lo 0",
     dove: "farmacie di turno",
   },
   {
-    campo: "Stemma + NEXT_PUBLIC_SITE_URL",
-    esempio: "public/stemma-… · URL del dominio",
-    dove: "brand e SEO/PWA",
+    campo: "features.*",
+    esempio: "porto, balneazione, treni, … = false",
+    dove: "spegne tab/API non pertinenti al tuo comune",
+  },
+  {
+    campo: "fork.maintainer_*",
+    esempio: "nome/email di chi cura il fork",
+    dove: "Attribuzioni e footer; i crediti originali restano fissi",
   },
 ];
 
@@ -295,7 +307,7 @@ export function RiusaPanel() {
     <section>
       <SectionIntro
         title="Riusa questo cruscotto"
-        description={`Guida completa per duplicare lo stack su un altro comune: dall’account GitHub alla messa online su Vercel, account esterni, variabili d’ambiente e come usare Cursor o Claude per adattare il fork. Non serve replicare ogni pannello locale di ${COMUNE_NOME}.`}
+        description={`Guida per adattare questo stack a qualsiasi comune italiano: GitHub → config/comune.json → Vercel. I link di fork e la documentazione puntano sempre al progetto originale di ${AUTHOR.name} (Cruscotto ${PROJECT_ORIGIN.comune_demo}).`}
       />
 
       <div className="max-w-3xl">
@@ -385,9 +397,9 @@ export function RiusaPanel() {
           </p>
           <p className="text-[var(--pa-muted)]">
             Architettura dello stack:{" "}
-            <Link href="/#come-funziona" className="underline">
+            <a href="/come-funziona" className="underline">
               Come funziona
-            </Link>
+            </a>
             .
           </p>
         </Section>
@@ -719,10 +731,12 @@ git branch -M main && git push -u origin main`}
             </li>
             <li>
               Non rimuovere disclaimer e{" "}
-              <Link href="/#attribuzioni" className="underline">
+              <a href="/attribuzioni" className="underline">
                 attribuzioni
-              </Link>
-              .
+              </a>
+              . Nei fork lascia intatto{" "}
+              <code>src/lib/project-origin.ts</code> e indica te stesso in{" "}
+              <code>config/comune.json → fork</code>.
             </li>
             <li>
               Non lasciare <code>ASSISTENTE_MODAL_URL</code> /{" "}
@@ -740,9 +754,9 @@ git branch -M main && git push -u origin main`}
               {AUTHOR.email}
             </a>{" "}
             oppure{" "}
-            <Link href="/#partecipa" className="underline">
+            <a href="/partecipa" className="underline">
               Partecipa
-            </Link>
+            </a>
             .
           </p>
         </Section>

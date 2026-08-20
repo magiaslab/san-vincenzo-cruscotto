@@ -16,7 +16,7 @@ import {
 import {
   AUTHOR,
   CRUSCOTTO_ITALIA_URL,
-  GITHUB_REPO_URL,
+  GITHUB_FORK_REPO_URL,
   OPENAEDMAP_URL,
   TELEGRAM_DAE_BOT_URL,
 } from "@/lib/constants";
@@ -289,7 +289,7 @@ export function PartecipaPanel() {
             <li>
               {t("Codice e issue su")}{" "}
               <a
-                href={GITHUB_REPO_URL}
+                href={GITHUB_FORK_REPO_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-semibold underline"
@@ -679,7 +679,7 @@ export function PartecipaPanel() {
           ) : null}
           <p className="mb-0 mt-3 text-xs text-[var(--pa-muted)]">
             <a
-              href={`${GITHUB_REPO_URL}/issues?q=is%3Aissue+%5BSuggerimento%5D`}
+              href={`${GITHUB_FORK_REPO_URL}/issues?q=is%3Aissue+%5BSuggerimento%5D`}
               target="_blank"
               rel="noopener noreferrer"
               className="font-semibold underline"

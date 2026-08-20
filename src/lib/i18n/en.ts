@@ -476,6 +476,13 @@ export const en: Record<string, string> = {
   "Raffiche max": "Max gusts",
   "Rappresentante": "Representative",
   "Realizzato da": "Built by",
+  "Basato sul": "Based on the",
+  "di": "by",
+  "Questo fork è curato da": "This fork is maintained by",
+  "Progetto sorgente:": "Source project:",
+  "non affiliato ad AgID, al Governo italiano o al Comune indicato.": "not affiliated with AgID, the Italian Government or the municipality shown.",
+  "Calendario eventi e biblioteca comunale": "Events calendar and municipal library",
+
   "Redditi MEF (serie e fasce), profilo occupazionale ISTAT e imprese ASIA con ATECO.": "MEF incomes (series and brackets), ISTAT employment profile and ASIA businesses with NACE codes.",
   "Reddito medio": "Average income",
   "Reddito medio €": "Average income €",

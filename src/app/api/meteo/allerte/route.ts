@@ -3,9 +3,13 @@ import {
   ALLERTA_METEO_APP_URL,
   ALLERTA_METEO_SV_API_URL,
   CFR_TOSCANA_URL,
+  COMUNE_NOME,
+  COMUNE_PROVINCIA,
+  COMUNE_REGIONE,
   DPC_CRITICITA_REPO_URL,
   REGIONE_TOSCANA_ALLERTA_URL,
 } from "@/lib/constants";
+import { COMUNE, isFeatureEnabled } from "@/lib/comune-config";
 import {
   dettaglioLabel,
   fetchAllerteToscanaE2,
@@ -128,9 +132,22 @@ function mergeDay(
   };
 }
 
-/** Allerte meteo per San Vincenzo: DPC nazionale + bollettino Regione Toscana (zona E2). */
+/** Allerte meteo per il comune configurato: DPC + eventuale bollettino regionale. */
 export async function GET() {
+  if (!isFeatureEnabled("allerte")) {
+    return NextResponse.json(
+      {
+        disponibile: false,
+        has_alert: false,
+        show_home_banner: false,
+        error: "Modulo allerte disattivato",
+      },
+      { status: 404 },
+    );
+  }
+
   try {
+    const useSir = isFeatureEnabled("allerte_toscana_sir");
     const [dpcSettled, toscanaSettled] = await Promise.allSettled([
       fetch(ALLERTA_METEO_SV_API_URL, {
         headers: { Accept: "application/json" },
@@ -143,7 +160,9 @@ export async function GET() {
         }
         return raw;
       }),
-      fetchAllerteToscanaE2(),
+      useSir
+        ? fetchAllerteToscanaE2()
+        : Promise.resolve(null),
     ]);
 
     const dpcRaw =
@@ -175,12 +194,15 @@ export async function GET() {
 
     return NextResponse.json(
       {
-        comune: dpcRaw?.data?.comune ?? "San Vincenzo",
-        zona: dpcRaw?.data?.zona ?? toscana?.zona_label ?? "Etruria-Costa Nord",
-        zona_codice: toscana?.zona ?? "E2",
-        provincia: dpcRaw?.data?.provincia ?? "Livorno",
-        regione: dpcRaw?.data?.regione ?? "Toscana",
-        sigla: dpcRaw?.data?.sigla ?? "LI",
+        comune: dpcRaw?.data?.comune ?? COMUNE_NOME,
+        zona:
+          dpcRaw?.data?.zona ??
+          toscana?.zona_label ??
+          COMUNE.allerte.toscana_zona_label,
+        zona_codice: toscana?.zona ?? COMUNE.allerte.toscana_zona,
+        provincia: dpcRaw?.data?.provincia ?? COMUNE_PROVINCIA,
+        regione: dpcRaw?.data?.regione ?? COMUNE_REGIONE,
+        sigla: dpcRaw?.data?.sigla ?? COMUNE_PROVINCIA,
         oggi,
         domani,
         bollettino: {

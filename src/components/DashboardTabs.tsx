@@ -69,6 +69,7 @@ import {
   valueOrMissing,
 } from "@/components/ui";
 import { COMUNI_LOOKUP } from "@/lib/constants";
+import { isFeatureEnabled, isTabEnabled } from "@/lib/comune-config";
 import {
   formatDecimal,
   formatEuro,
@@ -246,6 +247,15 @@ const NAV_GROUPS: NavGroup[] = [
   },
 ];
 
+function filterNavGroups(groups: readonly NavGroup[]): NavGroup[] {
+  return groups
+    .map((g) => ({
+      ...g,
+      items: g.items.filter((item) => isTabEnabled(item.id)),
+    }))
+    .filter((g) => g.items.length > 0);
+}
+
 const TABS = NAV_GROUPS.flatMap((g) => [...g.items]);
 
 const TAB_IDS = new Set<string>(TABS.map((t) => t.id));
@@ -333,20 +343,20 @@ export function DashboardTabs({
 
   return (
     <AppShell
-      groups={NAV_GROUPS}
+      groups={filterNavGroups(NAV_GROUPS)}
       activeId={tab}
       onNavigate={(id) => {
         if (isTabId(id)) navigate(id);
       }}
       generatedAt={generatedAt}
-      footer={<Footer />}
+      footer={<Footer onNavigate={(id) => { if (isTabId(id)) navigate(id); }} />}
     >
       <div aria-label={t(tabLabel(tab))}>
         {tab === "panoramica" && (
           <Panoramica kpi={kpi} onNavigate={navigate} />
         )}
         {tab === "turismo" && <Turismo onNavigate={navigate} />}
-        {tab === "porto" && <Porto />}
+        {tab === "porto" && isFeatureEnabled("porto") && <Porto />}
         {tab === "economia" && <Economia kpi={kpi} />}
         {tab === "istruzione" && <Istruzione kpi={kpi} />}
         {tab === "societa" && <Societa kpi={kpi} />}
@@ -424,63 +434,77 @@ function Panoramica({
               title: t("Farmacie di turno"),
               hint: t("Orari e punti più vicini"),
               Icon: Pill,
+              show: true,
             },
             {
               id: "disabilita" as const,
               title: t("Accessibilità e disabilità"),
               hint: t("Luoghi accessibili, stalli e bagni OSM"),
               Icon: Accessibility,
+              show: true,
             },
             {
               id: "infra" as const,
               title: t("Prezzi carburanti"),
               hint: `Benzina self media ${formatDecimal(num(carburanti?.prezzo_medio_benzina_self), 3)} €/L`,
               Icon: Fuel,
+              show: true,
             },
             {
               id: "infra" as const,
               title: t("Trasporti e mobilità"),
               hint: t("Bus, treni GTFS, ciclabili e colonnine EV"),
               Icon: Train,
+              show: true,
             },
             {
               id: "meteo" as const,
               title: t("Meteo e allerte"),
               hint: t("OpenWeather, previsioni e Protezione Civile"),
               Icon: CloudSun,
+              show: true,
             },
             {
               id: "ambiente" as const,
               title: t("Mare e balneazione"),
               hint: t("Qualità acque ARPAT"),
               Icon: Waves,
+              show: isFeatureEnabled("balneazione"),
             },
             {
               id: "istruzione" as const,
               title: t("Scuole e istruzione"),
               hint: t("Plessi MIUR e titoli di studio"),
               Icon: School,
+              show: true,
             },
             {
               id: "porto" as const,
               title: t("Porto"),
               hint: t("Posti barca, webcam e AIS"),
               Icon: Ship,
+              show: isFeatureEnabled("porto"),
             },
             {
               id: "turismo" as const,
               title: t("Eventi e biblioteca"),
-              hint: t("Calendario Visit SV e Biblioteca Calandra"),
+              hint: t("Calendario eventi e biblioteca comunale"),
               Icon: Palmtree,
+              show:
+                isFeatureEnabled("eventi_comune") ||
+                isFeatureEnabled("biblioteca"),
             },
             {
               id: "partecipa" as const,
               title: t("Suggerimenti"),
               hint: t("Proponi miglioramenti: diventano issue su GitHub"),
               Icon: MessageSquarePlus,
+              show: true,
             },
           ] as const
-        ).map(({ id, title, hint, Icon }, i) => (
+        )
+          .filter((c) => c.show)
+          .map(({ id, title, hint, Icon }, i) => (
           <button
             key={`${id}-${title}-${i}`}
             type="button"
