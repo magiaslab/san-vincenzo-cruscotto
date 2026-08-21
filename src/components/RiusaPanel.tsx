@@ -145,6 +145,11 @@ const CORE_FIELDS: { campo: string; esempio: string; dove: string }[] = [
     dove: "spegne tab/API non pertinenti al tuo comune",
   },
   {
+    campo: "gestori.acqua / gestori.rifiuti",
+    esempio: "ASA WFS · SEI pagina comunale",
+    dove: "Ambiente: etichette idriche e RD% del gestore (oltre a ISPRA)",
+  },
+  {
     campo: "fork.maintainer_*",
     esempio: "nome/email di chi cura il fork",
     dove: "Attribuzioni e footer; i crediti originali restano fissi",
@@ -313,6 +318,16 @@ const OPTIONAL_MODULES: { area: string; cerca: string }[] = [
   {
     area: "Allerte / ARPAT / turismo / eventi",
     cerca: "URL regionali in constants — spesso da sostituire fuori Toscana",
+  },
+  {
+    area: "Rifiuti ISPRA / gestore",
+    cerca:
+      "features.rifiuti_ispra (default true, CSV nazionale). gestori.rifiuti.url = pagina comunale SEI o analogo per RD% HTML",
+  },
+  {
+    area: "Acqua / SII",
+    cerca:
+      "features.acqua_sii + gestori.acqua.geoserver_wfs (ASA WFS). Fuori ATO 5: spegni il flag e lascia i link al tuo gestore",
   },
   {
     area: "Testi i18n e FAQ",

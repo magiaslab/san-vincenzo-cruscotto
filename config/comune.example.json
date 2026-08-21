@@ -84,7 +84,32 @@
     "dae_telegram": false,
     "assistente_rag": false,
     "biblioteca": false,
-    "arpat_aria": false
+    "arpat_aria": false,
+    "rifiuti_ispra": true,
+    "acqua_sii": false
+  },
+  "gestori": {
+    "acqua": {
+      "nome": "",
+      "url": "",
+      "etichette_map_url": "",
+      "fontanelle_map_url": "",
+      "composizione_url": "",
+      "geoserver_wfs": "",
+      "etichette_layer": "",
+      "fontanelle_layer": "",
+      "fontanelle_aq_layer": "",
+      "ait_opendata_url": "",
+      "nota": "WFS etichette/fontanelle è tipico di ASA (ATO 5 Toscana Costa). Fuori da quell’ambito: features.acqua_sii=false e lascia gli URL vuoti, oppure metti i link del tuo gestore SII."
+    },
+    "rifiuti": {
+      "nome": "",
+      "url": "",
+      "calendario_url": "",
+      "centri_url": "",
+      "centro_url": "",
+      "nota": "ISPRA (features.rifiuti_ispra) è nazionale via ISTAT. url = pagina comunale del gestore se pubblica le RD% in HTML (pattern SEI Toscana perc_raccolta)."
+    }
   },
   "eventi_filtro_extra": [],
   "fork": {

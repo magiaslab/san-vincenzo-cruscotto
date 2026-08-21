@@ -396,6 +396,22 @@ Account HF opzionale; eventuale token HF solo se usi modelli gated.
 | ARPAT / turismo / eventi | URL regionali in `comune.json`; CKAN Toscana non è universale |
 | Porto / webcam / erosione | `features.porto`, `balneazione`, `erosione_costiera` |
 | Rilievo 3D | `geo.terrain_sea_side` (`none` se non costiero) |
+| Rifiuti | `features.rifiuti_ispra` (CSV ISPRA nazionale). `gestori.rifiuti.*` per SEI/ARRR (HTML, non API) |
+| Acqua / SII | `features.acqua_sii` + `gestori.acqua.geoserver_wfs` (WFS ASA). AIT RQTII è link, non scrape |
+
+### 11.7 Rifiuti (ISPRA) e acqua (gestore SII)
+
+**Rifiuti.** Né SEI Toscana né gli altri gestori ATO pubblicano un catalogo CKAN/API.
+La fonte machine-readable è il **Catasto nazionale ISPRA**
+(`GET /api/rifiuti`, CSV per anno, filtro ISTAT). Opzionale: pagina HTML del
+gestore (`gestori.rifiuti.url`) per RD% in corso d’anno (provvisorie).
+I file ARRR sono XLS, non parsati a runtime.
+
+**Acqua.** ASA non ha open data: etichette e fontanelle arrivano dal **WFS
+GeoServer** della mappa pubblica (`asamap.it`, layer `etichette` /
+`fontanelle_aq`). Qualità tecnica (RQTII) e contrattuale (RQSII) sono CSV
+dell’Autorità Idrica Toscana a **scala di gestore**, con WAF che spesso
+blocca i download automatici — in UI restano i link.
 
 MVP onesto: **KPI nazionali + mappa + 1–2 fonti locali**.
 
