@@ -1,16 +1,17 @@
 import { unstable_cache } from "next/cache";
+import { ISTAT_CODE } from "./constants";
 import { fetchComuneDashboard, fetchComuneKpi } from "./mcp";
 
 export const getCachedKpi = unstable_cache(
   async () => fetchComuneKpi(),
-  ["comune-kpi-049018"],
-  { revalidate: 86400, tags: ["kpi"] },
+  ["comune-kpi", ISTAT_CODE],
+  { revalidate: 86400, tags: ["kpi", `kpi-${ISTAT_CODE}`] },
 );
 
 export const getCachedDashboard = unstable_cache(
   async () => fetchComuneDashboard(),
-  ["comune-dashboard-049018"],
-  { revalidate: 86400, tags: ["dashboard"] },
+  ["comune-dashboard", ISTAT_CODE],
+  { revalidate: 86400, tags: ["dashboard", `dashboard-${ISTAT_CODE}`] },
 );
 
 /** Sezioni estratte da comune_dashboard via query `sezioni`. */

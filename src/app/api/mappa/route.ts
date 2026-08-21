@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { CIVICI_MAP_LIMIT } from "@/lib/constants";
+import { CATASTO_GEOJSON_URL, CIVICI_MAP_LIMIT, ISTAT_CODE } from "@/lib/constants";
 import { getCachedDashboard } from "@/lib/dashboard";
 import { buildMapLayers } from "@/lib/geo";
 
@@ -36,9 +36,10 @@ export async function GET(req: NextRequest) {
       {
         type: "FeatureCollectionBundle",
         layers,
+        istat_code: ISTAT_CODE,
         catasto: {
           disponibile: true,
-          url: `https://cruscotto-italia.dati.gov.it/data/catasto_full/049018_ple.geojson.gz`,
+          url: CATASTO_GEOJSON_URL,
           nota: "Layer catastale da caricare lato client (gzip GeoJSON, CORS aperto). File potenzialmente pesante.",
         },
       },

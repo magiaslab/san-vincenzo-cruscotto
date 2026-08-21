@@ -4,7 +4,7 @@ import {
   PIENOFURBO_COLONNINE_URL,
   PUN_IDR_URL,
 } from "@/lib/constants";
-import { matchesComuneNome } from "@/lib/comune-config";
+import { COMUNE, matchesComuneNome } from "@/lib/comune-config";
 import { getCachedDashboard } from "@/lib/dashboard";
 
 export type EvStationRow = {
@@ -120,9 +120,10 @@ async function fetchPienofurboNearSv(): Promise<PfStation[]> {
     headers: {
       Accept: "application/json",
       "User-Agent":
-        "CruscottoSanVincenzo/1.0 (+https://www.cruscottosanvincenzo.it)",
+        COMUNE.brand.user_agent ||
+        "Cruscotto-Comunale/1.0 (+https://github.com/magiaslab/san-vincenzo-cruscotto)",
     },
-    next: { revalidate: 3600 },
+    next: { revalidate: 0 },
   });
   if (!res.ok) throw new Error(`pienofurbo_http_${res.status}`);
   const json = (await res.json()) as {
