@@ -7,6 +7,7 @@
  */
 
 import { ISTAT_CODE } from "@/lib/constants";
+import { isFeatureEnabled } from "@/lib/comune-config";
 
 export const IDROGEO_API_BASE = "https://idrogeo.isprambiente.it/api" as const;
 export const IDROGEO_WFS_URL =
@@ -356,6 +357,7 @@ export async function buildRischioData(
     const provId = pickNum(comune, "cod_prov");
 
     const wfsCode = buildWfsCodIstat(codReg, istatCode);
+    const wantCosta = isFeatureEnabled("erosione_costiera");
 
     const [provincia, regione, italia, erosione] = await Promise.all([
       provId != null
@@ -365,7 +367,7 @@ export async function buildRischioData(
         ? fetchPirByPath(`/pir/regioni/${codReg}`)
         : Promise.resolve(null),
       fetchPirByPath("/pir/italia"),
-      wfsCode != null
+      wantCosta && wfsCode != null
         ? fetchErosioneCostiera(wfsCode).catch((err) => {
             console.warn("rischio erosione costiera fallita", err);
             return null;
@@ -384,7 +386,7 @@ export async function buildRischioData(
       };
     }
     erosioneCostiera = erosione;
-  } else {
+  } else if (isFeatureEnabled("erosione_costiera")) {
     // Fallback: prova solo WFS con formula standard Toscana
     const wfsCode = buildWfsCodIstat(9, istatCode);
     if (wfsCode != null) {

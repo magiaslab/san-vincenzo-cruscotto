@@ -10,19 +10,31 @@
  * Cosa fa:
  * 1. Elenca i CSV `*_VALORI_utf8.csv` / `*_ZONE_utf8.csv` nel mirror
  * 2. Scarica l'ultimo semestre (e, se `--all`, tutti i semestri disponibili)
- * 3. Filtra le sole righe del comune ISTAT 049018 (codifica OMI `9049018`)
- * 4. Scrive `src/data/omi/YYYY-S.json` e aggiorna `src/data/omi/049018.json`
+ * 3. Filtra le sole righe del comune ISTAT in `config/comune.json`
+ *    (codifica OMI tipo `9` + ISTAT, es. `9049018`)
+ * 4. Scrive `src/data/omi/{ISTAT}.json` (e i semestri `{ISTAT}-YYYY-S.json`)
  *    (con `storico` aggregato sulle abitazioni civili)
  *
  * Non richiede login Fisconline/Entratel. Attribuzione: «Agenzia Entrate – OMI».
  */
 
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 const ISTAT = "049018";
-/** Codifica Comune_ISTAT nei CSV OMI / ondata: regione (9) + ISTAT 6 cifre. */
-const ISTAT_OMI = "9049018";
+/** Codifica Comune_ISTAT nei CSV OMI / ondata: termina con ISTAT a 6 cifre (es. `9049018`). */
+function loadIstatFromConfig(): string {
+  try {
+    const raw = readFileSync(path.join(process.cwd(), "config", "comune.json"), "utf8");
+    const json = JSON.parse(raw) as { istat_code?: string };
+    const code = String(json.istat_code ?? "").replace(/\D/g, "").padStart(6, "0");
+    return code || ISTAT;
+  } catch {
+    return ISTAT;
+  }
+}
+
+const ISTAT_CODE = loadIstatFromConfig();
 const MIRROR_API =
   "https://api.github.com/repos/ondata/quotazioni-immobiliari-agenzia-entrate/contents/data";
 const MIRROR_RAW =
@@ -136,8 +148,14 @@ async function listMirrorFiles(): Promise<string[]> {
 }
 
 function isTargetComune(istat: string): boolean {
-  const v = istat.trim();
-  return v === ISTAT_OMI || v === ISTAT || v === "49018";
+  const digits = istat.replace(/\D/g, "");
+  const target = ISTAT_CODE;
+  const short = target.replace(/^0+/, "");
+  return (
+    digits === target ||
+    digits.endsWith(target) ||
+    (Boolean(short) && digits.endsWith(short))
+  );
 }
 
 function buildSnapshot(
@@ -187,7 +205,7 @@ function buildSnapshot(
 
   return {
     semestre,
-    comuneIstat: ISTAT,
+    comuneIstat: ISTAT_CODE,
     zone,
     fonte: "Agenzia Entrate – OMI",
     mirror: "ondata/quotazioni-immobiliari-agenzia-entrate",
@@ -247,26 +265,37 @@ async function main() {
     ]);
     const snap = buildSnapshot(item.semestre, valoriCsv, zoneCsv, item.name);
     if (!snap) {
-      console.warn("Nessuna riga per", ISTAT, "in", item.semestre);
+      console.warn("Nessuna riga per", ISTAT_CODE, "in", item.semestre);
       continue;
     }
-    writeJson(path.join(OUT_DIR, `${item.semestre}.json`), snap);
+    writeJson(path.join(OUT_DIR, `${ISTAT_CODE}-${item.semestre}.json`), snap);
+    if (ISTAT_CODE === "049018") {
+      writeJson(path.join(OUT_DIR, `${item.semestre}.json`), snap);
+    }
     snaps.push(snap);
   }
 
   if (snaps.length === 0) {
-    throw new Error(`Nessuno snapshot generato per ${ISTAT}`);
+    throw new Error(`Nessuno snapshot generato per ${ISTAT_CODE}`);
   }
 
   // Ricarica tutti i semestri già presenti su disco per lo storico
-  const { readdirSync, readFileSync } = await import("node:fs");
   const existing = readdirSync(OUT_DIR)
-    .filter((f) => /^\d{4}-[12]\.json$/.test(f))
+    .filter(
+      (f) =>
+        (f.startsWith(`${ISTAT_CODE}-`) &&
+          /^\d{6}-\d{4}-[12]\.json$/.test(f)) ||
+        (ISTAT_CODE === "049018" && /^\d{4}-[12]\.json$/.test(f)),
+    )
     .sort();
   const allSnaps: Snapshot[] = [];
   for (const f of existing) {
     const raw = JSON.parse(readFileSync(path.join(OUT_DIR, f), "utf8")) as Snapshot;
-    if (raw?.semestre && Array.isArray(raw.zone)) allSnaps.push(raw);
+    if (raw?.semestre && Array.isArray(raw.zone)) {
+      const istat = String(raw.comuneIstat ?? "").replace(/\D/g, "");
+      if (istat && istat !== ISTAT_CODE && !istat.endsWith(ISTAT_CODE)) continue;
+      allSnaps.push(raw);
+    }
   }
 
   const storico = allSnaps
@@ -285,7 +314,7 @@ async function main() {
       "Snapshot comunale da mirror open data ondata (senza login Fisconline). " +
       "Il mirror nazionale può non includere i semestri più recenti.",
   };
-  writeJson(path.join(OUT_DIR, `${ISTAT}.json`), primary);
+  writeJson(path.join(OUT_DIR, `${ISTAT_CODE}.json`), primary);
   console.log(
     `OK: ${primary.zone.length} zone, semestre ${primary.semestre}, storico ${storico.length} punti`,
   );

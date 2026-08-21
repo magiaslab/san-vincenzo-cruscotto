@@ -1,10 +1,11 @@
 /**
- * Estrae da GTFS Regione Toscana (rt-oraritb) i dati rilevanti per San Vincenzo.
- * Output: public/data/trasporti-gtfs-sv.json
+ * Estrae da GTFS regionale i dati TPL intorno al comune in config/comune.json.
+ * Output: public/{urls.trasporti_gtfs_local} (default /data/trasporti-gtfs.json)
  *
  * Uso: node scripts/build-trasporti-gtfs.mjs
+ *      npm run trasporti:gtfs
  */
-import { createWriteStream } from "node:fs";
+import { createWriteStream, readFileSync } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
 import { pipeline } from "node:stream/promises";
 import { Readable } from "node:stream";
@@ -15,29 +16,36 @@ import { spawnSync } from "node:child_process";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
-const OUT = path.join(ROOT, "public/data/trasporti-gtfs-sv.json");
 
-const LAT = 43.085;
-const LON = 10.54;
-const BUS_RADIUS_KM = 8;
-const TRAIN_RADIUS_KM = 12;
+function loadComuneConfig() {
+  try {
+    return JSON.parse(
+      readFileSync(path.join(ROOT, "config", "comune.json"), "utf8"),
+    );
+  } catch {
+    return {};
+  }
+}
+
+const CFG = loadComuneConfig();
+const GEO = CFG.geo ?? {};
+const CENTER = Array.isArray(GEO.map_center) ? GEO.map_center : [43.085, 10.54];
+const LAT = Number(CENTER[0]);
+const LON = Number(CENTER[1]);
+const BUS_RADIUS_KM = Math.max(Number(GEO.bbox_radius_km) || 8, 1);
+const TRAIN_RADIUS_KM = Math.max(BUS_RADIUS_KM + 4, 12);
+const ISTAT = String(CFG.istat_code ?? "").replace(/\D/g, "").padStart(6, "0");
+const STAZIONE_NOME = String(CFG.ferrovie?.stazione_nome || CFG.nome || "");
+const OUT_REL = String(
+  CFG.urls?.trasporti_gtfs_local || "/data/trasporti-gtfs.json",
+).replace(/^\//, "");
+const OUT = path.join(ROOT, "public", OUT_REL);
 
 const URLS = {
   autolinee: "https://regionetoscana.smartregion.toscana.it/mobility/artifacts/gtfs",
   trenitalia:
     "https://dati.toscana.it/dataset/8bb8f8fe-fe7d-41d0-90dc-49f2456180d1/resource/4f85393b-357d-443d-8378-65de4198505f/download/trenitalia.gtfs",
 };
-
-function haversine(lat1, lon1, lat2, lon2) {
-  const R = 6371;
-  const p = Math.PI / 180;
-  const a =
-    Math.sin(((lat2 - lat1) * p) / 2) ** 2 +
-    Math.cos(lat1 * p) *
-      Math.cos(lat2 * p) *
-      Math.sin(((lon2 - lon1) * p) / 2) ** 2;
-  return 2 * R * Math.asin(Math.sqrt(a));
-}
 
 async function download(url, dest) {
   const res = await fetch(url, { redirect: "follow" });
@@ -53,6 +61,8 @@ from pathlib import Path
 
 LAT, LON = ${LAT}, ${LON}
 BUS_R, TRAIN_R = ${BUS_RADIUS_KM}, ${TRAIN_RADIUS_KM}
+ISTAT = ${JSON.stringify(ISTAT)}
+STAZIONE = ${JSON.stringify(STAZIONE_NOME.toLowerCase())}
 zip_dir = Path(${JSON.stringify(zipDir)})
 
 def haversine(lat1, lon1, lat2, lon2):
@@ -120,10 +130,10 @@ with zipfile.ZipFile(zip_dir/'trenitalia.zip') as zf:
       continue
     d=haversine(LAT,LON,lat,lon)
     name=s.get('stop_name') or ''
-    if d<=TRAIN_R or 'vincenzo' in name.lower():
+    if d<=TRAIN_R or (STAZIONE and STAZIONE in name.lower()):
       stops.append({'stop_id': s['stop_id'], 'name': name, 'lat': lat, 'lon': lon, 'dist_km': round(d,2)})
   stops.sort(key=lambda x:x['dist_km'])
-  target_ids={s['stop_id'] for s in stops if 'vincenzo' in s['name'].lower() or s['dist_km']<=2.5}
+  target_ids={s['stop_id'] for s in stops if (STAZIONE and STAZIONE in s['name'].lower()) or s['dist_km']<=2.5}
   trip_ids=set(); stop_events=[]
   for row in dict_reader(zf,'stop_times.txt'):
     if row['stop_id'] not in target_ids: continue
@@ -180,7 +190,7 @@ with zipfile.ZipFile(zip_dir/'trenitalia.zip') as zf:
   arr_sample=sample_rows(arrs)
   train={'agency':'Trenitalia','source':'https://dati.toscana.it/dataset/rt-oraritb','stops':stops,'routes':routes,'departures_sample':dep_sample,'arrivals_sample':arr_sample,'stats':{'stops':len(stops),'routes':len(routes),'departures_listed':len(dep_sample),'arrivals_listed':len(arr_sample)}}
 
-out={'generated_at': datetime.now(timezone.utc).isoformat(), 'center':{'lat':LAT,'lon':LON}, 'dataset':'https://dati.toscana.it/dataset/rt-oraritb', 'bus':bus, 'train':train}
+out={'generated_at': datetime.now(timezone.utc).isoformat(), 'istat_code': ISTAT, 'center':{'lat':LAT,'lon':LON}, 'dataset':'https://dati.toscana.it/dataset/rt-oraritb', 'bus':bus, 'train':train}
 print(json.dumps(out, ensure_ascii=False, separators=(',',':')))
 `;
   const r = spawnSync("python3", ["-c", script], {
@@ -194,13 +204,13 @@ print(json.dumps(out, ensure_ascii=False, separators=(',',':')))
 }
 
 async function main() {
-  const dir = path.join(tmpdir(), `gtfs-sv-${Date.now()}`);
+  const dir = path.join(tmpdir(), `gtfs-${ISTAT || "comune"}-${Date.now()}`);
   await mkdir(dir, { recursive: true });
   console.log("Download Autolinee Toscane GTFS…");
   await download(URLS.autolinee, path.join(dir, "autolinee.zip"));
   console.log("Download Trenitalia GTFS…");
   await download(URLS.trenitalia, path.join(dir, "trenitalia.zip"));
-  console.log("Estrazione San Vincenzo…");
+  console.log(`Estrazione TPL per ${CFG.nome || ISTAT} (${LAT}, ${LON}) → ${OUT}`);
   const json = runPython(dir);
   await mkdir(path.dirname(OUT), { recursive: true });
   await writeFile(OUT, json);

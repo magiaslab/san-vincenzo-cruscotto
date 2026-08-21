@@ -64,6 +64,8 @@ export const GITHUB_FORK_REPO_URL =
 /** Centro approssimativo del comune (per mappa iniziale). */
 export const MAP_CENTER: [number, number] = COMUNE.geo.map_center;
 export const MAP_DEFAULT_ZOOM = COMUNE.geo.map_default_zoom;
+/** Lato mare del rilievo 3D (`none` = comune interno). */
+export const TERRAIN_SEA_SIDE = COMUNE.geo.terrain_sea_side;
 
 /** Mappa globale OpenAEDMap centrata sul comune. */
 export const OPENAEDMAP_URL = `https://openaedmap.org/it/#map=14/${MAP_CENTER[0]}/${MAP_CENTER[1]}`;
@@ -164,6 +166,7 @@ export const COMUNE_EVENTI_URL = COMUNE.urls.eventi_comune;
 export const VISIT_SAN_VINCENZO_EVENTI_URL = COMUNE.urls.eventi_calendario;
 export const BIBLIOTECA_COMUNALE_URL = COMUNE.urls.biblioteca;
 export const BIBLIOTECA_OPAC_URL = COMUNE.urls.biblioteca_opac;
+export const COMUNE_STALLI_DISABILI_URL = COMUNE.urls.stalli_disabili;
 export const ARPAT_BASE_URL = COMUNE.regione_opendata.arpat_base_url;
 export const ARPAT_OPENDATA_URL = `${ARPAT_BASE_URL.replace(/\/$/, "")}/opendata`;
 export const ARPAT_BALNEAZIONE_URL = `${ARPAT_BASE_URL.replace(/\/$/, "")}/tema-ambientale/balneazione/`;

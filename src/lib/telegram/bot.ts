@@ -3,7 +3,7 @@
  */
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { COMUNE_NOME, COMUNE_PROVINCIA, OPENAEDMAP_URL } from "@/lib/constants";
+import { COMUNE_NOME, COMUNE_PROVINCIA, DAE_GEOJSON_PATH, OPENAEDMAP_URL } from "@/lib/constants";
 import {
   answerCallbackQuery,
   parseAdminChatIds,
@@ -18,6 +18,7 @@ import {
   setSegnalazioneStatus,
   upsertSegnalazione,
 } from "@/lib/telegram/store";
+import { getSiteUrl } from "@/lib/seo";
 import {
   decodeCoordMarker,
   encodeCoordMarker,
@@ -27,9 +28,7 @@ import {
   type DaeSegnalazioneFeature,
 } from "@/lib/telegram/types";
 
-const CRUSCOTTO_SANITA =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
-  "https://www.cruscottosanvincenzo.it";
+const CRUSCOTTO_SANITA = getSiteUrl();
 
 function helpText(): string {
   return [
@@ -62,8 +61,9 @@ async function loadOsmDae(): Promise<
   Array<{ lat: number; lon: number; nome: string }>
 > {
   try {
+    const rel = (DAE_GEOJSON_PATH || "/data/dae.geojson").replace(/^\//, "");
     const raw = await readFile(
-      path.join(process.cwd(), "public/data/dae-san-vincenzo.geojson"),
+      path.join(process.cwd(), "public", rel),
       "utf8",
     );
     const json = JSON.parse(raw) as {

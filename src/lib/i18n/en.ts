@@ -838,6 +838,8 @@ export const en: Record<string, string> = {
   "Rischio territoriale": "Territorial risk",
   "Dissesto idrogeologico ed erosione costiera — indicatori ISPRA IdroGEO a scala comunale.":
     "Hydrogeological hazard and coastal erosion — ISPRA IdroGEO indicators at municipal scale.",
+  "Dissesto idrogeologico — indicatori ISPRA IdroGEO a scala comunale.":
+    "Hydrogeological hazard — ISPRA IdroGEO indicators at municipal scale.",
   "Layer ISPRA su alluvioni e frane a scala comunale — in integrazione.": "ISPRA flood and landslide layers at municipal scale — integration in progress.",
   "Dati IdroGEO non disponibili": "IdroGEO data unavailable",
   "La fonte open data sarà collegata a breve. Intanto consulta i KPI rischio già presenti sopra (Cruscotto Italia).": "The open-data source will be connected soon. For now use the risk KPIs above (Cruscotto Italia).",

@@ -1,14 +1,11 @@
 /** Tipi e costanti per il bot Telegram DAE. */
 
+import { getComuneBbox, inComuneBbox } from "@/lib/comune-config";
+
 export const DAE_SEGNALAZIONI_PATH = "/data/dae-segnalazioni.geojson";
 
-/** BBox San Vincenzo (allineata a scripts/sync-dae-geojson.mjs). */
-export const DAE_BBOX = {
-  lonMin: 10.48,
-  latMin: 43.02,
-  lonMax: 10.58,
-  latMax: 43.12,
-} as const;
+/** BBox territoriale da `config/comune.json` (geo.bbox o raggio intorno al centro). */
+export const DAE_BBOX = getComuneBbox();
 
 export type DaeSegnalazioneStatus =
   | "pending"
@@ -43,12 +40,7 @@ export type DaeSegnalazioniCollection = {
 };
 
 export function inDaeBbox(lat: number, lon: number): boolean {
-  return (
-    lon >= DAE_BBOX.lonMin &&
-    lon <= DAE_BBOX.lonMax &&
-    lat >= DAE_BBOX.latMin &&
-    lat <= DAE_BBOX.latMax
-  );
+  return inComuneBbox(lat, lon);
 }
 
 export function haversineM(

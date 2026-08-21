@@ -115,7 +115,19 @@ const CORE_FIELDS: { campo: string; esempio: string; dove: string }[] = [
   {
     campo: "geo.map_center · geo.meteo",
     esempio: `${COMUNE.geo.map_center.join(", ")}`,
-    dove: "mappe Leaflet, meteo, radar (seguono il comune in config/comune.json)",
+    dove: "mappe Leaflet, meteo, radar, Wheelmap, OpenAEDMap",
+  },
+  {
+    campo: "geo.bbox / bbox_radius_km",
+    esempio: COMUNE.geo.bbox
+      ? COMUNE.geo.bbox.join(", ")
+      : `raggio ${COMUNE.geo.bbox_radius_km} km`,
+    dove: "filtro DAE, TPL Overpass, bot Telegram",
+  },
+  {
+    campo: "geo.terrain_sea_side",
+    esempio: COMUNE.geo.terrain_sea_side,
+    dove: "rilievo 3D (west/east/south/north/none)",
   },
   {
     campo: "miur_codice_catastale",
@@ -129,7 +141,7 @@ const CORE_FIELDS: { campo: string; esempio: string; dove: string }[] = [
   },
   {
     campo: "features.*",
-    esempio: "porto, balneazione, treni, … = false",
+    esempio: "porto, balneazione, erosione_costiera, treni, … = false",
     dove: "spegne tab/API non pertinenti al tuo comune",
   },
   {
@@ -290,7 +302,13 @@ const OPTIONAL_MODULES: { area: string; cerca: string }[] = [
   },
   {
     area: "Trasporti e treni",
-    cerca: "build-trasporti-gtfs.mjs, FS_STAZIONE_* in viaggiatreno.ts",
+    cerca:
+      "npm run trasporti:gtfs (legge centro/raggio da comune.json). Senza file locale l’API usa Overpass. Codice FS in ferrovie.stazione_viaggiatreno",
+  },
+  {
+    area: "OMI / DAE",
+    cerca:
+      "npm run omi:update e npm run dae:sync dopo aver impostato ISTAT e geo.bbox",
   },
   {
     area: "Allerte / ARPAT / turismo / eventi",
@@ -511,7 +529,7 @@ git branch -M main && git push -u origin main`}
             </li>
             <li>
               <strong>Identità comune</strong> — aggiorna{" "}
-              <code>src/lib/constants.ts</code> (tabella sotto). Checklist:{" "}
+              <code>config/comune.json</code> (tabella sotto). Checklist:{" "}
               <a
                 className="underline"
                 href={GITHUB_CONFIG_EXAMPLE_URL}
@@ -540,8 +558,7 @@ git branch -M main && git push -u origin main`}
               <strong>Dominio (opzionale)</strong> — Settings → Domains, DNS
               come da Vercel, poi{" "}
               <code>NEXT_PUBLIC_SITE_URL=https://www.tuodominio.it</code> e
-              redeploy. Aggiorna anche il fallback in{" "}
-              <code>src/lib/seo.ts</code> se serve.
+              redeploy. Imposta anche <code>brand.site_url</code> nel JSON.
             </li>
           </ol>
         </Section>
@@ -590,9 +607,10 @@ git branch -M main && git push -u origin main`}
             </table>
           </div>
           <p className="text-[var(--pa-muted)]">
-            Aggiorna anche stazione FS (<code>viaggiatreno.ts</code>), asset in{" "}
-            <code>public/data/</code>, OG image e stringhe col nome del comune se
-            non vuoi residui di {COMUNE_NOME}.
+            Aggiorna anche <code>geo.terrain_sea_side</code>,{" "}
+            <code>features.erosione_costiera</code>, bbox DAE, stemma/OG in{" "}
+            <code>public/</code>. Poi: <code>npm run dae:sync</code>,{" "}
+            <code>npm run omi:update</code>, <code>npm run trasporti:gtfs</code>.
           </p>
         </Section>
 
@@ -688,7 +706,7 @@ git branch -M main && git push -u origin main`}
             <li>
               <strong>Cursor:</strong> apri la cartella del fork →{" "}
               <code>npm install && npm run dev</code> → in Agent chiedi ad es.
-              «Aggiorna <code>constants.ts</code> per il comune X, ISTAT Y,
+              «Aggiorna <code>config/comune.json</code> per il comune X, ISTAT Y,
               coordinate Z» o «adatta/rimuovi porto e ARPAT». Vedi{" "}
               <code>AGENTS.md</code>.
             </li>
