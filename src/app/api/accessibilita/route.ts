@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { unstable_cache } from "next/cache";
+import { ISTAT_CODE } from "@/lib/constants";
 import { buildAccessibilitaPayload } from "@/lib/accessibilita";
 import type { AccessibilitaPayload } from "@/lib/accessibilita";
 
@@ -8,7 +9,7 @@ export const revalidate = 21600;
 
 const getCachedPayload = unstable_cache(
   async () => buildAccessibilitaPayload(6),
-  ["accessibilita-overpass-v4"],
+  ["accessibilita-overpass-v4", ISTAT_CODE],
   { revalidate: 21600 },
 );
 

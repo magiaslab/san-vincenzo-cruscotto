@@ -4,6 +4,7 @@ import {
   PIENOFURBO_COLONNINE_URL,
   PUN_IDR_URL,
 } from "@/lib/constants";
+import { matchesComuneNome, COMUNE } from "@/lib/comune-config";
 import { getCachedDashboard } from "@/lib/dashboard";
 
 export type EvStationRow = {
@@ -105,12 +106,7 @@ function roundCoord(n: number): number {
   return Math.round(n * 1e4) / 1e4;
 }
 
-function isSanVincenzoComune(comune: string | null | undefined): boolean {
-  if (!comune) return false;
-  return /san\s*vincenzo/i.test(comune);
-}
-
-async function fetchPienofurboNearSv(): Promise<PfStation[]> {
+async function fetchPienofurboNearComune(): Promise<PfStation[]> {
   const [lat, lon] = MAP_CENTER;
   const url = new URL(PIENOFURBO_COLONNINE_SEARCH_URL);
   url.searchParams.set("lat", String(lat));
@@ -124,7 +120,8 @@ async function fetchPienofurboNearSv(): Promise<PfStation[]> {
     headers: {
       Accept: "application/json",
       "User-Agent":
-        "CruscottoSanVincenzo/1.0 (+https://www.cruscottosanvincenzo.it)",
+        COMUNE.brand.user_agent ||
+        "Cruscotto-Comunale/1.0 (+https://github.com/magiaslab/san-vincenzo-cruscotto)",
     },
     next: { revalidate: 3600 },
   });
@@ -248,7 +245,7 @@ function pfOnlyInComune(
     const lon = toNum(p.lon);
     const dist = toNum(p.distanza_km);
     const inComune =
-      isSanVincenzoComune(p.comune) || (dist != null && dist <= 2.5);
+      matchesComuneNome(p.comune) || (dist != null && dist <= 2.5);
     if (!inComune || lat == null || lon == null) continue;
 
     const nearExisting = used.some(
@@ -292,7 +289,7 @@ export async function buildEvPrezziPayload(): Promise<EvPrezziPayload> {
   let pf: PfStation[] = [];
   let note: string | undefined;
   try {
-    pf = await fetchPienofurboNearSv();
+    pf = await fetchPienofurboNearComune();
   } catch (err) {
     note = `Prezzi PienoFurbo non disponibili al momento (${
       err instanceof Error ? err.message : "errore"
