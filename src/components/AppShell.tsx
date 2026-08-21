@@ -242,7 +242,7 @@ export function AppShell({
                 type="button"
                 onClick={goHome}
                 className="inline-flex h-9 shrink-0 items-center lg:hidden"
-                aria-label={t("Home Cruscotto San Vincenzo")}
+                aria-label={t("Home Cruscotto {comune}", { comune: COMUNE_NOME })}
               >
                 <Image
                   src={STEMMA.src}
@@ -292,7 +292,8 @@ export function AppShell({
             </div>
             <div className="bg-[var(--pa-primary)] px-3 py-2 text-xs font-semibold leading-snug text-white sm:px-4 sm:text-sm">
               {t(
-                "Progetto non ufficiale: non affiliato ad AgID, al Governo italiano o al Comune di San Vincenzo.",
+                "Progetto non ufficiale: non affiliato ad AgID, al Governo italiano o al Comune di {comune}.",
+                { comune: COMUNE_NOME },
               )}
             </div>
           </header>

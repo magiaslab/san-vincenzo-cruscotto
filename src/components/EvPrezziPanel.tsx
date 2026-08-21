@@ -49,7 +49,7 @@ export default function EvPrezziPanel() {
     let cancelled = false;
     setLoading(true);
     setError(null);
-    fetch("/api/ev")
+    fetch(`/api/ev?_=${Date.now()}`, { cache: "no-store" })
       .then((r) => {
         if (!r.ok) throw new Error("ev");
         return r.json() as Promise<EvPrezziPayload>;

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { COMUNE_NOME } from "@/lib/constants";
 
 const CACHE_DURATION = 1800; // 30 minuti per dati aria
 
@@ -10,7 +11,7 @@ export async function GET() {
     
     const data = {
       disponibile: false,
-      messaggio: "Nessuna stazione di rilevamento qualità aria presente nel comune di San Vincenzo",
+      messaggio: `Nessuna stazione di rilevamento qualità aria presente nel comune di ${COMUNE_NOME}`,
       stazioni_piu_vicine: [
         {
           nome: "Cecina",

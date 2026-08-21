@@ -5,6 +5,7 @@ import { AlertTriangle, ShieldAlert } from "lucide-react";
 import {
   ALLERTA_METEO_SV_PAGE_URL,
   CFR_TOSCANA_URL,
+  COMUNE_NOME,
   DPC_ALLERTAMENTO_URL,
   REGIONE_TOSCANA_ALLERTA_URL,
 } from "@/lib/constants";
@@ -188,7 +189,7 @@ export function AllerteMeteoPanel() {
               {t("Allerte meteo")}
             </h3>
             <p className="mb-0 mt-1 text-xs text-[var(--pa-muted)] sm:text-sm">
-              {t("San Vincenzo")}
+              {COMUNE_NOME}
               {data?.zona ? ` · ${t("Zona")} ${data.zona}` : ""}
               {data?.bollettino?.data
                 ? ` · ${t("Bollettino")} ${data.bollettino.data}${

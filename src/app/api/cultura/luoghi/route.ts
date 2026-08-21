@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { COMUNE_ISTAT_CULTURA } from "@/lib/constants";
+import { COMUNE_ISTAT_CULTURA, COMUNE_NOME } from "@/lib/constants";
+import { isUpstreamDeploy } from "@/lib/comune-config";
 
 const CACHE_DURATION = 86400; // 24 ore
 
@@ -12,7 +13,8 @@ function mapsUrl(query: string, lat?: number, lon?: number): string {
 
 export async function GET() {
   try {
-    const luoghi = [
+    const luoghi = isUpstreamDeploy()
+      ? [
       {
         nome: "Torre di San Vincenzo",
         tipo: "Monumento",
@@ -59,11 +61,12 @@ export async function GET() {
           10.5272,
         ),
       },
-    ];
+    ]
+      : [];
 
     return NextResponse.json(
       {
-        comune: "San Vincenzo",
+        comune: COMUNE_NOME,
         istat: COMUNE_ISTAT_CULTURA,
         n_luoghi: luoghi.length,
         luoghi,

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import {
+  COMUNE_NOME,
   METEO_LAT,
   METEO_LON,
   OPENWEATHER_BASE_URL,
@@ -224,7 +225,7 @@ export async function GET() {
           components: airItem?.components ?? null,
           dt: isoFromUnix(airItem?.dt),
         },
-        place: forecast.city?.name ?? "San Vincenzo",
+        place: forecast.city?.name ?? COMUNE_NOME,
         lat: METEO_LAT,
         lon: METEO_LON,
         source: "OpenWeather",

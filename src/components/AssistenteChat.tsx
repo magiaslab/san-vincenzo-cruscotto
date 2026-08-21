@@ -1,6 +1,7 @@
 "use client";
 
 import { useT } from "@/lib/i18n";
+import { COMUNE_NOME } from "@/lib/constants";
 import { FormEvent, useState } from "react";
 import { LoadingBlock, SectionIntro, SolidLink } from "@/components/ui";
 
@@ -24,7 +25,7 @@ type Msg = {
 };
 
 const SUGGESTIONS = [
-  "Quanti abitanti ha San Vincenzo?",
+  `Quanti abitanti ha ${COMUNE_NOME}?`,
   "Dove trovo i luoghi accessibili?",
   "Qual è la capienza del porto?",
   "Quante colonnine EV ci sono?",
@@ -114,8 +115,8 @@ export default function AssistenteChat({
           >
             {compact
               ? t(s)
-                  .replace(" in San Vincenzo?", "?")
-                  .replace(" a San Vincenzo?", "?")
+                  .replace(` in ${COMUNE_NOME}?`, "?")
+                  .replace(` a ${COMUNE_NOME}?`, "?")
                   .slice(0, 48)
               : t(s)}
           </button>

@@ -4,6 +4,7 @@ import {
   PIENOFURBO_COLONNINE_URL,
   PUN_IDR_URL,
 } from "@/lib/constants";
+import { matchesComuneNome } from "@/lib/comune-config";
 import { getCachedDashboard } from "@/lib/dashboard";
 
 export type EvStationRow = {
@@ -103,11 +104,6 @@ function haversineKm(
 
 function roundCoord(n: number): number {
   return Math.round(n * 1e4) / 1e4;
-}
-
-function isSanVincenzoComune(comune: string | null | undefined): boolean {
-  if (!comune) return false;
-  return /san\s*vincenzo/i.test(comune);
 }
 
 async function fetchPienofurboNearSv(): Promise<PfStation[]> {
@@ -246,9 +242,7 @@ function pfOnlyInComune(
   for (const p of pf) {
     const lat = toNum(p.lat);
     const lon = toNum(p.lon);
-    const dist = toNum(p.distanza_km);
-    const inComune =
-      isSanVincenzoComune(p.comune) || (dist != null && dist <= 2.5);
+    const inComune = matchesComuneNome(p.comune);
     if (!inComune || lat == null || lon == null) continue;
 
     const nearExisting = used.some(

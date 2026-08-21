@@ -80,7 +80,7 @@ const FLOW_STEPS: { title: string; body: string }[] = [
   },
   {
     title: "Dashboard",
-    body: `I pannelli React leggono JSON dalle API interne e mostrano KPI, mappe, grafici e sezioni tematiche per San Vincenzo (ISTAT ${ISTAT_CODE}).`,
+    body: `I pannelli React leggono JSON dalle API interne e mostrano KPI, mappe, grafici e sezioni tematiche per ${COMUNE_NOME} (ISTAT ${ISTAT_CODE}).`,
   },
   {
     title: "Degrado controllato",

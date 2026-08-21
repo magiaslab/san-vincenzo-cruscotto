@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { isFeatureEnabled } from "@/lib/comune-config";
+import { COMUNE_DI } from "@/lib/constants";
+import { isFeatureEnabled, isUpstreamDeploy } from "@/lib/comune-config";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -15,6 +16,16 @@ export async function GET() {
   if (!isFeatureEnabled("porto")) {
     return NextResponse.json(
       { disponibile: false, error: "Modulo porto disattivato" },
+      { status: 404 },
+    );
+  }
+  if (!isUpstreamDeploy()) {
+    return NextResponse.json(
+      {
+        disponibile: false,
+        camere: [],
+        error: "Webcam porto non configurate per questo comune",
+      },
       { status: 404 },
     );
   }
@@ -57,10 +68,10 @@ export async function GET() {
             : null,
         ].filter(Boolean),
         fonte: {
-          nome: "Comune di San Vincenzo — WebCam",
+          nome: `${COMUNE_DI} — WebCam`,
           url: WEBCAM_PAGE,
         },
-        note: "Immagini di proprietà del Comune di San Vincenzo; mostrate con attribuzione e link alla fonte ufficiale.",
+        note: `Immagini di proprietà del ${COMUNE_DI}; mostrate con attribuzione e link alla fonte ufficiale.`,
       },
       {
         headers: {
@@ -75,7 +86,7 @@ export async function GET() {
         disponibile: false,
         camere: [],
         fonte: {
-          nome: "Comune di San Vincenzo — WebCam",
+          nome: `${COMUNE_DI} — WebCam`,
           url: WEBCAM_PAGE,
         },
         error: "Impossibile recuperare le webcam ufficiali",

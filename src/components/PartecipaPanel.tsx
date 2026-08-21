@@ -15,9 +15,12 @@ import {
 } from "lucide-react";
 import {
   AUTHOR,
+  COMUNE_NOME,
+  COMUNE_PROVINCIA,
   CRUSCOTTO_ITALIA_URL,
   GITHUB_FORK_REPO_URL,
   OPENAEDMAP_URL,
+  TELEGRAM_DAE_BOT_HANDLE,
   TELEGRAM_DAE_BOT_URL,
 } from "@/lib/constants";
 import { formatDateTime } from "@/lib/format";
@@ -224,7 +227,8 @@ export function PartecipaPanel() {
           </h3>
           <p className="mb-0 mt-2 text-sm leading-relaxed text-[var(--pa-muted)]">
             {t(
-              "È un cruscotto indipendente e non ufficiale sui dati aperti di San Vincenzo (LI). Non è affiliato ad AgID, al Governo o al Comune: aggrega fonti pubbliche per consultarle in un unico posto.",
+              "È un cruscotto indipendente e non ufficiale sui dati aperti di {comune} ({provincia}). Non è affiliato ad AgID, al Governo o al Comune: aggrega fonti pubbliche per consultarle in un unico posto.",
+              { comune: COMUNE_NOME, provincia: COMUNE_PROVINCIA },
             )}
           </p>
           <ul className="mb-0 mt-3 list-disc space-y-1.5 pl-5 text-sm text-[var(--pa-ink)]">
@@ -269,7 +273,7 @@ export function PartecipaPanel() {
                 rel="noopener noreferrer"
                 className="font-semibold underline"
               >
-                @DaesanvincenzoBot
+                {TELEGRAM_DAE_BOT_HANDLE}
               </a>
             </li>
             <li>

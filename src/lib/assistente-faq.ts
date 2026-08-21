@@ -3,6 +3,8 @@
  * Copre tutte le sezioni del cruscotto, non solo il porto.
  */
 
+import { COMUNE_NOME } from "@/lib/constants";
+
 export type FaqHit = {
   answer: string;
   link: { href: string; label: string };
@@ -30,7 +32,7 @@ const RULES: Rule[] = [
     patterns: [
       /capienza.*porto|posti\s*barca|quanti\s*posti.*porto|porto.*posti|ormeggi/i,
     ],
-    answer: "Capienza del porto di San Vincenzo: circa 140 posti barca (ISTAT / OpenDataComune).",
+    answer: `Capienza del porto di ${COMUNE_NOME}: circa 140 posti barca (ISTAT / OpenDataComune).`,
     href: "/#porto",
     label: "Apri sezione Porto",
     title: "Porto turistico",
@@ -174,7 +176,12 @@ const RULES: Rule[] = [
   },
   {
     id: "turismo",
-    patterns: [/turist|eventi|biblioteca|visit\s*san\s*vincenzo|arrivi|presenze|alberghi|\bhotel\b/i],
+    patterns: [
+      new RegExp(
+        `turist|eventi|biblioteca|visit\\s*${COMUNE_NOME.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s*")}|arrivi|presenze|alberghi|\\bhotel\\b`,
+        "i",
+      ),
+    ],
     answer:
       "Turismo (arrivi/presenze, strutture, eventi, biblioteca) è nella sezione Turismo.",
     href: "/#turismo",
@@ -344,7 +351,7 @@ const RULES: Rule[] = [
     id: "meteo-allerte",
     patterns: [/allerta|protezione\s*civile|criticit[aà]|bollettino\s*meteo/i],
     answer:
-      "Allerte Protezione Civile per San Vincenzo (zona Etruria-Costa Nord / E2) nel tab Meteo.",
+      `Allerte Protezione Civile per ${COMUNE_NOME} nel tab Meteo.`,
     href: "/#meteo",
     label: "Apri sezione Meteo",
     title: "Allerte meteo",

@@ -68,7 +68,7 @@ import {
   SolidButton,
   valueOrMissing,
 } from "@/components/ui";
-import { COMUNE_NOME, COMUNI_LOOKUP } from "@/lib/constants";
+import { COMUNE_NOME, COMUNE_PROVINCIA, COMUNI_LOOKUP } from "@/lib/constants";
 import { isFeatureEnabled, isTabEnabled } from "@/lib/comune-config";
 import {
   formatDecimal,
@@ -421,7 +421,7 @@ function Panoramica({
     <section>
       <SectionIntro
         title={t("Cosa ti serve oggi?")}
-        description={`${t("Dati aperti di")} ${String(anagrafica?.nome ?? "San Vincenzo")}: ${t("parti dai servizi utili, poi esplora le sezioni dedicate.")}`}
+        description={`${t("Dati aperti di")} ${String(anagrafica?.nome ?? COMUNE_NOME)}: ${t("parti dai servizi utili, poi esplora le sezioni dedicate.")}`}
       />
 
       <AllertaHomeBanner onOpenMeteo={() => onNavigate("meteo")} />
@@ -1061,7 +1061,7 @@ function Turismo({
         <KpiCard
           label={t("Eventi in calendario")}
           value={valueOrMissing(eventiComune?.n_eventi, formatInteger)}
-          hint={t("Visit San Vincenzo")}
+          hint={t("Calendario eventi")}
           icon={Palmtree}
           variant="info"
         />
@@ -1210,7 +1210,7 @@ function Turismo({
               rel="noopener noreferrer"
               className="underline"
             >
-              {t("Comune di San Vincenzo")}
+              {t("Comune di {comune}", { comune: COMUNE_NOME })}
             </a>
             {" · "}
             <a
@@ -1241,7 +1241,7 @@ function Turismo({
                 typeof luogo.maps_url === "string" && luogo.maps_url.trim()
                   ? luogo.maps_url.trim()
                   : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                      `${nome}, San Vincenzo LI`,
+                      `${nome}, ${COMUNE_NOME} ${COMUNE_PROVINCIA}`,
                     )}`;
               const primary = sito || maps;
               return (
@@ -1792,7 +1792,7 @@ function Finanza({ kpi }: { kpi: Kpi }) {
           <div className="panel">
             <h3 className={h3}>{t("Top CPV ANAC")}</h3>
             <p className="m-0 mb-3 text-xs text-[var(--pa-muted)] sm:text-sm">
-              {String(anac?.buyer_name ?? t("Comune di San Vincenzo"))}
+              {String(anac?.buyer_name ?? t("Comune di {comune}", { comune: COMUNE_NOME }))}
               {anac?.first_award_date || anac?.last_award_date
                 ? ` · ${t("Aggiudicazioni")} ${String(anac?.first_award_date ?? "—")} → ${String(anac?.last_award_date ?? "—")}`
                 : null}
@@ -2764,7 +2764,7 @@ function Ambiente({ kpi }: { kpi: Kpi }) {
       <p className="mt-3 text-xs text-[#5b6f82] sm:mt-4 sm:text-sm">
         <strong>{t("Note:")}</strong> ARPAT effettua monitoraggi microbiologici settimanali
         nelle aree di balneazione durante la stagione (1 aprile - 30 settembre).
-        La classificazione si basa sui dati degli ultimi 4 anni. San Vincenzo mantiene
+        La classificazione si basa sui dati degli ultimi 4 anni. {COMUNE_NOME} mantiene
         acque di qualità eccellente su tutta la costa.
       </p>
     </section>

@@ -11,6 +11,7 @@
  */
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { COMUNE_NOME, COMUNE_PROVINCIA, TELEGRAM_DAE_BOT_HANDLE } from "@/lib/constants";
 import type {
   DaeSegnalazioneFeature,
   DaeSegnalazioneStatus,
@@ -68,8 +69,8 @@ function emptyCollection(): DaeSegnalazioniCollection {
     type: "FeatureCollection",
     features: [],
     meta: {
-      fonte: "Segnalazioni cittadine via Telegram (@DaesanvincenzoBot)",
-      ambito: "San Vincenzo (LI)",
+      fonte: `Segnalazioni cittadine via Telegram (${TELEGRAM_DAE_BOT_HANDLE})`,
+      ambito: `${COMUNE_NOME} (${COMUNE_PROVINCIA})`,
       n: 0,
       nota: "Punti non ancora su OpenStreetMap; in emergenza chiama il 118.",
     },

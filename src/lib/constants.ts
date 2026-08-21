@@ -23,6 +23,11 @@ export const ISTAT_CODE = COMUNE.istat_code;
 export const COMUNE_NOME = COMUNE.nome;
 export const COMUNE_PROVINCIA = COMUNE.provincia;
 export const COMUNE_REGIONE = COMUNE.regione;
+/** Etichetta UI «Comune di …» dal JSON. */
+export const COMUNE_DI = `Comune di ${COMUNE.nome}`;
+/** Nome stazione FS (ViaggiaTreno / etichette TPL). */
+export const STAZIONE_FS_NOME =
+  COMUNE.ferrovie.stazione_nome?.trim() || COMUNE.nome;
 
 export const MCP_ENDPOINT = "https://cruscotto-italia-mcp.agid.workers.dev/mcp";
 
@@ -73,6 +78,17 @@ export const DAE_GEOJSON_PATH = COMUNE.urls.dae_geojson;
 export const TELEGRAM_DAE_BOT_URL =
   process.env.NEXT_PUBLIC_TELEGRAM_BOT_URL?.trim() ||
   "https://t.me/DaesanvincenzoBot";
+
+function telegramHandleFromUrl(url: string): string {
+  try {
+    const path = new URL(url).pathname.replace(/^\//, "").replace(/\/$/, "");
+    return path ? `@${path}` : url;
+  } catch {
+    return url;
+  }
+}
+/** Handle visibile in UI, derivato da NEXT_PUBLIC_TELEGRAM_BOT_URL. */
+export const TELEGRAM_DAE_BOT_HANDLE = telegramHandleFromUrl(TELEGRAM_DAE_BOT_URL);
 
 /** GeoJSON overlay segnalazioni cittadine (approvate). */
 export const DAE_SEGNALAZIONI_API = "/api/dae/segnalazioni";

@@ -3,7 +3,7 @@
  */
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { OPENAEDMAP_URL } from "@/lib/constants";
+import { COMUNE_NOME, COMUNE_PROVINCIA, OPENAEDMAP_URL } from "@/lib/constants";
 import {
   answerCallbackQuery,
   parseAdminChatIds,
@@ -33,7 +33,7 @@ const CRUSCOTTO_SANITA =
 
 function helpText(): string {
   return [
-    "<b>Bot DAE San Vincenzo</b>",
+    `<b>Bot DAE ${COMUNE_NOME}</b>`,
     "",
     "Segnala un defibrillatore (DAE) mancante sulla mappa open data.",
     "In emergenza chiama sempre il <b>118</b>.",
@@ -127,7 +127,7 @@ async function handleLocation(msg: TelegramMessage) {
   if (!inDaeBbox(lat, lon)) {
     await sendMessage(
       msg.chat.id,
-      "Questa posizione sembra fuori da San Vincenzo. Avvicinati al DAE e riprova con /nuovo.",
+      `Questa posizione sembra fuori da ${COMUNE_NOME}. Avvicinati al DAE e riprova con /nuovo.`,
       { reply_markup: { remove_keyboard: true } },
     );
     return;
@@ -390,7 +390,7 @@ export async function handleTelegramUpdate(update: TelegramUpdate) {
       [
         "Per segnalare un DAE, inviami la <b>posizione</b> (pulsante qui sotto oppure graffetta → Posizione).",
         "",
-        "Deve essere nel territorio di San Vincenzo (LI).",
+        `Deve essere nel territorio di ${COMUNE_NOME} (${COMUNE_PROVINCIA}).`,
       ].join("\n"),
     );
     return;

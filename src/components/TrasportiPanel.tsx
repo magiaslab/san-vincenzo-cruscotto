@@ -5,7 +5,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Bike, Bus, Footprints, Train } from "lucide-react";
 import {
   CICLABILI_DATASET_URL,
+  COMUNE_NOME,
   PEDONALI_DATASET_URL,
+  STAZIONE_FS_NOME,
   RT_ORARITB_DATASET_URL,
   TRASPORTI_TRENI_LIVE_API,
   VIAGGIATRENO_ATTRIBUTION_URL,
@@ -282,7 +284,8 @@ export function TrasportiPanel({
           </h2>
           <p className="mb-0 mt-1 text-sm text-[var(--pa-muted)]">
             {t(
-              "Orari TPL (GTFS Regione Toscana), fermate e linee Autolinee Toscane, partenze e arrivi FS da S.Vincenzo (con ritardi live), aree ciclabili e pedonali comunali.",
+              "Orari TPL (GTFS Regione Toscana), fermate e linee Autolinee Toscane, partenze e arrivi FS da {stazione} (con ritardi live), aree ciclabili e pedonali comunali.",
+              { stazione: STAZIONE_FS_NOME },
             )}
           </p>
         </div>
@@ -290,7 +293,8 @@ export function TrasportiPanel({
         <SectionIntro
           title={t("Trasporti")}
           description={t(
-            "Orari TPL (GTFS Regione Toscana), fermate e linee Autolinee Toscane, partenze e arrivi FS da S.Vincenzo (con ritardi live), aree ciclabili e pedonali comunali.",
+            "Orari TPL (GTFS Regione Toscana), fermate e linee Autolinee Toscane, partenze e arrivi FS da {stazione} (con ritardi live), aree ciclabili e pedonali comunali.",
+            { stazione: STAZIONE_FS_NOME },
           )}
         />
       )}
@@ -332,7 +336,9 @@ export function TrasportiPanel({
         <KpiCard
           label={t("Stazioni FS vicine")}
           value={valueOrMissing(data?.kpi?.stazioni_fs, formatInteger)}
-          hint={t("Partenze e arrivi da S.Vincenzo")}
+          hint={t("Partenze e arrivi da {stazione}", {
+            stazione: STAZIONE_FS_NOME,
+          })}
           icon={Train}
         />
         <KpiCard
@@ -393,7 +399,7 @@ export function TrasportiPanel({
               className="shrink-0 text-[var(--pa-primary)]"
               aria-hidden
             />
-            {t("Treni FS — S.Vincenzo")}
+            {t("Treni FS — {stazione}", { stazione: STAZIONE_FS_NOME })}
           </h3>
           <p className="mb-0 mt-1 text-xs text-[var(--pa-muted)] sm:text-sm">
             {hasLive
@@ -561,7 +567,7 @@ export function TrasportiPanel({
                 className="shrink-0 text-[var(--pa-primary)]"
                 aria-hidden
               />
-              {t("Linee Autolinee Toscane che servono San Vincenzo")}
+              {t("Linee Autolinee Toscane che servono {comune}", { comune: COMUNE_NOME })}
             </h3>
           </div>
           <table className="mt-2 min-w-full text-left text-xs sm:text-sm">

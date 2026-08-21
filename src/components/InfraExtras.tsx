@@ -12,6 +12,7 @@ import {
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import {
+  COMUNE_NOME,
   MAP_CENTER,
   MAP_DEFAULT_ZOOM,
   OSM_COPYRIGHT_URL,
@@ -352,7 +353,7 @@ export function BandaUltralargaPanel({
     <div className="panel">
       <PanelHeading
         title={t("Copertura banda ultralarga / FTTH")}
-        description={t("Indicatori AGCOM Broadband Map per San Vincenzo. La mappa ufficiale nazionale non espone layer incorporabili: apri il portale per i dettagli civico per civico.")}
+        description={t("Indicatori AGCOM Broadband Map per {comune}. La mappa ufficiale nazionale non espone layer incorporabili: apri il portale per i dettagli civico per civico.", { comune: COMUNE_NOME })}
         icon={Wifi}
         actions={
           <>

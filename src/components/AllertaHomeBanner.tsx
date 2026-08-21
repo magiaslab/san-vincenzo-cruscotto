@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { AlertTriangle, X } from "lucide-react";
-import { REGIONE_TOSCANA_ALLERTA_URL } from "@/lib/constants";
+import { COMUNE_NOME, REGIONE_TOSCANA_ALLERTA_URL } from "@/lib/constants";
 import { useT } from "@/lib/i18n";
 
 type DayNorm = {
@@ -154,7 +154,7 @@ export function AllertaHomeBanner({
             </span>
           </div>
           <p className={`mb-0 mt-1 text-xs sm:text-sm ${styles.text}`}>
-            {t("San Vincenzo")}
+            {COMUNE_NOME}
             {data.zona ? ` · ${t("Zona")} ${data.zona}` : ""}
             {rischi.length > 0 ? ` · ${rischi.join(", ")}` : ""}
             {". "}
