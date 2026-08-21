@@ -1,15 +1,7 @@
 /**
  * Fermate TPL da OpenStreetMap (Overpass) quando manca l’estratto GTFS locale.
  */
-import { HTTP_USER_AGENT } from "@/lib/constants";
-
-const OVERPASS_ENDPOINTS = [
-  "https://overpass-api.de/api/interpreter",
-  "https://lz4.overpass-api.de/api/interpreter",
-  "https://z.overpass-api.de/api/interpreter",
-] as const;
-
-const OVERPASS_FETCH_MS = 22_000;
+import { fetchOverpass } from "@/lib/overpass";
 
 export type OsmTplStop = {
   stop_id: string;
@@ -18,14 +10,6 @@ export type OsmTplStop = {
   lon: number;
   dist_km: number;
   routes_sample?: string[];
-};
-
-type OverpassElement = {
-  type: string;
-  id: number;
-  lat?: number;
-  lon?: number;
-  tags?: Record<string, string>;
 };
 
 function haversineKm(
@@ -44,48 +28,8 @@ function haversineKm(
   return 2 * R * Math.asin(Math.sqrt(a));
 }
 
-async function fetchOverpass(query: string): Promise<OverpassElement[]> {
-  let lastErr: unknown;
-  for (const endpoint of OVERPASS_ENDPOINTS) {
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), OVERPASS_FETCH_MS);
-    try {
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-          Accept: "application/json",
-          "User-Agent": HTTP_USER_AGENT,
-        },
-        body: `data=${encodeURIComponent(query)}`,
-        signal: ctrl.signal,
-        cache: "no-store",
-      });
-      if (!res.ok) throw new Error(`overpass_http_${res.status}`);
-      const json = (await res.json()) as { elements?: OverpassElement[] };
-      const elements = Array.isArray(json.elements) ? json.elements : [];
-      if (elements.length === 0) {
-        lastErr = new Error(`overpass_empty:${endpoint}`);
-        continue;
-      }
-      return elements;
-    } catch (err) {
-      lastErr = err;
-    } finally {
-      clearTimeout(timer);
-    }
-  }
-  if (
-    lastErr instanceof Error &&
-    String(lastErr.message).startsWith("overpass_empty:")
-  ) {
-    return [];
-  }
-  throw lastErr instanceof Error ? lastErr : new Error("overpass_failed");
-}
-
 function toStop(
-  el: OverpassElement,
+  el: { type: string; id: number; lat?: number; lon?: number; tags?: Record<string, string> },
   lat0: number,
   lon0: number,
 ): OsmTplStop | null {

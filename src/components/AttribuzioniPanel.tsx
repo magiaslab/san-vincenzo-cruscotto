@@ -219,7 +219,27 @@ export function AttribuzioniPanel() {
               >
                 Regione Toscana Open Data
               </a>{" "}
-              — eventi culturali, orari TPL (GTFS), aree ciclabili e pedonali
+              — eventi culturali, orari TPL (GTFS)
+            </li>
+            <li>
+              <a
+                className="text-[#0066CC] underline"
+                href="https://www.openstreetmap.org/copyright"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                OpenStreetMap
+              </a>
+              {" / "}
+              <a
+                className="text-[#0066CC] underline"
+                href="https://cycling.waymarkedtrails.org/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Waymarked Trails
+              </a>{" "}
+              — percorsi ciclabili, MTB e sentieri (relazioni OSM)
             </li>
             <li>
               <a

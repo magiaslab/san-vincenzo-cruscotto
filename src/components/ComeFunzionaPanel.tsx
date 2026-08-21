@@ -99,7 +99,7 @@ const API_ROWS: { route: string; desc: string }[] = [
     desc: "Layer GeoJSON (civici, EV, beni, sanità)",
   },
   { route: "GET /api/meteo*", desc: "Meteo live, previsioni, radar, allerte" },
-  { route: "GET /api/trasporti", desc: "GTFS TPL, fermate, ciclabili" },
+  { route: "GET /api/percorsi", desc: "Percorsi ciclabili/pedonali OSM (lista, mappa, GPX)" },
   { route: "GET /api/dae", desc: "Defibrillatori da GeoJSON locale / OSM" },
   { route: "POST /api/feedback", desc: "Suggerimenti → issue GitHub" },
   { route: "POST /api/assistente", desc: "Proxy RAG su Modal (se configurato)" },

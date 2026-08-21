@@ -301,9 +301,9 @@ const OPTIONAL_MODULES: { area: string; cerca: string }[] = [
     cerca: "GITHUB_FEEDBACK_TOKEN o GITHUB_TOKEN con issues:write sul tuo repo",
   },
   {
-    area: "Trasporti e treni",
+    area: "Percorsi ciclo / pedonali",
     cerca:
-      "npm run trasporti:gtfs (legge centro/raggio da comune.json). Senza file locale l’API usa Overpass. Codice FS in ferrovie.stazione_viaggiatreno",
+      "OSM automatico sul bbox (features.ciclabili_pedonali). URL GeoJSON comunale opzionali. GPX dalla lista in Mobilità",
   },
   {
     area: "OMI / DAE",

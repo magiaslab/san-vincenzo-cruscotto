@@ -253,7 +253,7 @@ function parseConfig(input: unknown): ComuneConfig {
       balneazione: bool(features.balneazione, false),
       treni: bool(features.treni, false),
       gtfs_locale: bool(features.gtfs_locale, false),
-      ciclabili_pedonali: bool(features.ciclabili_pedonali, false),
+      ciclabili_pedonali: bool(features.ciclabili_pedonali, true),
       eventi_comune: bool(features.eventi_comune, false),
       eventi_regionali: bool(features.eventi_regionali, false),
       turismo_flussi: bool(features.turismo_flussi, true),

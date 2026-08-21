@@ -198,9 +198,12 @@ npm run trasporti:gtfs    # fermate/linee GTFS intorno al centro
 ```
 
 Senza questi file l’UI non resta su San Vincenzo: DAE e TPL degradano
-(Overpass / collection vuota); OMI prova il mirror ondata. Ciclabili/pedonali
-si caricano solo se `features.ciclabili_pedonali` è true e gli URL nel JSON
-sono del tuo comune (non lasciare i path ldpgis di San Vincenzo).
+(Overpass / collection vuota); OMI prova il mirror ondata.
+
+**Percorsi ciclabili/pedonali** arrivano da OpenStreetMap (relazioni `route=bicycle|hiking`
+nel bbox). `features.ciclabili_pedonali` è **true** di default. Gli URL
+`ciclabili_geojson` / `pedonali_geojson` restano un overlay opzionale (DBT
+comunale); lasciali vuoti se non hai un GIS locale.
 
 ### Come trovare i dati
 
@@ -224,7 +227,8 @@ sono del tuo comune (non lasciare i path ldpgis di San Vincenzo).
 | `treni` | Disattiva board ViaggiaTreno |
 | `eventi_comune` / `eventi_regionali` | Niente scrape calendario / CKAN eventi |
 | `allerte_toscana_sir` | Solo allertameteo.app (ok fuori Toscana) |
-| `gtfs_locale` / `ciclabili_pedonali` | Niente file GTFS/GeoJSON locali SV |
+| `gtfs_locale` | Niente estratto GTFS locale (restano fermate OSM) |
+| `ciclabili_pedonali` | Nasconde lista/mappa percorsi OSM e overlay GeoJSON comunale |
 
 Dopo le modifiche: commit + push sul tuo repo.
 

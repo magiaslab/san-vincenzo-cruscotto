@@ -52,6 +52,7 @@ import { ScuoleMiurPanel } from "@/components/ScuoleMiurPanel";
 import { AllerteMeteoPanel } from "@/components/AllerteMeteoPanel";
 import { AllertaHomeBanner } from "@/components/AllertaHomeBanner";
 import { TrasportiPanel } from "@/components/TrasportiPanel";
+import { PercorsiPanel } from "@/components/PercorsiPanel";
 import { PartecipaPanel } from "@/components/PartecipaPanel";
 import { ComeFunzionaPanel } from "@/components/ComeFunzionaPanel";
 import { RiusaPanel } from "@/components/RiusaPanel";
@@ -2333,6 +2334,8 @@ function Infra({ kpi }: { kpi: Kpi }) {
       <div className="mb-6">
         <TrasportiPanel embedded />
       </div>
+
+      {isFeatureEnabled("ciclabili_pedonali") ? <PercorsiPanel /> : null}
 
       {loading ? <LoadingBlock /> : null}
 
