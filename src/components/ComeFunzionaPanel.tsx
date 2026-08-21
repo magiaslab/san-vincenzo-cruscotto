@@ -153,7 +153,7 @@ export function ComeFunzionaPanel() {
               {AUTHOR.name}
             </a>
             . Progetto indipendente e non ufficiale — vedi anche le{" "}
-            <Link href="/#attribuzioni" className="underline">
+            <Link href="/attribuzioni" className="underline">
               attribuzioni e regole
             </Link>
             .
@@ -333,11 +333,11 @@ export function ComeFunzionaPanel() {
             reale su tutti i dataset. Per usi ufficiali o legali fare sempre
             riferimento alle fonti primarie. Licenze, stemma e elenco completo
             delle fonti sono in{" "}
-            <Link href="/#attribuzioni" className="underline">
+            <Link href="/attribuzioni" className="underline">
               Attribuzioni e regole
             </Link>
             . Per duplicare lo stack su un altro comune vedi{" "}
-            <Link href="/#riusa" className="underline">
+            <Link href="/riusa" className="underline">
               Riusa / fork
             </Link>
             .

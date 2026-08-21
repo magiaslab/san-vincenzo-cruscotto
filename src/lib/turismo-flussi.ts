@@ -9,6 +9,7 @@ import {
   REGIONE_TOSCANA_CKAN_API,
   TURISMO_CSV_FALLBACK_URL as TURISMO_CSV_FALLBACK_URL_CONST,
 } from "@/lib/constants";
+import { COMUNE, matchesComuneText } from "@/lib/comune-config";
 
 export const TURISMO_REVALIDATE_SECONDS = 604800; // 7 giorni
 
@@ -18,7 +19,7 @@ export const TURISMO_CSV_FALLBACK_URL = TURISMO_CSV_FALLBACK_URL_CONST;
 export const TURISMO_FONTE =
   "Regione Toscana — Movimento dei clienti negli esercizi ricettivi (dati ISTAT), dati.toscana.it — CC BY";
 
-export const TURISMO_RESIDENTI_FALLBACK = 6342;
+export const TURISMO_RESIDENTI_FALLBACK = COMUNE.residenti_fallback || 0;
 
 export type TurismoMese = {
   mese: number;
@@ -94,7 +95,9 @@ export function emptyTurismoPayload(
   };
 }
 
-const UA = "Cruscotto-San-Vincenzo/1.0 (+https://github.com/magiaslab/san-vincenzo-cruscotto)";
+const UA =
+  COMUNE.brand.user_agent ||
+  "Cruscotto-Comunale/1.0 (+https://github.com/magiaslab/san-vincenzo-cruscotto)";
 
 type CkanResource = {
   id?: string;
@@ -486,13 +489,22 @@ function parseMensileFromRows(rows: string[][], yearHint: number | null): {
 } | null {
   // Layout tipico ODS RT: Provincia | Comune | (arrivi,presenze)×12 | totale arrivi | totale presenze
   for (const cells of rows) {
-    const joined = cells.slice(0, 4).join(" ").toLowerCase();
-    if (!joined.includes("san vincenzo") && !cells.some((c) => normalizeIstat(c) === ISTAT_CODE)) {
+    const joined = cells.slice(0, 4).join(" ");
+    if (
+      !matchesComuneText(joined) &&
+      !cells.some((c) => normalizeIstat(c) === ISTAT_CODE)
+    ) {
       continue;
     }
     // trova indice comune
     let start = 2;
-    const comuneIdx = cells.findIndex((c) => c.trim().toLowerCase() === "san vincenzo");
+    const aliases = [
+      COMUNE_NOME,
+      ...COMUNE.nome_aliases,
+    ].map((s) => s.trim().toLowerCase());
+    const comuneIdx = cells.findIndex((c) =>
+      aliases.includes(c.trim().toLowerCase()),
+    );
     if (comuneIdx >= 0) start = comuneIdx + 1;
     const nums: number[] = [];
     for (let i = start; i < cells.length; i++) {

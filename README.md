@@ -9,9 +9,11 @@ Progetto **indipendente e non ufficiale**, realizzato da [Alessandro Cipriani](m
 Guida completa (GitHub → Vercel → dominio, account esterni, Telegram, Modal/HF,
 env, Cursor/Claude): [`docs/riuso-fork.md`](docs/riuso-fork.md).
 
-In-app: tab **Progetto → Riusa / fork** (`/#riusa`). Checklist:
-[`config/comune.example.json`](config/comune.example.json). Env:
-[`.env.example`](.env.example).
+In-app: tab **Progetto → Riusa / fork** (`/#riusa`). Identità comunale a
+runtime: [`config/comune.json`](config/comune.json) (template:
+[`config/comune.example.json`](config/comune.example.json)). Crediti progetto
+originale (non modificare nei fork): [`src/lib/project-origin.ts`](src/lib/project-origin.ts).
+Env: [`.env.example`](.env.example).
 
 ## Stack
 

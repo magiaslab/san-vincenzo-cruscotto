@@ -1,13 +1,16 @@
 /**
  * Client non ufficiale verso l’API pubblica ViaggiaTreno (RFI / Trenitalia).
- * Usata solo server-side per arrivi/partenze live e ritardi a S.Vincenzo.
+ * Usata solo server-side per arrivi/partenze live della stazione configurata.
  */
+
+import { COMUNE } from "@/lib/comune-config";
 
 export const VIAGGIATRENO_BASE =
   "https://www.viaggiatreno.it/infomobilita/resteasy/viaggiatreno" as const;
 
-/** Codice stazione FS San Vincenzo (coincide con prefisso GTFS S06030_1). */
-export const FS_STAZIONE_SAN_VINCENZO = "S06030" as const;
+/** Codice stazione FS del comune (`config/comune.json` → ferrovie). */
+export const FS_STAZIONE_SAN_VINCENZO =
+  COMUNE.ferrovie.stazione_viaggiatreno || "S06030";
 
 export const VIAGGIATRENO_ATTRIBUTION_URL =
   "https://www.viaggiatreno.it/" as const;

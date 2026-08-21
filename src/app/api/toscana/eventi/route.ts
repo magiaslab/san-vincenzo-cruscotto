@@ -1,5 +1,17 @@
 import { NextResponse } from "next/server";
-import { REGIONE_TOSCANA_CKAN_API } from "@/lib/constants";
+import {
+  COMUNE_EVENTI_URL,
+  COMUNE_NOME,
+  HTTP_USER_AGENT,
+  REGIONE_TOSCANA_CKAN_API,
+  REGIONE_TOSCANA_OPENDATA_URL,
+  VISIT_SAN_VINCENZO_EVENTI_URL,
+} from "@/lib/constants";
+import {
+  COMUNE,
+  isFeatureEnabled,
+  matchesComuneText,
+} from "@/lib/comune-config";
 
 const CACHE_DURATION = 7200; // 2 ore
 
@@ -23,7 +35,7 @@ async function fetchJsonRecords(
   url: string,
 ): Promise<Array<Record<string, unknown>>> {
   const res = await fetch(url, {
-    headers: { "User-Agent": "Cruscotto-San-Vincenzo/1.0" },
+    headers: { "User-Agent": HTTP_USER_AGENT },
     next: { revalidate: CACHE_DURATION },
   });
   if (!res.ok) return [];
@@ -43,7 +55,6 @@ function pick(obj: Record<string, unknown>, keys: string[]): string | null {
     if (typeof v === "string" && v.trim()) return v.trim();
     if (typeof v === "number") return String(v);
   }
-  // case-insensitive
   const lower = Object.fromEntries(
     Object.entries(obj).map(([k, v]) => [k.toLowerCase(), v]),
   );
@@ -83,24 +94,26 @@ function mapRecord(
   };
 }
 
-function relevantToSanVincenzo(e: EventoRegionale): boolean {
-  const hay = `${e.comune ?? ""} ${e.luogo ?? ""} ${e.titolo}`.toLowerCase();
-  return (
-    hay.includes("san vincenzo") ||
-    hay.includes("piombino") ||
-    hay.includes("campiglia") ||
-    hay.includes("castagneto") ||
-    hay.includes("livorno") ||
-    hay.includes("populonia") ||
-    hay.includes("baratti")
-  );
-}
-
 export async function GET() {
+  if (!isFeatureEnabled("eventi_regionali")) {
+    return NextResponse.json(
+      {
+        disponibile: false,
+        n_eventi: 0,
+        eventi: [],
+        messaggio: "Modulo eventi regionali disattivato",
+      },
+      { status: 404 },
+    );
+  }
+
+  const ckanId = COMUNE.regione_opendata.eventi_ckan_id || "rt-eventi-sistcult";
+  const datasetUrl = `${REGIONE_TOSCANA_OPENDATA_URL.replace(/\/$/, "")}/dataset/${ckanId}`;
+
   try {
-    const packageUrl = `${REGIONE_TOSCANA_CKAN_API}/package_show?id=rt-eventi-sistcult`;
+    const packageUrl = `${REGIONE_TOSCANA_CKAN_API}/package_show?id=${encodeURIComponent(ckanId)}`;
     const response = await fetch(packageUrl, {
-      headers: { "User-Agent": "Cruscotto-San-Vincenzo/1.0" },
+      headers: { "User-Agent": HTTP_USER_AGENT },
       next: { revalidate: CACHE_DURATION },
     });
 
@@ -141,18 +154,20 @@ export async function GET() {
           if (mapped) collected.push(mapped);
         }
       } catch (err) {
-        console.warn("Risorsa eventi Toscana non leggibile:", res.url, err);
+        console.warn("Risorsa eventi regionale non leggibile:", res.url, err);
       }
     }
 
-    const locali = collected.filter(relevantToSanVincenzo);
-    const eventi = (locali.length > 0 ? locali : collected).slice(0, 40);
+    const locali = collected.filter((e) =>
+      matchesComuneText(e.comune, e.luogo, e.titolo),
+    );
+    const eventi = (locali.length > 0 ? locali : []).slice(0, 40);
 
     return NextResponse.json(
       {
         disponibile: Boolean(ckanData.success),
-        dataset: ckanData.result?.name ?? "rt-eventi-sistcult",
-        title: ckanData.result?.title ?? "Eventi Sistema Cultura",
+        dataset: ckanData.result?.name ?? ckanId,
+        title: ckanData.result?.title ?? "Eventi culturali",
         description: ckanData.result?.notes ?? "",
         resources,
         n_record_totali: collected.length,
@@ -160,19 +175,22 @@ export async function GET() {
         eventi,
         filtro_territoriale:
           locali.length > 0
-            ? "San Vincenzo e comuni limitrofi / provincia"
+            ? `${COMUNE_NOME} (e alias configurati)`
             : collected.length > 0
-              ? "Elenco regionale (nessun match locale)"
+              ? `Nessun match per ${COMUNE_NOME} nelle risorse JSON`
               : "Nessun record attivo nelle risorse JSON CKAN",
         categorie: ["Musei", "Biblioteche", "Archeologia", "Eventi culturali"],
         note:
           collected.length === 0
-            ? "Il dataset regionale Sistema Cultura risulta raggiungibile, ma le risorse JSON non restituiscono eventi attivi al momento. Consulta il calendario comunale Visit San Vincenzo."
-            : "Eventi dal Sistema Cultura Regione Toscana (open data).",
+            ? `Dataset regionale raggiungibile, ma senza eventi JSON attivi. Consulta il calendario comunale.`
+            : locali.length === 0
+              ? `Trovati ${collected.length} eventi regionali, nessuno filtrato su ${COMUNE_NOME}.`
+              : "Eventi dal Sistema Cultura / open data regionale.",
         fonte: {
-          nome: "Regione Toscana - Open Data",
-          url: "https://dati.toscana.it/dataset/rt-eventi-sistcult",
+          nome: "Open data regionale",
+          url: datasetUrl,
           licenza: "CC-BY 4.0",
+          calendario_comune: COMUNE_EVENTI_URL || VISIT_SAN_VINCENZO_EVENTI_URL,
         },
       },
       {
@@ -182,7 +200,7 @@ export async function GET() {
       },
     );
   } catch (error) {
-    console.error("Errore API eventi Toscana:", error);
+    console.error("Errore API eventi regionali:", error);
 
     return NextResponse.json(
       {
@@ -192,8 +210,8 @@ export async function GET() {
         messaggio: "Servizio temporaneamente non disponibile",
         categorie: ["Musei", "Biblioteche", "Archeologia"],
         fonte: {
-          nome: "Regione Toscana - Open Data",
-          url: "https://dati.toscana.it/dataset/rt-eventi-sistcult",
+          nome: "Open data regionale",
+          url: datasetUrl,
         },
       },
       {

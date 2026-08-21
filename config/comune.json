@@ -1,0 +1,97 @@
+{
+  "$schema_comment": "Identità comunale caricata a runtime da src/lib/comune-config.ts. Per un fork: copia questo file, adatta i valori, spegni i moduli non pertinenti. Vedi anche config/comune.example.json e docs/riuso-fork.md.",
+  "istat_code": "049018",
+  "nome": "San Vincenzo",
+  "nome_aliases": ["san vincenzo"],
+  "provincia": "LI",
+  "regione": "Toscana",
+  "miur_codice_catastale": "I390",
+  "farmacie_di_turno_cod": "49018",
+  "residenti_fallback": 6342,
+  "geo": {
+    "map_center": [43.085, 10.54],
+    "meteo": [43.085, 10.54],
+    "map_default_zoom": 13
+  },
+  "ferrovie": {
+    "stazione_viaggiatreno": "S06030",
+    "stazione_nome": "San Vincenzo"
+  },
+  "allerte": {
+    "allertameteo_comune": "San Vincenzo",
+    "allertameteo_page_path": "toscana/livorno/san-vincenzo",
+    "toscana_zona": "E2",
+    "toscana_zona_label": "Etruria-Costa Nord",
+    "toscana_sample": [98, 152]
+  },
+  "urls": {
+    "comune": "https://www.comune.sanvincenzo.li.it/",
+    "opendata": "https://cloud.ldpgis.it/sanvincenzoopen/",
+    "eventi_comune": "https://www.comune.sanvincenzo.li.it/Vivere-il-comune/Eventi",
+    "eventi_calendario": "https://visitsanvincenzo.it/it/calendario-eventi/",
+    "eventi_calendario_kind": "visit_html",
+    "biblioteca": "https://www.comune.sanvincenzo.li.it/Vivere-il-comune/Luoghi/Biblioteca-Comunale-Giorgio-Calandra",
+    "biblioteca_opac": "https://opacsol.comune.livorno.it/SebinaOpac/library/SAN%20VINCENZO%20-%20Biblioteca%20comunale/LIASA",
+    "ciclabili_geojson": "https://sanvincenzo.ldpgis.it/metarepo2/api/datasets/area_di_circolazione_ciclabile/resources/139/GeoJSON",
+    "pedonali_geojson": "https://sanvincenzo.ldpgis.it/metarepo2/api/datasets/area_di_circolazione_pedonale/resources/138/GeoJSON",
+    "dae_geojson": "/data/dae-san-vincenzo.geojson",
+    "ciclabili_geojson_local": "/data/ciclabili-san-vincenzo.geojson",
+    "pedonali_geojson_local": "/data/pedonali-san-vincenzo.geojson",
+    "trasporti_gtfs_local": "/data/trasporti-gtfs-sv.json"
+  },
+  "brand": {
+    "stemma_path": "/stemma-san-vincenzo.png",
+    "stemma_width": 399,
+    "stemma_height": 500,
+    "stemma_alt": "Stemma del Comune di San Vincenzo",
+    "stemma_attribution": "Stemma di San Vincenzo, disegno di Massimo Ghirardi, per gentile concessione di Araldicacivica.it — CC BY-NC-ND 3.0 IT",
+    "stemma_license_url": "https://creativecommons.org/licenses/by-nc-nd/3.0/it/",
+    "stemma_source_url": "https://upload.wikimedia.org/wikipedia/it/8/81/San_Vincenzo_%28Italia%29-Stemma.png",
+    "site_url": "https://www.cruscottosanvincenzo.it",
+    "user_agent": "Cruscotto-San-Vincenzo/1.0 (+https://github.com/magiaslab/san-vincenzo-cruscotto)"
+  },
+  "regione_opendata": {
+    "portal_url": "https://dati.toscana.it/",
+    "ckan_api": "https://dati.toscana.it/api/3/action",
+    "turismo_stats_url": "https://www.regione.toscana.it/statistiche/dati-statistici/turismo",
+    "gtfs_dataset_url": "https://dati.toscana.it/dataset/rt-oraritb",
+    "gtfs_ckan_id": "rt-oraritb",
+    "eventi_ckan_id": "rt-eventi-sistcult",
+    "allerta_url": "https://www.regione.toscana.it/allertameteo",
+    "cfr_url": "https://www.cfr.toscana.it/",
+    "arpat_base_url": "https://www.arpat.toscana.it",
+    "nota": "Per altre regioni: cerca il portale open data regionale (spesso CKAN su dati.<regione>.it), il dataset turismo ISTAT/movimenti ricettivi, GTFS TPL e allerte Protezione Civile regionali. Catalogo nazionale: https://www.dati.gov.it/"
+  },
+  "features": {
+    "porto": true,
+    "balneazione": true,
+    "treni": true,
+    "gtfs_locale": true,
+    "ciclabili_pedonali": true,
+    "eventi_comune": true,
+    "eventi_regionali": true,
+    "turismo_flussi": true,
+    "allerte": true,
+    "allerte_toscana_sir": true,
+    "dae": true,
+    "dae_telegram": true,
+    "assistente_rag": true,
+    "biblioteca": true,
+    "arpat_aria": true
+  },
+  "eventi_filtro_extra": [
+    "piombino",
+    "campiglia",
+    "castagneto",
+    "populonia",
+    "baratti"
+  ],
+  "fork": {
+    "is_upstream": true,
+    "maintainer_name": "",
+    "maintainer_email": "",
+    "maintainer_url": "",
+    "github_repo_url": "",
+    "_comment": "Nei fork: is_upstream=false e compila maintainer_*. I crediti al progetto originale restano in src/lib/project-origin.ts (non modificarli)."
+  }
+}

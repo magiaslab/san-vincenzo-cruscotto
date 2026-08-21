@@ -460,6 +460,11 @@ export const en: Record<string, string> = {
   "Progetto non ufficiale: non affiliato ad AgID, al Governo italiano o al Comune di San Vincenzo.": "Unofficial project: not affiliated with AgID, the Italian Government, or the Municipality of San Vincenzo.",
   "Provincia": "Province",
   "Provincia di Livorno": "Province of Livorno",
+  "Provincia di": "Province of",
+  "Aria, raccolta differenziata e consumo di suolo.":
+    "Air quality, separate waste collection and land consumption.",
+  "Aria e rifiuti da fonti open; stazioni ISPRA più vicine se assenti in comune.":
+    "Air and waste from open sources; nearest ISPRA stations if none in the municipality.",
   "punti georeferenziati (anagrafe Ministero della Salute).": "georeferenced points (Ministry of Health registry).",
   "Punti ricarica EV": "EV charging points",
   "Qual è la copertura FTTH?": "What is the FTTH coverage?",
@@ -476,6 +481,13 @@ export const en: Record<string, string> = {
   "Raffiche max": "Max gusts",
   "Rappresentante": "Representative",
   "Realizzato da": "Built by",
+  "Basato sul": "Based on the",
+  "di": "by",
+  "Questo fork è curato da": "This fork is maintained by",
+  "Progetto sorgente:": "Source project:",
+  "non affiliato ad AgID, al Governo italiano o al Comune indicato.": "not affiliated with AgID, the Italian Government or the municipality shown.",
+  "Calendario eventi e biblioteca comunale": "Events calendar and municipal library",
+
   "Redditi MEF (serie e fasce), profilo occupazionale ISTAT e imprese ASIA con ATECO.": "MEF incomes (series and brackets), ISTAT employment profile and ASIA businesses with NACE codes.",
   "Reddito medio": "Average income",
   "Reddito medio €": "Average income €",

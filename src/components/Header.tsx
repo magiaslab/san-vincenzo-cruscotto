@@ -67,7 +67,7 @@ export function Header({ generatedAt, brandAsHeading = true }: HeaderProps) {
               </Link>
             </BrandTag>
             <p className="m-0 mt-1 text-xs text-[var(--pa-muted)] sm:text-sm">
-              {t("Provincia di Livorno")} ({COMUNE_PROVINCIA}) · {COMUNE_REGIONE} ·
+              {t("Provincia di")} {COMUNE_PROVINCIA} · {COMUNE_REGIONE} ·
               ISTAT {ISTAT_CODE}
               {generatedAt
                 ? ` · ${t("agg.")} ${formatDateTime(generatedAt)}`

@@ -2,7 +2,7 @@
  * Crea una GitHub Issue da un suggerimento cittadino.
  * Richiede GITHUB_TOKEN (o GH_TOKEN) con permesso issues:write sul repo.
  */
-import { GITHUB_REPO_URL } from "@/lib/constants";
+import { GITHUB_FORK_REPO_URL } from "@/lib/constants";
 
 export type FeedbackTipo =
   | "miglioramento"
@@ -37,7 +37,7 @@ const TIPO_LABELS_GH: Record<FeedbackTipo, string[]> = {
 function repoSlug(): string {
   const fromEnv = process.env.GITHUB_REPO?.trim();
   if (fromEnv) return fromEnv;
-  return GITHUB_REPO_URL.replace("https://github.com/", "");
+  return GITHUB_FORK_REPO_URL.replace("https://github.com/", "");
 }
 
 function token(): string | null {
@@ -69,7 +69,7 @@ export function buildFallbackIssueUrl(payload: FeedbackPayload): string {
     .filter((l) => l != null)
     .join("\n");
   const labels = TIPO_LABELS_GH[payload.tipo].join(",");
-  const u = new URL(`${GITHUB_REPO_URL}/issues/new`);
+  const u = new URL(`${GITHUB_FORK_REPO_URL}/issues/new`);
   u.searchParams.set("title", title);
   u.searchParams.set("body", body);
   u.searchParams.set("labels", labels);

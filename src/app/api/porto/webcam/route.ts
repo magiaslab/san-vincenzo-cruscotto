@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isFeatureEnabled } from "@/lib/comune-config";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -11,6 +12,13 @@ const WEBCAM_BASE = "https://lnx.comune.sanvincenzo.li.it/webcamfoto/";
  * (Vista Nord / Vista Sud sul porto). Aggiornamento tipico ~5 minuti.
  */
 export async function GET() {
+  if (!isFeatureEnabled("porto")) {
+    return NextResponse.json(
+      { disponibile: false, error: "Modulo porto disattivato" },
+      { status: 404 },
+    );
+  }
+
   try {
     const res = await fetch(WEBCAM_PAGE, {
       cache: "no-store",
