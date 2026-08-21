@@ -6,6 +6,7 @@ import {
   ARPAT_OPENDATA_URL,
   CARTO_ATTRIBUTION_URL,
   COMUNE_NOME,
+  COMUNE_SAN_VINCENZO_URL,
   CRUSCOTTO_ITALIA_URL,
   FARMACIE_DI_TURNO_URL,
   MINISTERO_CULTURA_URL,
@@ -287,7 +288,7 @@ export function AttribuzioniPanel() {
               >
                 Esplora i dati
               </a>
-              ) — anagrafe scuole, alunni/classi e infanzia per San Vincenzo
+              ) — anagrafe scuole, alunni/classi e infanzia per {COMUNE_NOME}
               (IODL 2.0)
             </li>
             <li>
@@ -389,11 +390,11 @@ export function AttribuzioniPanel() {
               — traffico AIS (embed); webcam porto:{" "}
               <a
                 className="text-[#0066CC] underline"
-                href="https://lnx.comune.sanvincenzo.li.it/webcam/"
+                href={COMUNE_SAN_VINCENZO_URL}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Comune di San Vincenzo
+                Comune di {COMUNE_NOME}
               </a>
             </li>
             <li>

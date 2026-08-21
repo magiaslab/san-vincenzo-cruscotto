@@ -12,6 +12,7 @@ import {
   REGIONE_TOSCANA_CKAN_API,
   RT_ORARITB_CKAN_ID,
   RT_ORARITB_DATASET_URL,
+  STAZIONE_FS_NOME,
   TRASPORTI_GTFS_SV_PATH,
 } from "@/lib/constants";
 import { ensureWgs84GeoJson } from "@/lib/geo/reproject";
@@ -158,7 +159,7 @@ export async function GET() {
           autolinee_gtfs_url: AUTOLINEE_GTFS_URL,
         },
         note:
-          "GTFS filtrato entro ~8 km (bus) / stazione S.Vincenzo (treni). Orari campione non filtrati per calendario giornaliero: verificare su Autolinee Toscane / Trenitalia.",
+          `GTFS filtrato entro ~8 km (bus) / stazione ${STAZIONE_FS_NOME} (treni). Orari campione non filtrati per calendario giornaliero: verificare su Autolinee Toscane / Trenitalia.`,
       },
       {
         headers: {

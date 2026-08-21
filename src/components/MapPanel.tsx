@@ -12,7 +12,7 @@ import {
 } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { CATASTO_GEOJSON_URL, MAP_CENTER, MAP_DEFAULT_ZOOM } from "@/lib/constants";
+import { CATASTO_GEOJSON_URL, COMUNE_NOME, MAP_CENTER, MAP_DEFAULT_ZOOM } from "@/lib/constants";
 import {
   DataUnavailable,
   KpiCard,
@@ -224,7 +224,7 @@ export default function MapPanel({ kpi }: { kpi?: Record<string, unknown> }) {
 
       {beniUnavailable ? (
         <div className="mb-3">
-          <DataUnavailable message={t("Beni culturali MiC: nessun punto con coordinate per San Vincenzo.")} />
+          <DataUnavailable message={t("Beni culturali MiC: nessun punto con coordinate per {comune}.", { comune: COMUNE_NOME })} />
         </div>
       ) : null}
       {showCatasto && catastoError ? (

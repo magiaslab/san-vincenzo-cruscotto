@@ -31,7 +31,8 @@ export function Header({ generatedAt, brandAsHeading = true }: HeaderProps) {
         <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-1.5 px-4 py-2 text-xs sm:flex-row sm:items-center sm:gap-2 sm:text-sm sm:px-6">
           <span className="font-semibold leading-snug tracking-wide">
             {t(
-              "Progetto non ufficiale: non affiliato ad AgID, al Governo italiano o al Comune di San Vincenzo.",
+              "Progetto non ufficiale: non affiliato ad AgID, al Governo italiano o al Comune di {comune}.",
+              { comune: COMUNE_NOME },
             )}
           </span>
           <div className="flex w-full items-center justify-between gap-3 sm:w-auto sm:justify-end">

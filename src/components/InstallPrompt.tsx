@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { Download, Share, X } from "lucide-react";
 import { useT } from "@/lib/i18n";
+import { COMUNE_NOME } from "@/lib/constants";
 import { useFocusTrap } from "@/lib/focus-trap";
 
 const STORAGE_KEY = "sv-cruscotto-install-prompt";
@@ -179,7 +180,8 @@ export function InstallPrompt() {
             </p>
             <p id={descId} className="m-0 mt-1 text-sm text-[var(--pa-muted)]">
               {t(
-                "Aggiungi il Cruscotto San Vincenzo alla schermata Home per aprirlo subito, anche offline per le pagine già visitate.",
+                "Aggiungi il Cruscotto {comune} alla schermata Home per aprirlo subito, anche offline per le pagine già visitate.",
+                { comune: COMUNE_NOME },
               )}
             </p>
           </div>

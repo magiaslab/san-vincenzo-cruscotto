@@ -19,6 +19,7 @@ import {
   MAP_DEFAULT_ZOOM,
   OPENAEDMAP_URL,
   OSM_COPYRIGHT_URL,
+  TELEGRAM_DAE_BOT_HANDLE,
   TELEGRAM_DAE_BOT_URL,
 } from "@/lib/constants";
 import {
@@ -306,7 +307,7 @@ export function DaeMap() {
             rel="noopener noreferrer"
             className="font-semibold underline"
           >
-            @DaesanvincenzoBot
+            {TELEGRAM_DAE_BOT_HANDLE}
           </a>
         </p>
       </div>

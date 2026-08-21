@@ -21,7 +21,7 @@ import {
   Clock,
   type LucideIcon,
 } from "lucide-react";
-import { TRASPORTI_TRENI_LIVE_API } from "@/lib/constants";
+import { STAZIONE_FS_NOME, TRASPORTI_TRENI_LIVE_API } from "@/lib/constants";
 import { matchesComuneNome } from "@/lib/comune-config";
 import { formatDecimal } from "@/lib/format";
 import { useT } from "@/lib/i18n";
@@ -554,7 +554,9 @@ export function ServiziUtiliCards({
             </ul>
           ) : (
             <p className="m-0 text-sm text-[var(--pa-muted)]">
-              {t("Nessun treno imminente da S.Vincenzo.")}
+              {t("Nessun treno imminente da {stazione}.", {
+                stazione: STAZIONE_FS_NOME,
+              })}
             </p>
           )}
         </ServiceCardShell>

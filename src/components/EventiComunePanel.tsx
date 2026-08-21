@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { ExternalLink, Filter } from "lucide-react";
 import { useT } from "@/lib/i18n";
 import { formatInteger } from "@/lib/format";
-import { COMUNE_EVENTI_URL, VISIT_SAN_VINCENZO_EVENTI_URL } from "@/lib/constants";
+import { COMUNE_EVENTI_URL, COMUNE_NOME, VISIT_SAN_VINCENZO_EVENTI_URL } from "@/lib/constants";
 
 export type EventoComuneRow = {
   id?: string | null;
@@ -80,7 +80,7 @@ export function EventiComunePanel({
           {t("Eventi e manifestazioni (Comune)")}
         </h3>
         <p className="m-0 text-xs text-[var(--pa-muted)] sm:text-sm">
-          {t("Calendario ufficiale su Visit San Vincenzo")} —{" "}
+          {t("Calendario ufficiale {comune}", { comune: COMUNE_NOME })} —{" "}
           {formatInteger(nEventi ?? eventi.length)} {t("voci")}.{" "}
           {t("Filtra per testo, luogo o periodo.")}
         </p>
@@ -230,7 +230,7 @@ export function EventiComunePanel({
           rel="noopener noreferrer"
           className="font-semibold underline"
         >
-          Visit San Vincenzo
+          {COMUNE_NOME}
         </a>
         {" · "}
         <a

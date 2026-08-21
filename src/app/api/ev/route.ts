@@ -2,14 +2,15 @@ import { NextResponse } from "next/server";
 import { buildEvPrezziPayload } from "@/lib/ev-prezzi";
 
 export const dynamic = "force-dynamic";
-export const revalidate = 3600;
+export const revalidate = 0;
 
 export async function GET() {
   try {
     const payload = await buildEvPrezziPayload();
     return NextResponse.json(payload, {
       headers: {
-        "Cache-Control": "s-maxage=3600, stale-while-revalidate=1800",
+        "Cache-Control": "no-store, no-cache, must-revalidate",
+        Pragma: "no-cache",
       },
     });
   } catch (err) {

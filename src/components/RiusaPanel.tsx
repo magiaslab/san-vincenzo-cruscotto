@@ -115,7 +115,7 @@ const CORE_FIELDS: { campo: string; esempio: string; dove: string }[] = [
   {
     campo: "geo.map_center · geo.meteo",
     esempio: `${COMUNE.geo.map_center.join(", ")}`,
-    dove: "mappe Leaflet, meteo, radar (non restano su San Vincenzo)",
+    dove: "mappe Leaflet, meteo, radar (seguono il comune in config/comune.json)",
   },
   {
     campo: "miur_codice_catastale",
@@ -740,7 +740,7 @@ git branch -M main && git push -u origin main`}
             </li>
             <li>
               Non lasciare <code>ASSISTENTE_MODAL_URL</code> /{" "}
-              <code>GITHUB_REPO</code> puntati a San Vincenzo se non è
+              <code>GITHUB_REPO</code> puntati al comune originale se non è
               intenzionale.
             </li>
             <li>

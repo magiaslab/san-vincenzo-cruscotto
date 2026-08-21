@@ -2,6 +2,7 @@
 
 import { Accessibility } from "lucide-react";
 import { useT } from "@/lib/i18n";
+import { COMUNE_NOME } from "@/lib/constants";
 import { WHEELMAP_URL, buildWheelmapEmbedSrc } from "@/lib/accessibilita";
 import { PanelHeading, SolidLink } from "@/components/ui";
 
@@ -27,7 +28,8 @@ export default function WheelmapEmbed({
         <PanelHeading
           title={t("Mappa Wheelmap")}
           description={t(
-            "Widget ufficiale centrato su San Vincenzo (semaforo accessibilità).",
+            "Widget ufficiale centrato su {comune} (semaforo accessibilità).",
+            { comune: COMUNE_NOME },
           )}
           icon={Accessibility}
           actions={<SolidLink href={WHEELMAP_URL}>Apri a schermo intero</SolidLink>}

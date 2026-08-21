@@ -12,6 +12,7 @@ import {
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import {
+  COMUNE_NOME,
   MAP_CENTER,
   METEO_LAT,
   METEO_LON,
@@ -268,7 +269,7 @@ export default function MeteoRadarMap() {
                   weight: 2,
                 }}
               >
-                <Popup>San Vincenzo — punto meteo di riferimento</Popup>
+                <Popup>{t("{comune} — punto meteo di riferimento", { comune: COMUNE_NOME })}</Popup>
               </CircleMarker>
             </MapContainer>
           </div>
