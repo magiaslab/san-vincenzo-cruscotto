@@ -285,27 +285,43 @@ export function isTabEnabled(tabId: string): boolean {
   }
 }
 
-/** True se testo/luogo riguarda il comune configurato (o alias / extra). */
-export function matchesComuneText(...parts: Array<string | null | undefined>): boolean {
-  const hay = parts
-    .filter(Boolean)
-    .join(" ")
+function normalizeMatchText(s: string): string {
+  return s
     .toLowerCase()
     .normalize("NFD")
-    .replace(/\p{M}/gu, "");
-  const needles = [
+    .replace(/\p{M}/gu, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function matchesNeedles(
+  parts: Array<string | null | undefined>,
+  needles: string[],
+): boolean {
+  const hay = normalizeMatchText(parts.filter(Boolean).join(" "));
+  if (!hay) return false;
+  return needles
+    .map(normalizeMatchText)
+    .filter(Boolean)
+    .some((n) => hay.includes(n));
+}
+
+/** True se il testo coincide col nome/alias del comune (es. farmacie di turno). */
+export function matchesComuneNome(
+  ...parts: Array<string | null | undefined>
+): boolean {
+  return matchesNeedles(parts, [COMUNE.nome, ...COMUNE.nome_aliases]);
+}
+
+/** True se testo/luogo riguarda il comune configurato (o alias / extra). */
+export function matchesComuneText(
+  ...parts: Array<string | null | undefined>
+): boolean {
+  return matchesNeedles(parts, [
     COMUNE.nome,
     ...COMUNE.nome_aliases,
     ...COMUNE.eventi_filtro_extra,
-  ]
-    .map((s) =>
-      s
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/\p{M}/gu, ""),
-    )
-    .filter(Boolean);
-  return needles.some((n) => hay.includes(n));
+  ]);
 }
 
 export function allertameteoApiUrl(): string {

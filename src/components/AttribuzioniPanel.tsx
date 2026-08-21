@@ -405,7 +405,7 @@ export function AttribuzioniPanel() {
               >
                 FarmacieDiTurno.org
               </a>{" "}
-              — farmacie di turno (orari e date) per San Vincenzo e comuni
+              — farmacie di turno (orari e date) per {COMUNE_NOME} e comuni
               vicini
             </li>
             <li>
