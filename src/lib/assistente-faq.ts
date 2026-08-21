@@ -252,10 +252,21 @@ const RULES: Rule[] = [
       /raccolta\s*differenziat|rifiuti\s*pro\s*capite|consumo\s*(di\s*)?suolo|riciclo/i,
     ],
     answer:
-      "Ambiente: RD circa 47,9%, rifiuti ~1.380 kg/ab, consumo di suolo ~13,1%. Dettaglio in Ambiente.",
-    href: "/#ambiente",
-    label: "Apri sezione Ambiente",
-    title: "Ambiente",
+      "Ambiente: RD ISPRA (Catasto rifiuti) e, se disponibili, stime del gestore (SEI). Dettaglio frazioni e serie in Ambiente.",
+    href: "/#rifiuti-ispra",
+    label: "Apri rifiuti ISPRA",
+    title: "Rifiuti",
+  },
+  {
+    id: "acqua-sii",
+    patterns: [
+      /acqua\s*potabile|etichett[ae]\s*(dell['’])?acqua|fontanell|acquedott|\basa\b|servizio\s*idrico|qualit[aà]\s*(dell['’])?acqua/i,
+    ],
+    answer:
+      "Acqua potabile: etichette e fontanelle del gestore (ASA, WFS della mappa pubblica). Qualità tecnica regionale (RQTII) è su AIT a scala di gestore. Dettaglio in Ambiente.",
+    href: "/#servizio-idrico",
+    label: "Apri servizio idrico",
+    title: "Acqua potabile",
   },
   {
     id: "ambiente",
@@ -263,7 +274,7 @@ const RULES: Rule[] = [
       /balneaz|arpat|rifiuti|qualit[aà]\s*(dell['’])?aria|\bpm10\b|\bpm2\.?5\b|\bco2\b|emissioni|ambiente/i,
     ],
     answer:
-      "Balneazione ARPAT, aria, rifiuti e suolo sono nella sezione Ambiente.",
+      "Balneazione ARPAT, aria, rifiuti ISPRA, acqua potabile (gestore SII) e suolo sono nella sezione Ambiente.",
     href: "/#ambiente",
     label: "Apri sezione Ambiente",
     title: "Ambiente",

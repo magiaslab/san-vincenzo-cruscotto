@@ -22,6 +22,16 @@ export type ComuneFeatures = {
   assistente_rag: boolean;
   biblioteca: boolean;
   arpat_aria: boolean;
+  /**
+   * Catasto ISPRA rifiuti urbani (CSV nazionale, filtro ISTAT).
+   * Default true: funziona in qualsiasi comune italiano.
+   */
+  rifiuti_ispra: boolean;
+  /**
+   * Servizio idrico: etichette/fontanelle WFS del gestore (ASA o analogo)
+   * se `gestori.acqua.geoserver_wfs` è valorizzato.
+   */
+  acqua_sii: boolean;
 };
 
 export type ComuneConfig = {
@@ -96,6 +106,14 @@ export type ComuneConfig = {
     arpat_base_url: string;
     nota: string;
   };
+  /**
+   * Gestori locali (acqua / rifiuti). URL vuoti = modulo solo con fonti nazionali.
+   * Il WFS etichette è tipico di ASA (ATO 5 Toscana Costa), non universale.
+   */
+  gestori: {
+    acqua: GestoreAcquaConfig;
+    rifiuti: GestoreRifiutiConfig;
+  };
   features: ComuneFeatures;
   eventi_filtro_extra: string[];
   /**
@@ -110,6 +128,28 @@ export type ComuneConfig = {
     maintainer_url: string;
     github_repo_url: string;
   };
+};
+
+export type GestoreAcquaConfig = {
+  nome: string;
+  url: string;
+  etichette_map_url: string;
+  fontanelle_map_url: string;
+  composizione_url: string;
+  /** Endpoint WFS GeoServer (es. http://asamap.it:8080/geoserver/asa_geoserver/ows). */
+  geoserver_wfs: string;
+  etichette_layer: string;
+  fontanelle_layer: string;
+  fontanelle_aq_layer: string;
+  ait_opendata_url: string;
+};
+
+export type GestoreRifiutiConfig = {
+  nome: string;
+  url: string;
+  calendario_url: string;
+  centri_url: string;
+  centro_url: string;
 };
 
 export type TerrainSeaSide = "west" | "east" | "south" | "north" | "none";
@@ -174,6 +214,9 @@ function parseConfig(input: unknown): ComuneConfig {
   const brand = (c.brand ?? {}) as Record<string, unknown>;
   const reg = (c.regione_opendata ?? {}) as Record<string, unknown>;
   const features = (c.features ?? {}) as Record<string, unknown>;
+  const gestori = (c.gestori ?? {}) as Record<string, unknown>;
+  const acqua = (gestori.acqua ?? {}) as Record<string, unknown>;
+  const rifiuti = (gestori.rifiuti ?? {}) as Record<string, unknown>;
   const fork = (c.fork ?? {}) as Record<string, unknown>;
 
   return {
@@ -265,6 +308,32 @@ function parseConfig(input: unknown): ComuneConfig {
       assistente_rag: bool(features.assistente_rag, false),
       biblioteca: bool(features.biblioteca, false),
       arpat_aria: bool(features.arpat_aria, false),
+      rifiuti_ispra: bool(features.rifiuti_ispra, true),
+      acqua_sii: bool(features.acqua_sii, false),
+    },
+    gestori: {
+      acqua: {
+        nome: str(acqua.nome),
+        url: str(acqua.url),
+        etichette_map_url: str(acqua.etichette_map_url),
+        fontanelle_map_url: str(acqua.fontanelle_map_url),
+        composizione_url: str(acqua.composizione_url),
+        geoserver_wfs: str(acqua.geoserver_wfs),
+        etichette_layer: str(acqua.etichette_layer, "asa_geoserver:etichette"),
+        fontanelle_layer: str(acqua.fontanelle_layer, "asa_geoserver:fontanelle"),
+        fontanelle_aq_layer: str(
+          acqua.fontanelle_aq_layer,
+          "asa_geoserver:fontanelle_aq",
+        ),
+        ait_opendata_url: str(acqua.ait_opendata_url),
+      },
+      rifiuti: {
+        nome: str(rifiuti.nome),
+        url: str(rifiuti.url),
+        calendario_url: str(rifiuti.calendario_url),
+        centri_url: str(rifiuti.centri_url),
+        centro_url: str(rifiuti.centro_url),
+      },
     },
     eventi_filtro_extra: Array.isArray(c.eventi_filtro_extra)
       ? c.eventi_filtro_extra.filter((x): x is string => typeof x === "string")

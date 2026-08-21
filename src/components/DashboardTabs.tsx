@@ -53,6 +53,8 @@ import { AllerteMeteoPanel } from "@/components/AllerteMeteoPanel";
 import { AllertaHomeBanner } from "@/components/AllertaHomeBanner";
 import { TrasportiPanel } from "@/components/TrasportiPanel";
 import { PercorsiPanel } from "@/components/PercorsiPanel";
+import { RifiutiPanel } from "@/components/RifiutiPanel";
+import { AcquaPanel } from "@/components/AcquaPanel";
 import { PartecipaPanel } from "@/components/PartecipaPanel";
 import { ComeFunzionaPanel } from "@/components/ComeFunzionaPanel";
 import { RiusaPanel } from "@/components/RiusaPanel";
@@ -2571,8 +2573,12 @@ function Ambiente({ kpi }: { kpi: Kpi }) {
         title={t("Ambiente")}
         description={
           isFeatureEnabled("balneazione")
-            ? t("Balneazione ARPAT, aria, raccolta differenziata e consumo di suolo.")
-            : t("Aria, raccolta differenziata e consumo di suolo.")
+            ? t(
+                "Balneazione ARPAT, aria, raccolta differenziata, servizio idrico e consumo di suolo.",
+              )
+            : t(
+                "Aria, raccolta differenziata, servizio idrico e consumo di suolo.",
+              )
         }
         sourceNote={
           isFeatureEnabled("balneazione")
@@ -2645,7 +2651,7 @@ function Ambiente({ kpi }: { kpi: Kpi }) {
       {loading || loadingTerr ? <LoadingBlock label={t("Caricamento dati ambientali…")} /> : null}
 
       <div className="mb-4 grid gap-3 sm:gap-4 lg:grid-cols-2">
-        {serieRifiuti.length > 0 ? (
+        {serieRifiuti.length > 0 && !isFeatureEnabled("rifiuti_ispra") ? (
           <div className="panel">
             <h3>{t("Serie raccolta differenziata")}</h3>
             <LineChart
@@ -2667,6 +2673,9 @@ function Ambiente({ kpi }: { kpi: Kpi }) {
           </div>
         ) : null}
       </div>
+
+      {isFeatureEnabled("rifiuti_ispra") ? <RifiutiPanel /> : null}
+      {isFeatureEnabled("acqua_sii") ? <AcquaPanel /> : null}
 
       {aree.length > 0 ? (
         <div className="mb-4 panel">

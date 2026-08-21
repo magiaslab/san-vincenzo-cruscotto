@@ -148,7 +148,7 @@ export const SEARCH_CATALOG: SearchEntry[] = [
     id: "ambiente",
     tab: "ambiente",
     label: "Ambiente",
-    hint: "Balneazione, rifiuti, aria",
+    hint: "Balneazione, rifiuti, acqua, aria",
     keywords: [
       "mare",
       "balneazione",
@@ -157,6 +157,13 @@ export const SEARCH_CATALOG: SearchEntry[] = [
       "aria",
       "suolo",
       "spiaggia",
+      "acqua",
+      "asa",
+      "sei",
+      "fontanelle",
+      "etichetta",
+      "potabile",
+      "ispra",
     ],
   },
   {

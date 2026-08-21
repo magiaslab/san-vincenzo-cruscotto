@@ -82,7 +82,30 @@
     "dae_telegram": true,
     "assistente_rag": true,
     "biblioteca": true,
-    "arpat_aria": true
+    "arpat_aria": true,
+    "rifiuti_ispra": true,
+    "acqua_sii": true
+  },
+  "gestori": {
+    "acqua": {
+      "nome": "ASA SpA",
+      "url": "https://www.asaspa.it/",
+      "etichette_map_url": "https://www.asamap.it/etichette",
+      "fontanelle_map_url": "https://www.asamap.it/fontanelle-web",
+      "composizione_url": "https://www.asaspa.it/acqua-i-tuoi-diritti/composizione-analitica-dellacqua/",
+      "geoserver_wfs": "http://asamap.it:8080/geoserver/asa_geoserver/ows",
+      "etichette_layer": "asa_geoserver:etichette",
+      "fontanelle_layer": "asa_geoserver:fontanelle",
+      "fontanelle_aq_layer": "asa_geoserver:fontanelle_aq",
+      "ait_opendata_url": "https://www.autoritaidrica.toscana.it/it/page/open-data-del-servizio-idrico-integrato"
+    },
+    "rifiuti": {
+      "nome": "SEI Toscana",
+      "url": "https://seitoscana.it/comuni/san-vincenzo",
+      "calendario_url": "https://seitoscana.it/comuni/san-vincenzo/raccolta-rifiuti",
+      "centri_url": "https://seitoscana.it/centri-di-raccolta",
+      "centro_url": "https://seitoscana.it/comuni/san-vincenzo/centro-di-raccolta"
+    }
   },
   "eventi_filtro_extra": [
     "piombino",
