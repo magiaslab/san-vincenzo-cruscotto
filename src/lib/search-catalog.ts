@@ -52,7 +52,7 @@ export const SEARCH_CATALOG: SearchEntry[] = [
     id: "infra",
     tab: "infra",
     label: "Mobilità",
-    hint: "Bus, treni, EV, carburanti",
+    hint: "Bus, treni, percorsi, EV, carburanti",
     keywords: [
       "bus",
       "treno",
@@ -69,6 +69,10 @@ export const SEARCH_CATALOG: SearchEntry[] = [
       "benzina",
       "gasolio",
       "ciclabili",
+      "percorsi",
+      "gpx",
+      "sentieri",
+      "piste",
     ],
   },
   {

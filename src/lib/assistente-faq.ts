@@ -101,7 +101,7 @@ const RULES: Rule[] = [
       /trasport|autobus|\bbus\b|autolinee|fermata|treno|trenitalia|stazione\s*fs|gtfs|\btpl\b|ciclabil|pedonal|sentieri/i,
     ],
     answer:
-      "Orari Autolinee Toscana e Trenitalia (GTFS), ciclabili e pedonali: sezione Mobilità.",
+      "Orari Autolinee Toscana e Trenitalia (GTFS). Percorsi ciclabili e pedonali da OpenStreetMap (lista, mappa, GPX) in Mobilità.",
     href: "/#infra",
     label: "Apri sezione Mobilità",
     title: "Trasporti",

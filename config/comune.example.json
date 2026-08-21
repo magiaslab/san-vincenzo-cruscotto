@@ -74,7 +74,7 @@
     "erosione_costiera": false,
     "treni": false,
     "gtfs_locale": false,
-    "ciclabili_pedonali": false,
+    "ciclabili_pedonali": true,
     "eventi_comune": true,
     "eventi_regionali": false,
     "turismo_flussi": true,
