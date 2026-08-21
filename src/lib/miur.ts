@@ -417,6 +417,6 @@ export async function buildMiurScuole(): Promise<MiurScuolePayload> {
 
 export const getCachedMiurScuole = unstable_cache(
   async () => buildMiurScuole(),
-  ["miur-scuole-san-vincenzo-i390"],
-  { revalidate: 86400, tags: ["miur-scuole"] },
+  ["miur-scuole", MIUR_COMUNE_CATASTALE],
+  { revalidate: 86400, tags: ["miur-scuole", `miur-${MIUR_COMUNE_CATASTALE}`] },
 );
