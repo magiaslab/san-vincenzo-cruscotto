@@ -10,7 +10,7 @@ export const VIAGGIATRENO_BASE =
 
 /** Codice stazione FS del comune (`config/comune.json` → ferrovie). */
 export const FS_STAZIONE_SAN_VINCENZO =
-  COMUNE.ferrovie.stazione_viaggiatreno || "S06030";
+  COMUNE.ferrovie.stazione_viaggiatreno || "";
 
 export const VIAGGIATRENO_ATTRIBUTION_URL =
   "https://www.viaggiatreno.it/" as const;

@@ -17,6 +17,8 @@ export type ComuneFeatures = {
   allerte_toscana_sir: boolean;
   dae: boolean;
   dae_telegram: boolean;
+  /** WFS IdroGEO dinamica litoranea. Off per comuni non costieri. */
+  erosione_costiera: boolean;
   assistente_rag: boolean;
   biblioteca: boolean;
   arpat_aria: boolean;
@@ -35,6 +37,14 @@ export type ComuneConfig = {
     map_center: [number, number];
     meteo: [number, number];
     map_default_zoom: number;
+    /** [lonMin, latMin, lonMax, latMax]. Se assente, si deriva da centro + raggio. */
+    bbox: [number, number, number, number] | null;
+    bbox_radius_km: number;
+    /**
+     * Lato mare del rilievo 3D stilizzato.
+     * `none` = comune interno (niente piano mare, collina al centro).
+     */
+    terrain_sea_side: TerrainSeaSide;
   };
   ferrovie: {
     stazione_viaggiatreno: string;
@@ -58,6 +68,7 @@ export type ComuneConfig = {
     ciclabili_geojson: string;
     pedonali_geojson: string;
     dae_geojson: string;
+    stalli_disabili: string;
     ciclabili_geojson_local: string;
     pedonali_geojson_local: string;
     trasporti_gtfs_local: string;
@@ -100,6 +111,32 @@ export type ComuneConfig = {
     github_repo_url: string;
   };
 };
+
+export type TerrainSeaSide = "west" | "east" | "south" | "north" | "none";
+
+const SEA_SIDES: TerrainSeaSide[] = ["west", "east", "south", "north", "none"];
+
+function asSeaSide(v: unknown, fallback: TerrainSeaSide): TerrainSeaSide {
+  return typeof v === "string" && SEA_SIDES.includes(v as TerrainSeaSide)
+    ? (v as TerrainSeaSide)
+    : fallback;
+}
+
+function asQuad(
+  v: unknown,
+): [number, number, number, number] | null {
+  if (
+    Array.isArray(v) &&
+    v.length >= 4 &&
+    typeof v[0] === "number" &&
+    typeof v[1] === "number" &&
+    typeof v[2] === "number" &&
+    typeof v[3] === "number"
+  ) {
+    return [v[0], v[1], v[2], v[3]];
+  }
+  return null;
+}
 
 function asPair(v: unknown, fallback: [number, number]): [number, number] {
   if (
@@ -154,6 +191,9 @@ function parseConfig(input: unknown): ComuneConfig {
       map_center: asPair(geo.map_center, [43.085, 10.54]),
       meteo: asPair(geo.meteo, [43.085, 10.54]),
       map_default_zoom: num(geo.map_default_zoom, 13),
+      bbox: asQuad(geo.bbox),
+      bbox_radius_km: num(geo.bbox_radius_km, 8),
+      terrain_sea_side: asSeaSide(geo.terrain_sea_side, "none"),
     },
     ferrovie: {
       stazione_viaggiatreno: str(ferrovie.stazione_viaggiatreno),
@@ -176,22 +216,14 @@ function parseConfig(input: unknown): ComuneConfig {
       biblioteca_opac: str(urls.biblioteca_opac),
       ciclabili_geojson: str(urls.ciclabili_geojson),
       pedonali_geojson: str(urls.pedonali_geojson),
-      dae_geojson: str(urls.dae_geojson, "/data/dae-san-vincenzo.geojson"),
-      ciclabili_geojson_local: str(
-        urls.ciclabili_geojson_local,
-        "/data/ciclabili-san-vincenzo.geojson",
-      ),
-      pedonali_geojson_local: str(
-        urls.pedonali_geojson_local,
-        "/data/pedonali-san-vincenzo.geojson",
-      ),
-      trasporti_gtfs_local: str(
-        urls.trasporti_gtfs_local,
-        "/data/trasporti-gtfs-sv.json",
-      ),
+      dae_geojson: str(urls.dae_geojson, "/data/dae.geojson"),
+      stalli_disabili: str(urls.stalli_disabili),
+      ciclabili_geojson_local: str(urls.ciclabili_geojson_local),
+      pedonali_geojson_local: str(urls.pedonali_geojson_local),
+      trasporti_gtfs_local: str(urls.trasporti_gtfs_local),
     },
     brand: {
-      stemma_path: str(brand.stemma_path, "/stemma-san-vincenzo.png"),
+      stemma_path: str(brand.stemma_path, "/stemma.png"),
       stemma_width: num(brand.stemma_width, 399),
       stemma_height: num(brand.stemma_height, 500),
       stemma_alt: str(brand.stemma_alt, "Stemma comunale"),
@@ -229,6 +261,7 @@ function parseConfig(input: unknown): ComuneConfig {
       allerte_toscana_sir: bool(features.allerte_toscana_sir, false),
       dae: bool(features.dae, true),
       dae_telegram: bool(features.dae_telegram, false),
+      erosione_costiera: bool(features.erosione_costiera, false),
       assistente_rag: bool(features.assistente_rag, false),
       biblioteca: bool(features.biblioteca, false),
       arpat_aria: bool(features.arpat_aria, false),
@@ -333,4 +366,42 @@ export function allertameteoPageUrl(): string {
   const path = COMUNE.allerte.allertameteo_page_path.trim();
   if (path) return `https://allertameteo.app/${path.replace(/^\//, "")}`;
   return `https://allertameteo.app/`;
+}
+
+export type ComuneBbox = {
+  lonMin: number;
+  latMin: number;
+  lonMax: number;
+  latMax: number;
+};
+
+/** BBox territoriale: `geo.bbox` oppure cerchio intorno a `map_center`. */
+export function getComuneBbox(): ComuneBbox {
+  const explicit = COMUNE.geo.bbox;
+  if (explicit) {
+    return {
+      lonMin: explicit[0],
+      latMin: explicit[1],
+      lonMax: explicit[2],
+      latMax: explicit[3],
+    };
+  }
+  const [lat, lon] = COMUNE.geo.map_center;
+  const km = Math.max(COMUNE.geo.bbox_radius_km || 8, 1);
+  const dLat = km / 111;
+  const cos = Math.cos((lat * Math.PI) / 180);
+  const dLon = km / (111 * Math.max(Math.abs(cos), 0.2));
+  return {
+    lonMin: lon - dLon,
+    latMin: lat - dLat,
+    lonMax: lon + dLon,
+    latMax: lat + dLat,
+  };
+}
+
+export function inComuneBbox(lat: number, lon: number): boolean {
+  const b = getComuneBbox();
+  return (
+    lon >= b.lonMin && lon <= b.lonMax && lat >= b.latMin && lat <= b.latMax
+  );
 }

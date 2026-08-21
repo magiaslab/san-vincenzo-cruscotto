@@ -6,6 +6,7 @@ import { PanelState } from "@/components/panel-state";
 import { KpiCard, LoadingBlock, PanelHeading } from "@/components/ui";
 import { formatDecimal, formatInteger, formatPercent } from "@/lib/format";
 import { useT } from "@/lib/i18n";
+import { isFeatureEnabled } from "@/lib/comune-config";
 import { getFormatLocale } from "@/lib/i18n/locale-store";
 import { translate } from "@/lib/i18n/translate";
 import type { RischioData } from "@/lib/rischio";
@@ -31,7 +32,9 @@ export function RischioPanel() {
         <PanelHeading
           title={t("Rischio territoriale")}
           description={t(
-            "Dissesto idrogeologico ed erosione costiera — indicatori ISPRA IdroGEO a scala comunale.",
+            isFeatureEnabled("erosione_costiera")
+              ? "Dissesto idrogeologico ed erosione costiera — indicatori ISPRA IdroGEO a scala comunale."
+              : "Dissesto idrogeologico — indicatori ISPRA IdroGEO a scala comunale.",
           )}
           icon={Waves}
           className="mb-0"
@@ -52,6 +55,7 @@ export function RischioPanel() {
               data.frane?.espostiRischioElevato.popolazione ?? null;
             const popAlluvMedia =
               data.alluvioni?.scenari.media.popolazione ?? null;
+            const showCosta = isFeatureEnabled("erosione_costiera");
             const kmErosione = data.erosioneCostiera?.kmErosione ?? null;
 
             const franeClassi = data.frane?.classi;
@@ -82,6 +86,7 @@ export function RischioPanel() {
 
             const erosione = data.erosioneCostiera;
             const hasErosione =
+              showCosta &&
               erosione != null &&
               [erosione.kmErosione, erosione.kmAvanzamento, erosione.kmStabile]
                 .filter((v): v is number => v != null)
@@ -89,7 +94,11 @@ export function RischioPanel() {
 
             return (
               <>
-                <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
+                <div
+                  className={`mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 ${
+                    showCosta ? "lg:grid-cols-4" : "lg:grid-cols-3"
+                  }`}
+                >
                   <KpiCard
                     label={t("Territorio frane P3+P4")}
                     value={
@@ -114,16 +123,18 @@ export function RischioPanel() {
                     }
                     hint={t("Scenario HPM / tempo di ritorno medio")}
                   />
-                  <KpiCard
-                    label={t("Costa in erosione")}
-                    value={
-                      kmErosione != null
-                        ? `${formatDecimal(kmErosione, 2)} km`
-                        : "n.d."
-                    }
-                    hint={t("Dinamica litoranea ISPRA")}
-                    variant="warning"
-                  />
+                  {showCosta ? (
+                    <KpiCard
+                      label={t("Costa in erosione")}
+                      value={
+                        kmErosione != null
+                          ? `${formatDecimal(kmErosione, 2)} km`
+                          : "n.d."
+                      }
+                      hint={t("Dinamica litoranea ISPRA")}
+                      variant="warning"
+                    />
+                  ) : null}
                 </div>
 
                 <div className="mb-4 grid gap-3 sm:gap-4 lg:grid-cols-2">

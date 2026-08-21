@@ -1,6 +1,8 @@
 "use client";
 
 import { useT } from "@/lib/i18n";
+import { TERRAIN_SEA_SIDE } from "@/lib/constants";
+import type { TerrainSeaSide } from "@/lib/comune-config";
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
@@ -33,9 +35,63 @@ function elevColor(t: number, out: THREE.Color) {
   return out;
 }
 
+/** 0 = costa, 1 = entroterra (o collina centrale se `none`). */
+function inlandFactor(nx: number, nz: number, side: TerrainSeaSide): number {
+  switch (side) {
+    case "west":
+      return Math.max(0, (nx + 1) * 0.5);
+    case "east":
+      return Math.max(0, (1 - nx) * 0.5);
+    case "south":
+      return Math.max(0, (nz + 1) * 0.5);
+    case "north":
+      return Math.max(0, (1 - nz) * 0.5);
+    default: {
+      const r = Math.min(Math.hypot(nx, nz), 1);
+      return THREE.MathUtils.clamp(1 - r * 0.85, 0, 1);
+    }
+  }
+}
+
+function seaPosition(
+  sizeX: number,
+  sizeZ: number,
+  side: TerrainSeaSide,
+): { x: number; z: number; w: number; d: number } | null {
+  const along = 0.42;
+  const span = 1.05;
+  switch (side) {
+    case "west":
+      return { x: -sizeX * 0.32, z: 0, w: sizeX * along, d: sizeZ * span };
+    case "east":
+      return { x: sizeX * 0.32, z: 0, w: sizeX * along, d: sizeZ * span };
+    case "south":
+      return { x: 0, z: sizeZ * 0.32, w: sizeX * span, d: sizeZ * along };
+    case "north":
+      return { x: 0, z: -sizeZ * 0.32, w: sizeX * span, d: sizeZ * along };
+    default:
+      return null;
+  }
+}
+
+function seaCaption(side: TerrainSeaSide): string {
+  switch (side) {
+    case "west":
+      return "costa a Ovest, rilievi a Est";
+    case "east":
+      return "costa a Est, rilievi a Ovest";
+    case "south":
+      return "costa a Sud, rilievi a Nord";
+    case "north":
+      return "costa a Nord, rilievi a Sud";
+    default:
+      return "rilievo collinare (nessuna costa in config)";
+  }
+}
+
 /**
  * Rilievo 3D stilizzato basato su morfologia CNR-IRPI (non DEM reale).
- * Interattivo: orbit/zoom; colori per quota.
+ * La geometria (lato mare) viene da `geo.terrain_sea_side` in comune.json.
  */
 export default function Terrain3D({
   elevMin,
@@ -45,6 +101,7 @@ export default function Terrain3D({
 }: Props) {
   const t = useT();
   const mountRef = useRef<HTMLDivElement>(null);
+  const seaSide = TERRAIN_SEA_SIDE;
 
   useEffect(() => {
     const mount = mountRef.current;
@@ -88,7 +145,6 @@ export default function Terrain3D({
     fill.position.set(-30, 20, -40);
     scene.add(fill);
 
-    // San Vincenzo: costa a Ovest, rilievi a Est — estensione E-O leggermente allungata
     const sizeX = 96;
     const sizeZ = 72;
     const segments = 128;
@@ -101,32 +157,30 @@ export default function Terrain3D({
     const roughness = Math.min(Math.max(slopeMean / 25, 0.2), 1.35);
     const heightScale = 14 + roughness * 10;
 
-    // Altezze stilizzate: costa Ovest bassa, colline Est (max ~647 m)
-    const heights: number[] = [];
     for (let i = 0; i < pos.count; i++) {
       const x = pos.getX(i);
       const y = pos.getY(i);
-      const nx = x / (sizeX / 2); // -1..1
+      const nx = x / (sizeX / 2);
       const nz = y / (sizeZ / 2);
-      const coastal = Math.max(0, (nx + 1) * 0.5); // 0 ovest → 1 est
+      const inland = inlandFactor(nx, nz, seaSide);
       const ridge =
-        Math.pow(Math.max(0, nx - 0.05), 1.35) * 0.85 +
+        Math.pow(Math.max(0, inland - 0.28), 1.35) * 0.85 +
         Math.sin((nx + 1) * Math.PI * 1.4) * Math.cos(nz * Math.PI * 1.1) * 0.22;
       const detail =
         Math.sin(nx * 9 + nz * 6) * 0.045 * roughness +
         Math.sin(nx * 17 - nz * 11) * 0.02 * roughness;
-      const valley = -Math.exp(-Math.pow((nz + 0.15) / 0.45, 2)) * 0.08 * coastal;
+      const valley =
+        -Math.exp(-Math.pow((nz + 0.15) / 0.45, 2)) * 0.08 * inland;
       const hNorm = THREE.MathUtils.clamp(
-        coastal * 0.35 + ridge + detail + valley + meanNorm * 0.12,
+        inland * 0.35 + ridge + detail + valley + meanNorm * 0.12,
         0,
         1.15,
       );
       const h = hNorm * heightScale;
-      heights.push(h);
       pos.setZ(i, h);
 
-      const t = THREE.MathUtils.clamp(h / (heightScale * 1.05), 0, 1);
-      elevColor(t, color);
+      const tt = THREE.MathUtils.clamp(h / (heightScale * 1.05), 0, 1);
+      elevColor(tt, color);
       colors[i * 3] = color.r;
       colors[i * 3 + 1] = color.g;
       colors[i * 3 + 2] = color.b;
@@ -144,21 +198,24 @@ export default function Terrain3D({
     mesh.rotation.x = -Math.PI / 2;
     scene.add(mesh);
 
-    // Mare a quota 0, solo sul lato occidentale
-    const seaGeo = new THREE.PlaneGeometry(sizeX * 0.42, sizeZ * 1.05, 1, 1);
-    const seaMat = new THREE.MeshStandardMaterial({
-      color: 0x2f7ea8,
-      transparent: true,
-      opacity: 0.72,
-      metalness: 0.2,
-      roughness: 0.35,
-    });
-    const sea = new THREE.Mesh(seaGeo, seaMat);
-    sea.rotation.x = -Math.PI / 2;
-    sea.position.set(-sizeX * 0.32, 0.15, 0);
-    scene.add(sea);
+    const seaLayout = seaPosition(sizeX, sizeZ, seaSide);
+    let seaGeo: THREE.PlaneGeometry | null = null;
+    let seaMat: THREE.MeshStandardMaterial | null = null;
+    if (seaLayout) {
+      seaGeo = new THREE.PlaneGeometry(seaLayout.w, seaLayout.d, 1, 1);
+      seaMat = new THREE.MeshStandardMaterial({
+        color: 0x2f7ea8,
+        transparent: true,
+        opacity: 0.72,
+        metalness: 0.2,
+        roughness: 0.35,
+      });
+      const sea = new THREE.Mesh(seaGeo, seaMat);
+      sea.rotation.x = -Math.PI / 2;
+      sea.position.set(seaLayout.x, 0.15, seaLayout.z);
+      scene.add(sea);
+    }
 
-    // Contorno sottile
     const edges = new THREE.LineSegments(
       new THREE.EdgesGeometry(geometry, 28),
       new THREE.LineBasicMaterial({ color: 0x2c3e50, transparent: true, opacity: 0.12 }),
@@ -166,7 +223,6 @@ export default function Terrain3D({
     edges.rotation.x = -Math.PI / 2;
     scene.add(edges);
 
-    // Freccia Nord (asse -Z della scena dopo rotazione = Nord stilizzato verso alto mappa)
     const northGroup = new THREE.Group();
     const arrow = new THREE.ArrowHelper(
       new THREE.Vector3(0, 0, -1),
@@ -202,8 +258,8 @@ export default function Terrain3D({
       controls.dispose();
       geometry.dispose();
       material.dispose();
-      seaGeo.dispose();
-      seaMat.dispose();
+      seaGeo?.dispose();
+      seaMat?.dispose();
       edges.geometry.dispose();
       (edges.material as THREE.Material).dispose();
       renderer.dispose();
@@ -211,7 +267,7 @@ export default function Terrain3D({
         mount.removeChild(renderer.domElement);
       }
     };
-  }, [elevMin, elevMax, elevMean, slopeMean]);
+  }, [elevMin, elevMax, elevMean, slopeMean, seaSide]);
 
   return (
     <div>
@@ -236,7 +292,7 @@ export default function Terrain3D({
         </div>
       </div>
       <p className="mt-2 text-xs text-[#5b6f82]">
-        Visualizzazione stilizzata (non DEM): costa a Ovest, rilievi a Est.
+        Visualizzazione stilizzata (non DEM): {seaCaption(seaSide)}.
         Pendenza media {slopeMean}°. Trascina per ruotare, scroll per zoom
         (N = freccia scura).
       </p>

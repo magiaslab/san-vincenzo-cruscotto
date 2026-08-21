@@ -11,7 +11,10 @@
   "geo": {
     "map_center": [43.085, 10.54],
     "meteo": [43.085, 10.54],
-    "map_default_zoom": 13
+    "map_default_zoom": 13,
+    "bbox": [10.48, 43.02, 10.58, 43.12],
+    "bbox_radius_km": 8,
+    "terrain_sea_side": "west"
   },
   "ferrovie": {
     "stazione_viaggiatreno": "S06030",
@@ -35,6 +38,7 @@
     "ciclabili_geojson": "https://sanvincenzo.ldpgis.it/metarepo2/api/datasets/area_di_circolazione_ciclabile/resources/139/GeoJSON",
     "pedonali_geojson": "https://sanvincenzo.ldpgis.it/metarepo2/api/datasets/area_di_circolazione_pedonale/resources/138/GeoJSON",
     "dae_geojson": "/data/dae-san-vincenzo.geojson",
+    "stalli_disabili": "https://www.comune.sanvincenzo.li.it/Servizi/Disciplina-delle-riserve-di-stalli-di-sosta-personali-per-disabili-e-istituzione-sosta-gratuita-su-stalli-a-pagamento-per-disabili",
     "ciclabili_geojson_local": "/data/ciclabili-san-vincenzo.geojson",
     "pedonali_geojson_local": "/data/pedonali-san-vincenzo.geojson",
     "trasporti_gtfs_local": "/data/trasporti-gtfs-sv.json"
@@ -65,6 +69,7 @@
   "features": {
     "porto": true,
     "balneazione": true,
+    "erosione_costiera": true,
     "treni": true,
     "gtfs_locale": true,
     "ciclabili_pedonali": true,

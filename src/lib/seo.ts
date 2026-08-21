@@ -5,11 +5,11 @@ import {
   COMUNE_REGIONE,
   ISTAT_CODE,
 } from "@/lib/constants";
-import { COMUNE } from "@/lib/comune-config";
+import { COMUNE, isUpstreamDeploy } from "@/lib/comune-config";
 import { PROJECT_ORIGIN } from "@/lib/project-origin";
 
 /** Host pubblico preferito. Nei fork: `NEXT_PUBLIC_SITE_URL` o `brand.site_url`. */
-function resolveCanonicalHost(): string {
+function resolveCanonicalHost(): string | null {
   const fromBrand = COMUNE.brand.site_url?.trim();
   if (fromBrand) {
     try {
@@ -20,11 +20,14 @@ function resolveCanonicalHost(): string {
       /* fall through */
     }
   }
-  try {
-    return new URL(PROJECT_ORIGIN.site_url).host;
-  } catch {
-    return "www.cruscottosanvincenzo.it";
+  if (isUpstreamDeploy()) {
+    try {
+      return new URL(PROJECT_ORIGIN.site_url).host;
+    } catch {
+      return "www.cruscottosanvincenzo.it";
+    }
   }
+  return null;
 }
 
 const CANONICAL_HOST = resolveCanonicalHost();
@@ -36,8 +39,9 @@ function normalizeSiteUrl(raw: string): string {
       trimmed.startsWith("http") ? trimmed : `https://${trimmed}`,
     );
     if (
-      url.hostname === "cruscottosanvincenzo.it" ||
-      url.hostname === CANONICAL_HOST
+      CANONICAL_HOST &&
+      (url.hostname === "cruscottosanvincenzo.it" ||
+        url.hostname === CANONICAL_HOST)
     ) {
       url.protocol = "https:";
       url.hostname = CANONICAL_HOST;
@@ -63,7 +67,8 @@ export function getSiteUrl(): string {
   const preview = process.env.VERCEL_URL?.trim();
   if (preview) return normalizeSiteUrl(preview);
 
-  return `https://${CANONICAL_HOST}`;
+  if (CANONICAL_HOST) return `https://${CANONICAL_HOST}`;
+  return "http://localhost:3000";
 }
 
 export const SITE_NAME = `Cruscotto ${COMUNE_NOME}`;

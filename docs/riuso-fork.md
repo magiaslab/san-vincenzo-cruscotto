@@ -177,16 +177,30 @@ Comandi utili: `npm run build`, `npm run lint` (unico quality gate oltre al buil
 1. Copia [`config/comune.example.json`](../config/comune.example.json) sopra
    `config/comune.json` (o modifica quello esistente).
 2. Compila almeno: `istat_code`, `nome`, `provincia`, `regione`,
-   `geo.map_center`, `geo.meteo`, `miur_codice_catastale`,
-   `farmacie_di_turno_cod`, `brand.*`, `fork.*`.
+   `geo.map_center`, `geo.meteo`, `geo.terrain_sea_side`,
+   `miur_codice_catastale`, `farmacie_di_turno_cod`, `brand.*`, `fork.*`.
 3. Spegnere ciò che non hai: `"porto": false`, `"balneazione": false`,
-   `"treni": false`, `"allerte_toscana_sir": false`, ecc.
+   `"erosione_costiera": false`, `"treni": false`,
+   `"allerte_toscana_sir": false`, ecc.
 4. **Non toccare** `src/lib/project-origin.ts` (crediti e link al progetto
    originale). In `fork` metti `is_upstream: false` e i tuoi contatti.
 
 `src/lib/constants.ts` legge da `comune.json`: mappe, meteo, allerte,
 farmacie, stemma, URL eventi/turismo puntano al **tuo** comune, non restano
 su San Vincenzo.
+
+Dopo l’identità, rigenera i dataset **locali** (non arrivano dal MCP AgID):
+
+```bash
+npm run dae:sync          # DAE OSM sul bbox / raggio
+npm run omi:update        # quotazioni immobiliari ISTAT
+npm run trasporti:gtfs    # fermate/linee GTFS intorno al centro
+```
+
+Senza questi file l’UI non resta su San Vincenzo: DAE e TPL degradano
+(Overpass / collection vuota); OMI prova il mirror ondata. Ciclabili/pedonali
+si caricano solo se `features.ciclabili_pedonali` è true e gli URL nel JSON
+sono del tuo comune (non lasciare i path ldpgis di San Vincenzo).
 
 ### Come trovare i dati
 
@@ -206,6 +220,7 @@ su San Vincenzo.
 | --- | --- |
 | `porto` | Nasconde tab Porto e API webcam |
 | `balneazione` | Nasconde card mare e API ARPAT balneazione |
+| `erosione_costiera` | Nasconde WFS IdroGEO «dinamica litoranea» (comuni interni) |
 | `treni` | Disattiva board ViaggiaTreno |
 | `eventi_comune` / `eventi_regionali` | Niente scrape calendario / CKAN eventi |
 | `allerte_toscana_sir` | Solo allertameteo.app (ok fuori Toscana) |
@@ -250,7 +265,8 @@ npx vercel --prod   # produzione
    ```
 
    Le variabili `NEXT_PUBLIC_*` richiedono **redeploy** dopo il salvataggio.
-4. Aggiorna `CANONICAL_HOST` in `src/lib/seo.ts` se non usi solo l’env
+4. Imposta `brand.site_url` in `config/comune.json` (i fork senza questo campo
+   non ereditano più `www.cruscottosanvincenzo.it`).
 5. Controlla `/manifest.webmanifest`, Open Graph e che il footer punti al
    tuo dominio/contatti
 
@@ -321,8 +337,8 @@ GitHub (non Upstash).
    ```
 
 5. Locale senza webhook: `npm run telegram:poll` (serve `TELEGRAM_BOT_TOKEN`)
-6. Sync base DAE OSM: adatta lo script `dae:sync` al bbox/comune e rigenera
-   `public/data/dae-*.geojson`
+6. Sync base DAE OSM: `npm run dae:sync` (bbox da `geo.bbox` / raggio intorno
+   a `map_center`; output in `urls.dae_geojson`)
 
 ### 11.3 Assistente RAG (Modal + Hugging Face)
 
@@ -370,11 +386,12 @@ Account HF opzionale; eventuale token HF solo se usi modelli gated.
 
 | Area | Cosa adattare |
 | --- | --- |
-| Treni | Codice stazione in `viaggiatreno.ts`; board `/api/trasporti/treni` |
-| GTFS bus | `scripts/build-trasporti-gtfs.mjs`, file in `public/data/` |
-| Allerte | `ALLERTA_METEO_*` in constants, `/api/meteo/allerte` |
-| ARPAT / turismo / eventi | URL regionali in constants; CKAN Toscana non è universale |
-| Porto / webcam | Pannelli e API `porto` — tipicamente da rimuovere fuori SV |
+| Treni | `ferrovie.stazione_viaggiatreno` in `comune.json`; board `/api/trasporti/treni` |
+| GTFS bus | `npm run trasporti:gtfs` (centro/raggio dal JSON). Senza file: fermate OSM |
+| Allerte | `allerte.*` in `comune.json`, `/api/meteo/allerte` |
+| ARPAT / turismo / eventi | URL regionali in `comune.json`; CKAN Toscana non è universale |
+| Porto / webcam / erosione | `features.porto`, `balneazione`, `erosione_costiera` |
+| Rilievo 3D | `geo.terrain_sea_side` (`none` se non costiero) |
 
 MVP onesto: **KPI nazionali + mappa + 1–2 fonti locali**.
 
@@ -428,6 +445,8 @@ per far funzionare il cruscotto online.
 
 - [ ] Fork/mirror sul tuo GitHub
 - [ ] `ISTAT_CODE` e anagrafica aggiornati; smoke `/api/kpi` corretto
+- [ ] `npm run dae:sync`, `omi:update`, `trasporti:gtfs` (o feature spente)
+- [ ] `geo.terrain_sea_side` e `features.erosione_costiera` coerenti col territorio
 - [ ] Stemma e nome in header/footer
 - [ ] Deploy Vercel verde
 - [ ] `NEXT_PUBLIC_SITE_URL` (e dominio) se non usi solo `*.vercel.app`
@@ -440,6 +459,10 @@ per far funzionare il cruscotto online.
 
 | Sintomo | Cosa controllare |
 | --- | --- |
+| Fermate bus / TPL vuoti | File GTFS di un altro comune, o path vuoto. L’API ora usa Overpass sul centro; per gli orari `npm run trasporti:gtfs`. Svuota `urls.ciclabili_geojson` se resta ldpgis SV |
+| OMI prezzi «sbagliati» | Snapshot `src/data/omi/049018.json` ignorato se l’ISTAT non coincide. Esegui `npm run omi:update` |
+| DAE errore / altro comune | `urls.dae_geojson` + `geo.bbox`. File assente → mappa vuota, non 500. `npm run dae:sync` |
+| Rilievo 3D ancora «costa ovest» | Imposta `geo.terrain_sea_side` (`none` se interno) |
 | KPI vuoti / errore | Egress rete; endpoint MCP AgID; `ISTAT_CODE` valido |
 | Meteo OpenWeather ko | Chiave attiva (attivazione a volte ritardata) |
 | Assistente risponde di San Vincenzo | Hai lasciato `ASSISTENTE_MODAL_URL` di default → deploy Modal tuo + corpus |

@@ -1,18 +1,19 @@
 import {
   COMUNE_NOME,
-  COMUNE_SAN_VINCENZO_URL,
+  COMUNE_STALLI_DISABILI_URL,
+  HTTP_USER_AGENT,
   MAP_CENTER,
   OSM_COPYRIGHT_URL,
 } from "@/lib/constants";
 
+const [WHEELMAP_LAT, WHEELMAP_LON] = MAP_CENTER;
 export const WHEELMAP_URL =
-  "https://wheelmap.org/it/map#/?lat=43.085&lng=10.54&zoom=14" as const;
+  `https://wheelmap.org/it/map#/?lat=${WHEELMAP_LAT}&lng=${WHEELMAP_LON}&zoom=14` as const;
 export const WHEELMAP_WIDGET_INFO_URL =
   "https://news.wheelmap.org/wheelmap-widget/" as const;
 export const ISTAT_DISABILITA_CIFRE_URL =
   "https://www.disabilitaincifre.istat.it/" as const;
-export const COMUNE_STALLI_DISABILI_URL =
-  `${COMUNE_SAN_VINCENZO_URL}Servizi/Disciplina-delle-riserve-di-stalli-di-sosta-personali-per-disabili-e-istituzione-sosta-gratuita-su-stalli-a-pagamento-per-disabili` as const;
+export { COMUNE_STALLI_DISABILI_URL } from "@/lib/constants";
 
 /** URL iframe ufficiale Wheelmap (richiede embedToken da accessibility.cloud / Sozialhelden). */
 export function buildWheelmapEmbedSrc(embedToken: string): string {
@@ -180,8 +181,7 @@ async function fetchOverpass(query: string): Promise<OverpassElement[]> {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
           Accept: "application/json",
-          "User-Agent":
-            "CruscottoSanVincenzo/1.0 (+https://www.cruscottosanvincenzo.it)",
+          "User-Agent": HTTP_USER_AGENT,
         },
         body: `data=${encodeURIComponent(query)}`,
         signal: ctrl.signal,
@@ -274,10 +274,9 @@ export async function buildAccessibilitaPayload(
       { label: "OpenStreetMap", url: OSM_COPYRIGHT_URL },
       { label: "Wheelmap", url: WHEELMAP_URL },
       { label: "ISTAT Disabilità in cifre", url: ISTAT_DISABILITA_CIFRE_URL },
-      {
-        label: "Comune — stalli / CUDE",
-        url: COMUNE_STALLI_DISABILI_URL,
-      },
+      ...(COMUNE_STALLI_DISABILI_URL
+        ? [{ label: "Comune — stalli / CUDE", url: COMUNE_STALLI_DISABILI_URL }]
+        : []),
     ],
   };
 }

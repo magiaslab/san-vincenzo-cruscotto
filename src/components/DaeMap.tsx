@@ -13,7 +13,6 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { HeartPulse } from "lucide-react";
 import {
-  DAE_GEOJSON_PATH,
   DAE_SEGNALAZIONI_API,
   MAP_CENTER,
   MAP_DEFAULT_ZOOM,
@@ -67,7 +66,7 @@ export function DaeMap() {
   useEffect(() => {
     let cancelled = false;
     Promise.all([
-      fetch(DAE_GEOJSON_PATH).then((r) => {
+      fetch("/api/dae?_=" + Date.now()).then((r) => {
         if (!r.ok) throw new Error("dae");
         return r.json() as Promise<FeatureCollection>;
       }),

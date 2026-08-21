@@ -1,6 +1,6 @@
 /**
  * Tipi e helper dominio OMI (Agenzia Entrate – Osservatorio Mercato Immobiliare).
- * Snapshot locale: `src/data/omi/*.json` (nessun login Fisconline).
+ * Snapshot locale: `src/data/omi/{ISTAT}.json` (nessun login Fisconline).
  * La route `/api/omi` restituisce `OpenDataResult<OmiData>`.
  *
  * Nota: nessun import `node:fs` — il modulo è condiviso col client (`OmiPanel`).
@@ -229,13 +229,26 @@ export function buildStoricoFromSnapshots(
   return out.sort((a, b) => a.semestre.localeCompare(b.semestre));
 }
 
+/** True se il campo Comune_ISTAT del CSV/snapshot coincide col codice ISTAT configurato. */
+export function matchesOmiComuneIstat(
+  cell: string | null | undefined,
+  istat: string = ISTAT_CODE,
+): boolean {
+  const digits = (cell ?? "").replace(/\D/g, "");
+  const target = istat.replace(/\D/g, "").padStart(6, "0");
+  if (!digits || target.length < 6) return false;
+  const short = target.replace(/^0+/, "");
+  return digits === target || digits.endsWith(target) || (Boolean(short) && digits.endsWith(short));
+}
+
 /**
- * Carica lo snapshot bundlato (`049018.json`, con `storico` già aggregato).
- * I file `YYYY-S.json` restano per `npm run omi:update`.
+ * Snapshot bundlato solo se appartiene al comune configurato.
+ * Nei fork senza file `src/data/omi/{ISTAT}.json` la route prova il mirror ondata.
  */
 export function loadOmiSnapshot(): OmiData | null {
   const bundled = normalizeSnapshot(snapshot049018);
   if (!bundled) return null;
+  if (!matchesOmiComuneIstat(bundled.comuneIstat ?? "049018")) return null;
   return {
     semestre: bundled.semestre,
     zone: bundled.zone,

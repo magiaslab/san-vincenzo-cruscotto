@@ -456,11 +456,13 @@ export default function DisabilitaPanel({
         <div className="panel">
           <h3 className="m-0 mb-2">{t("Servizi e fonti ufficiali")}</h3>
           <ul className="m-0 space-y-2 p-0 text-sm">
-            <li>
-              <SolidLink href={COMUNE_STALLI_DISABILI_URL}>
-                {t("Stalli personali e sosta CUDE (Comune)")}
-              </SolidLink>
-            </li>
+            {COMUNE_STALLI_DISABILI_URL ? (
+              <li>
+                <SolidLink href={COMUNE_STALLI_DISABILI_URL}>
+                  {t("Stalli personali e sosta CUDE (Comune)")}
+                </SolidLink>
+              </li>
+            ) : null}
             <li>
               <OutlineLink href={WHEELMAP_URL}>Wheelmap</OutlineLink>
             </li>
