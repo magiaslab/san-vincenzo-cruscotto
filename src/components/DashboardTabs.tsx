@@ -68,7 +68,7 @@ import {
   SolidButton,
   valueOrMissing,
 } from "@/components/ui";
-import { COMUNI_LOOKUP } from "@/lib/constants";
+import { COMUNE_NOME, COMUNI_LOOKUP } from "@/lib/constants";
 import { isFeatureEnabled, isTabEnabled } from "@/lib/comune-config";
 import {
   formatDecimal,
@@ -2474,7 +2474,8 @@ function Sanita({ kpi }: { kpi: Kpi }) {
           <DataUnavailable
             message={t("Ospedali e pronto soccorso")}
             hint={t(
-              "San Vincenzo non ha un ospedale nel territorio comunale. Per emergenze usa il 118; farmacie di turno e DAE sono mappati qui sotto. Se conosci una struttura da aggiungere, segnalala in Partecipa.",
+              "{comune} non ha un ospedale nel territorio comunale. Per emergenze usa il 118; farmacie di turno e DAE sono mappati qui sotto. Se conosci una struttura da aggiungere, segnalala in Partecipa.",
+              { comune: COMUNE_NOME },
             )}
           />
         </div>

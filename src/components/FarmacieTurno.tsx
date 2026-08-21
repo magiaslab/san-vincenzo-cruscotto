@@ -9,7 +9,8 @@ import {
   PanelHeading,
   SolidButton,
 } from "@/components/ui";
-import { FARMACIE_DI_TURNO_URL } from "@/lib/constants";
+import { COMUNE_NOME, FARMACIE_DI_TURNO_URL } from "@/lib/constants";
+import { matchesComuneNome } from "@/lib/comune-config";
 
 type FarmaciaTurno = {
   nome: string;
@@ -86,10 +87,8 @@ export function FarmacieTurno() {
   }, [tick]);
 
   const farmacie = Array.isArray(data?.farmacie) ? data.farmacie : [];
-  const locali = farmacie.filter((f) =>
-    /san\s*vincenzo/i.test(f.comune || ""),
-  );
-  const altre = farmacie.filter((f) => !/san\s*vincenzo/i.test(f.comune || ""));
+  const locali = farmacie.filter((f) => matchesComuneNome(f.comune));
+  const altre = farmacie.filter((f) => !matchesComuneNome(f.comune));
   const ordinati = [...locali, ...altre];
   const shown = ordinati.slice(0, DISPLAY_LIMIT);
   const fonteUrl = data?.fonte?.url || FARMACIE_DI_TURNO_URL;
@@ -102,12 +101,14 @@ export function FarmacieTurno() {
         title={t("Farmacie di turno")}
         description={
           [
-            data?.giorno ? `${t("Giorno")}: ${data.giorno}` : t("Turni più vicini a San Vincenzo"),
+            data?.giorno
+              ? `${t("Giorno")}: ${data.giorno}`
+              : t("Turni più vicini a {comune}", { comune: COMUNE_NOME }),
             data?.orario_riferimento
               ? `${t("riferimento ore")} ${data.orario_riferimento}`
               : null,
             locali.length > 0
-              ? `${locali.length} ${t("a San Vincenzo")}`
+              ? `${locali.length} ${t("a {comune}", { comune: COMUNE_NOME })}`
               : null,
           ]
             .filter(Boolean)
@@ -128,7 +129,8 @@ export function FarmacieTurno() {
       {nessunLocale ? (
         <p className="mb-3 rounded-lg border border-[color-mix(in_srgb,var(--pa-warning)_40%,var(--pa-border))] bg-[color-mix(in_srgb,var(--pa-warning)_10%,white)] px-3 py-2 text-xs text-[var(--pa-ink)] sm:text-sm">
           {t(
-            "Nessuna farmacia di San Vincenzo risulta di turno in questo orario secondo la fonte. Elenco delle più vicine nei comuni limitrofi (non è un errore di caricamento).",
+            "Nessuna farmacia di {comune} risulta di turno in questo orario secondo la fonte. Elenco delle più vicine nei comuni limitrofi (non è un errore di caricamento).",
+            { comune: COMUNE_NOME },
           )}
         </p>
       ) : null}
@@ -136,7 +138,7 @@ export function FarmacieTurno() {
       {!loading && shown.length > 0 ? (
         <ul className="m-0 grid list-none gap-3 p-0 sm:grid-cols-2">
           {shown.map((f) => {
-            const isLocale = /san\s*vincenzo/i.test(f.comune || "");
+            const isLocale = matchesComuneNome(f.comune);
             return (
             <li
               key={`${f.nome}-${f.comune}-${f.telefono ?? f.url_scheda}`}
@@ -151,7 +153,7 @@ export function FarmacieTurno() {
                   {f.nome}
                   {isLocale ? (
                     <span className="ml-2 align-middle text-xs font-semibold text-[var(--pa-primary)]">
-                      San Vincenzo
+                      {COMUNE_NOME}
                     </span>
                   ) : null}
                 </p>

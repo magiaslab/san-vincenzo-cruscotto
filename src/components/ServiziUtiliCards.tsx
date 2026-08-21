@@ -22,6 +22,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { TRASPORTI_TRENI_LIVE_API } from "@/lib/constants";
+import { matchesComuneNome } from "@/lib/comune-config";
 import { formatDecimal } from "@/lib/format";
 import { useT } from "@/lib/i18n";
 import type { TrenoBoardRow } from "@/lib/viaggiatreno";
@@ -396,7 +397,7 @@ export function ServiziUtiliCards({
   const farmacia = useMemo(() => {
     const list = Array.isArray(farmacie?.farmacie) ? farmacie.farmacie : [];
     if (!list.length) return null;
-    const locali = list.filter((f) => /san\s*vincenzo/i.test(f.comune || ""));
+    const locali = list.filter((f) => matchesComuneNome(f.comune));
     return (locali[0] ?? list[0]) || null;
   }, [farmacie]);
 

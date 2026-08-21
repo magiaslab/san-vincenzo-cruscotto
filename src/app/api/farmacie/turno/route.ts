@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import {
+  COMUNE_NOME,
   FARMACIE_DI_TURNO_BASE,
+  FARMACIE_DI_TURNO_COD,
   FARMACIE_DI_TURNO_URL,
 } from "@/lib/constants";
 
@@ -214,6 +216,10 @@ export async function GET() {
     nome: "FarmacieDiTurno.org",
     url: FARMACIE_DI_TURNO_URL,
   };
+  const query = {
+    comune: COMUNE_NOME,
+    cod: FARMACIE_DI_TURNO_COD,
+  };
 
   try {
     const html = await fetchHtml(FARMACIE_DI_TURNO_URL);
@@ -225,6 +231,7 @@ export async function GET() {
           giorno,
           orario_riferimento,
           farmacie: [],
+          query,
           fonte,
           fetched_at: new Date().toISOString(),
           error: "Nessuna farmacia di turno trovata nella pagina sorgente",
@@ -241,6 +248,7 @@ export async function GET() {
         giorno,
         orario_riferimento,
         farmacie,
+        query,
         fonte,
         fetched_at: new Date().toISOString(),
       },
@@ -253,6 +261,7 @@ export async function GET() {
         giorno: null,
         orario_riferimento: null,
         farmacie: [],
+        query,
         fonte,
         fetched_at: new Date().toISOString(),
         error: "Impossibile recuperare le farmacie di turno",
