@@ -25,6 +25,8 @@ import {
 } from "@/lib/constants";
 import { getForkMaintainer } from "@/lib/comune-config";
 import { PROJECT_ORIGIN } from "@/lib/project-origin";
+import { isSostieniEnabled } from "@/lib/sostieni";
+import { useT } from "@/lib/i18n";
 import { AccessibilitaCompliance } from "@/components/AccessibilitaCompliance";
 import { GitHubMark, VercelMark } from "@/components/BrandMarks";
 import {
@@ -53,6 +55,7 @@ function Section({
 }
 
 export function AttribuzioniPanel() {
+  const t = useT();
   const forkMaintainer = getForkMaintainer();
   return (
     <section>
@@ -139,6 +142,20 @@ export function AttribuzioniPanel() {
             </li>
           </ul>
         </Section>
+
+        {isSostieniEnabled() ? (
+          <Section title={t("Sostieni il progetto")}>
+            <p>
+              {t(
+                "Il cruscotto non ha budget pubblico. Un contributo volontario su Buy Me a Coffee aiuta a coprire hosting e compute; non è una donazione al Comune e non influenza i dati.",
+              )}{" "}
+              <a className="text-[#0066CC] underline" href="/sostieni">
+                {t("Pagina Sostieni e ringraziamenti")}
+              </a>
+              .
+            </p>
+          </Section>
+        ) : null}
 
         <Section title="Accuratezza dei dati">
           <p>

@@ -154,6 +154,11 @@ const CORE_FIELDS: { campo: string; esempio: string; dove: string }[] = [
     esempio: "nome/email di chi cura il fork",
     dove: "Attribuzioni e footer; i crediti originali restano fissi",
   },
+  {
+    campo: "sostieni.buymeacoffee_slug",
+    esempio: COMUNE.sostieni.buymeacoffee_slug || "(vuoto = pagina nascosta)",
+    dove: "pagina /sostieni + tab; ringraziamenti in config/sostegni.json",
+  },
 ];
 
 type AccountIcon =
@@ -328,6 +333,11 @@ const OPTIONAL_MODULES: { area: string; cerca: string }[] = [
     area: "Acqua / SII",
     cerca:
       "features.acqua_sii + gestori.acqua.geoserver_wfs (ASA WFS). Fuori ATO 5: spegni il flag e lascia i link al tuo gestore",
+  },
+  {
+    area: "Sostieni / Buy Me a Coffee",
+    cerca:
+      "sostieni.buymeacoffee_slug in comune.json (vuoto = pagina nascosta). Ringraziamenti in config/sostegni.json",
   },
   {
     area: "Testi i18n e FAQ",

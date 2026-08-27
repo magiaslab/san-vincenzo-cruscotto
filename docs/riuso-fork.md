@@ -398,6 +398,7 @@ Account HF opzionale; eventuale token HF solo se usi modelli gated.
 | Rilievo 3D | `geo.terrain_sea_side` (`none` se non costiero) |
 | Rifiuti | `features.rifiuti_ispra` (CSV ISPRA nazionale). `gestori.rifiuti.*` per SEI/ARRR (HTML, non API) |
 | Acqua / SII | `features.acqua_sii` + `gestori.acqua.geoserver_wfs` (WFS ASA). AIT RQTII è link, non scrape |
+| Sostieni / BMC | `sostieni.buymeacoffee_slug` (vuoto = pagina e tab nascosti). Ringraziamenti in `config/sostegni.json` |
 
 ### 11.7 Rifiuti (ISPRA) e acqua (gestore SII)
 

@@ -114,6 +114,10 @@
     "populonia",
     "baratti"
   ],
+  "sostieni": {
+    "buymeacoffee_slug": "acipriani",
+    "_comment": "Pagina /sostieni. Slug Buy Me a Coffee dell’autore. Vuoto = tab e pagina nascosti. I fork mettono il proprio slug."
+  },
   "fork": {
     "is_upstream": true,
     "maintainer_name": "",

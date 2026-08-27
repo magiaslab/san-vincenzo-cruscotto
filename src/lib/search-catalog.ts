@@ -1,5 +1,7 @@
 /** Catalogo ricerca globale: sezioni e servizi del cruscotto. */
 
+import { isTabEnabled } from "@/lib/comune-config";
+
 export type SearchEntry = {
   id: string;
   /** Tab id di navigazione */
@@ -103,6 +105,25 @@ export const SEARCH_CATALOG: SearchEntry[] = [
       "proposta",
       "bug",
       "miglioramento",
+    ],
+  },
+  {
+    id: "sostieni",
+    tab: "sostieni",
+    label: "Sostieni",
+    hint: "Buy Me a Coffee e ringraziamenti",
+    keywords: [
+      "sostieni",
+      "sostegno",
+      "donazione",
+      "caffè",
+      "caffe",
+      "buy me a coffee",
+      "bmc",
+      "hosting",
+      "spese",
+      "ringraziamenti",
+      "supporter",
     ],
   },
   {
@@ -285,7 +306,7 @@ export function searchCatalog(query: string, limit = 8): SearchEntry[] {
     if (parts.every((p) => hay.includes(p))) score += 15;
     return { entry, score };
   })
-    .filter((x) => x.score > 0)
+    .filter((x) => x.score > 0 && isTabEnabled(x.entry.tab))
     .sort((a, b) => b.score - a.score);
 
   return scored.slice(0, limit).map((x) => x.entry);

@@ -16,7 +16,7 @@ Eseguire dopo cambi UI rilevanti (shell, dialog, form, tabelle).
 - [ ] Drawer mobile: Escape chiude, focus trap, focus ripristinato
 - [ ] Assistente: Escape chiude, Tab resta nel dialog
 - [ ] Install prompt: Escape chiude, Tab resta nel dialog
-- [ ] Skip link «Vai al contenuto» visibile al focus (dashboard e pagine info)
+- [ ] Skip link «Vai al contenuto» visibile al focus (dashboard e pagine info, inclusa `/sostieni`)
 
 ## Screen reader (smoke)
 

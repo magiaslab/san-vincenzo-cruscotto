@@ -8,6 +8,7 @@ import {
 } from "@/lib/constants";
 import { getForkMaintainer, isUpstreamDeploy } from "@/lib/comune-config";
 import { PROJECT_ORIGIN } from "@/lib/project-origin";
+import { isSostieniEnabled } from "@/lib/sostieni";
 import { useT } from "@/lib/i18n";
 
 type FooterProps = {
@@ -114,6 +115,14 @@ export function Footer({ onNavigate }: FooterProps) {
                 {t(label)}
               </button>
             ))}
+            {isSostieniEnabled() ? (
+              <a
+                href="/sostieni"
+                className="inline-flex min-h-11 items-center font-semibold text-white underline underline-offset-2"
+              >
+                {t("Sostieni")}
+              </a>
+            ) : null}
             <a
               href={`mailto:${AUTHOR.email}`}
               className="inline-flex min-h-11 items-center font-semibold text-white underline underline-offset-2"
