@@ -7,7 +7,6 @@
  */
 
 import { ISTAT_CODE } from "@/lib/constants";
-import snapshot049018 from "@/data/omi/049018.json";
 
 export const OMI_ISTAT_CODE = ISTAT_CODE;
 
@@ -242,18 +241,11 @@ export function matchesOmiComuneIstat(
 }
 
 /**
- * Snapshot bundlato solo se appartiene al comune configurato.
- * Nei fork senza file `src/data/omi/{ISTAT}.json` la route prova il mirror ondata.
+ * Snapshot bundlato: nel template non c’è un comune di default.
+ * Lato server `omi-server.ts` legge `src/data/omi/{ISTAT}.json` se presente.
  */
 export function loadOmiSnapshot(): OmiData | null {
-  const bundled = normalizeSnapshot(snapshot049018);
-  if (!bundled) return null;
-  if (!matchesOmiComuneIstat(bundled.comuneIstat ?? "049018")) return null;
-  return {
-    semestre: bundled.semestre,
-    zone: bundled.zone,
-    storico: bundled.storico,
-  };
+  return null;
 }
 
 /** @deprecated alias — preferire `loadOmiSnapshot`. */

@@ -4,6 +4,7 @@ import {
   FARMACIE_DI_TURNO_BASE,
   FARMACIE_DI_TURNO_COD,
   FARMACIE_DI_TURNO_URL,
+  HTTP_USER_AGENT,
 } from "@/lib/constants";
 
 export const revalidate = 1800;
@@ -11,8 +12,7 @@ export const revalidate = 1800;
 const CACHE_CONTROL =
   "public, s-maxage=1800, stale-while-revalidate=3600";
 
-const USER_AGENT =
-  "Mozilla/5.0 (compatible; CruscottoSanVincenzo/1.0; +https://github.com/magiaslab/san-vincenzo-cruscotto)";
+const USER_AGENT = HTTP_USER_AGENT;
 
 export type FarmaciaTurno = {
   nome: string;

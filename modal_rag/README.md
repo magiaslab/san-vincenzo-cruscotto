@@ -1,6 +1,8 @@
-# RAG Assistente San Vincenzo (Modal + Hugging Face)
+# RAG Assistente (Modal + Hugging Face)
 
-Piccolo **RAG** (non un fine-tune a pagamento) sui contenuti/dati del cruscotto.
+Piccolo **RAG** sui contenuti del cruscotto del **tuo** comune.
+Non riusare l’indice di San Vincenzo: genera il corpus dopo aver compilato
+`config/comune.json`.
 
 ## Idea
 
@@ -14,31 +16,22 @@ Niente OpenAI / Anthropic / Inference API a consumo token: scarichi i pesi da Hu
 
 > Non è “addestramento”: è retrieval + generazione. Per aggiornare le conoscenze, aggiorni il corpus e rideployi.
 
-## Deploy sul workspace `magiaslab`
+## Deploy
 
 ```bash
 pip install modal
-modal setup   # login browser sul tuo account magiaslab
+modal setup
+npm run rag:corpus
 modal deploy modal_rag/app.py
 ```
 
-App deployata: [san-vincenzo-rag](https://modal.com/apps/magiaslab/main/deployed/san-vincenzo-rag)
-
-Endpoint (workspace `magiaslab`):
-
-- POST ask: `https://magiaslab--san-vincenzo-rag-ragservice-web-ask.modal.run`
-- GET health: `https://magiaslab--san-vincenzo-rag-ragservice-health.modal.run`
-
-Nel progetto Next.js (Vercel):
-
-```bash
-ASSISTENTE_MODAL_URL=https://magiaslab--san-vincenzo-rag-ragservice-web-ask.modal.run
-```
+Copia l’URL POST `…-web-ask.modal.run` in `ASSISTENTE_MODAL_URL`.
+Non lasciare l’endpoint di un altro comune.
 
 ## Test
 
 ```bash
-modal run modal_rag/app.py --question "Quante colonnine EV ci sono a San Vincenzo?"
+modal run modal_rag/app.py --question "Qual è la copertura FTTH?"
 
 curl -X POST "$ASSISTENTE_MODAL_URL" \
   -H 'content-type: application/json' \

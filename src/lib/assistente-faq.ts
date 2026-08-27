@@ -32,7 +32,7 @@ const RULES: Rule[] = [
     patterns: [
       /capienza.*porto|posti\s*barca|quanti\s*posti.*porto|porto.*posti|ormeggi/i,
     ],
-    answer: `Capienza del porto di ${COMUNE_NOME}: circa 140 posti barca (ISTAT / OpenDataComune).`,
+    answer: `Dati del porto di ${COMUNE_NOME}: apri la sezione Porto. I valori strutturali arrivano dalla config del comune, non da un altro ente.`,
     href: "/#porto",
     label: "Apri sezione Porto",
     title: "Porto turistico",

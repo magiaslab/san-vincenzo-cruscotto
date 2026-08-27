@@ -4,13 +4,15 @@
  */
 
 import { COMUNE } from "@/lib/comune-config";
+import { HTTP_USER_AGENT } from "@/lib/constants";
 
 export const VIAGGIATRENO_BASE =
   "https://www.viaggiatreno.it/infomobilita/resteasy/viaggiatreno" as const;
 
 /** Codice stazione FS del comune (`config/comune.json` → ferrovie). */
-export const FS_STAZIONE_SAN_VINCENZO =
+export const FS_STAZIONE_ID =
   COMUNE.ferrovie.stazione_viaggiatreno || "";
+export const FS_STAZIONE_SAN_VINCENZO = FS_STAZIONE_ID;
 
 export const VIAGGIATRENO_ATTRIBUTION_URL =
   "https://www.viaggiatreno.it/" as const;
@@ -140,7 +142,7 @@ async function fetchBoard(
   const res = await fetch(url, {
     headers: {
       Accept: "application/json",
-      "User-Agent": "cruscotto-san-vincenzo/1.0 (+https://www.cruscottosanvincenzo.it)",
+      "User-Agent": HTTP_USER_AGENT,
     },
     cache: "no-store",
   });

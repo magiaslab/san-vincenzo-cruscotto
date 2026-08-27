@@ -40,7 +40,7 @@ console.log(
   process.env.TELEGRAM_POLL_TARGET ||
     "http://127.0.0.1:3000/api/telegram/webhook",
 );
-console.log("Apri t.me/DaesanvincenzoBot e invia /start");
+console.log("Apri il tuo bot Telegram (NEXT_PUBLIC_TELEGRAM_BOT_URL) e invia /start");
 
 for (;;) {
   const res = await fetch(

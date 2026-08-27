@@ -1,15 +1,19 @@
-# Riusare / forkare il Cruscotto — guida completa
+# Riusare / forkare il Cruscotto Comune — guida completa
 
-Guida passo-passo per duplicare questo progetto su un **altro comune italiano**,
-dall’account GitHub alla messa online su Vercel, con i servizi esterni opzionali
-(Telegram, Modal, Hugging Face, OpenWeather, …) e indicazioni per usare
-Cursor o Claude ad adattare il fork.
+Guida passo-passo per duplicare **questo template** su un comune italiano,
+dall’account GitHub alla messa online su Vercel.
 
-La stessa guida è riassunta in-app su [`/#riusa`](https://www.cruscottosanvincenzo.it/#riusa)
-(tab **Progetto → Riusa / fork**). Redirect legacy: `/riusa`.
+Il Cruscotto San Vincenzo resta l’esemplare in produzione
+(<https://www.cruscottosanvincenzo.it>): i fork nuovi partono da
+**questo** template (<https://github.com/magiaslab/cruscotto-comune> /
+<https://www.cruscottocomune.it>), non da quel sito.
+
+La stessa guida è in-app su [`/riusa`](/riusa) (`/riuso` reindirizza).
+Come restare aggiornati: [`docs/aggiornamenti-upstream.md`](aggiornamenti-upstream.md).
 
 Checklist dati: [`config/comune.example.json`](../config/comune.example.json)  
-Env di esempio: [`.env.example`](../.env.example)
+Env di esempio: [`.env.example`](../.env.example)  
+Menzioni obbligatorie: [cruscottocomune.it/menzioni](https://www.cruscottocomune.it/menzioni).
 
 ---
 
@@ -61,7 +65,7 @@ adattamento moduli regionali (ARPAT, GTFS, allerte).
 
 | Incluso | Non incluso |
 | --- | --- |
-| Next.js 15 + TypeScript + Tailwind | Multi-tenant runtime (un deploy = un comune) |
+| Next.js 16 + TypeScript + Tailwind | Multi-tenant runtime (un deploy = un comune) |
 | Proxy `/api/*` → MCP Cruscotto Italia (AgID) | Backend/DB/auth locali |
 | Shell dashboard (sidebar, KPI, mappe, grafici) | Parità automatica di ogni pannello “costa / Toscana” |
 | **`config/comune.json` a runtime** + `features.*` per spegnere moduli | — |
@@ -124,14 +128,14 @@ indipendente se la fonte è giù.
 
 ### Opzione A — Fork (consigliata)
 
-1. Apri <https://github.com/magiaslab/san-vincenzo-cruscotto>
+1. Apri <https://github.com/magiaslab/cruscotto-comune>
 2. Pulsante **Fork** → scegli account/org → Create fork
-3. Otterrai `https://github.com/TUO_USER/san-vincenzo-cruscotto` (o rinominalo)
+3. Otterrai `https://github.com/TUO_USER/cruscotto-comune` (o rinominalo)
 
 ### Opzione B — Mirror in un repo nuovo
 
 ```bash
-git clone --depth 1 https://github.com/magiaslab/san-vincenzo-cruscotto.git mio-cruscotto
+git clone --depth 1 https://github.com/magiaslab/cruscotto-comune.git mio-cruscotto
 cd mio-cruscotto
 rm -rf .git
 git init
@@ -237,7 +241,7 @@ Dopo le modifiche: commit + push sul tuo repo.
 ## 8. Passo E — Deploy su Vercel
 
 1. Vai su [vercel.com](https://vercel.com) → **Add New… → Project**
-   (oppure usa il [Deploy Button](https://vercel.com/new/clone?repository-url=https://github.com/magiaslab/san-vincenzo-cruscotto)
+   (oppure usa il [Deploy Button](https://vercel.com/new/clone?repository-url=https://github.com/magiaslab/cruscotto-comune)
    sul repo / fork)
 2. Importa il repository forkato (autorizza GitHub se richiesto)
 3. Framework Preset: **Next.js** (già in `vercel.json`, region `fra1`)
@@ -453,7 +457,7 @@ Non serve costruire un MCP del cruscotto: i KPI arrivano già dal MCP AgID.
 2. Usa un brief fisso (Custom instructions / Project instructions), ad esempio:
 
    > Fork del Cruscotto San Vincenzo per il Comune di …. ISTAT ….
-   > Stack Next.js 15 App Router. Identità in `src/lib/constants.ts`.
+   > Stack Next.js 16 App Router. Identità in `config/comune.json`.
    > Nessun DB. KPI da MCP AgID. Non rimuovere disclaimer e attribuzioni.
    > Checklist: `config/comune.example.json` e `docs/riuso-fork.md`.
 

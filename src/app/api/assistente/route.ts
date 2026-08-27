@@ -53,6 +53,20 @@ export async function POST(req: NextRequest) {
   }
 
   const modalUrl = resolveModalUrl();
+  if (!modalUrl) {
+    return NextResponse.json(
+      {
+        error: "assistente_non_configurato",
+        message:
+          "ASSISTENTE_MODAL_URL non impostato. Non si riusa l’indice RAG di un altro comune.",
+        answer:
+          "L’assistente RAG non è attivo su questo deploy. Consulta le sezioni del cruscotto dal menu.",
+        link: { href: "/#panoramica", label: "Apri Panoramica" },
+        sources: [],
+      },
+      { status: 503 },
+    );
+  }
   try {
     const upstream = await fetch(modalUrl, {
       method: "POST",

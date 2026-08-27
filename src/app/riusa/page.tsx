@@ -1,15 +1,12 @@
-"use client";
+import { RiusaPanel } from "@/components/RiusaPanel";
+import { SiteChrome } from "@/components/SiteChrome";
 
-import { useEffect } from "react";
-
-export default function RiusaRedirectPage() {
-  useEffect(() => {
-    window.location.replace("/#riusa");
-  }, []);
-
+export default function RiusaPage() {
   return (
-    <main className="flex min-h-[40vh] items-center justify-center p-6 text-sm text-[var(--pa-muted)]">
-      Reindirizzamento…
-    </main>
+    <SiteChrome>
+      <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6 sm:py-8">
+        <RiusaPanel />
+      </div>
+    </SiteChrome>
   );
 }

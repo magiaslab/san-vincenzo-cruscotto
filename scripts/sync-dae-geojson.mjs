@@ -119,7 +119,7 @@ async function main() {
   const nome = cfg.nome || "comune";
   const ua =
     cfg.brand?.user_agent ||
-    "Cruscotto-Comunale/1.0 (+https://github.com/magiaslab/san-vincenzo-cruscotto; dae:sync)";
+    "Cruscotto-Comune/1.0 (dae:sync)";
 
   console.log("Scarico", IT_GEOJSON_URL);
   console.log("BBox", bbox, "→", outFile);

@@ -1,17 +1,10 @@
 import { NextResponse } from "next/server";
-import { COMUNE_DI } from "@/lib/constants";
-import { isFeatureEnabled, isUpstreamDeploy } from "@/lib/comune-config";
+import { COMUNE_DI, HTTP_USER_AGENT } from "@/lib/constants";
+import { COMUNE, isFeatureEnabled } from "@/lib/comune-config";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-const WEBCAM_PAGE = "https://lnx.comune.sanvincenzo.li.it/webcam/";
-const WEBCAM_BASE = "https://lnx.comune.sanvincenzo.li.it/webcamfoto/";
-
-/**
- * Estrae gli URL aggiornati delle webcam ufficiali del Comune
- * (Vista Nord / Vista Sud sul porto). Aggiornamento tipico ~5 minuti.
- */
 export async function GET() {
   if (!isFeatureEnabled("porto")) {
     return NextResponse.json(
@@ -19,24 +12,26 @@ export async function GET() {
       { status: 404 },
     );
   }
-  if (!isUpstreamDeploy()) {
+
+  const page = COMUNE.porto.webcam_page.trim();
+  const base = COMUNE.porto.webcam_base.trim();
+  if (!page) {
     return NextResponse.json(
       {
         disponibile: false,
         camere: [],
-        error: "Webcam porto non configurate per questo comune",
+        error: "Webcam porto non configurate (porto.webcam_page in comune.json)",
       },
       { status: 404 },
     );
   }
 
   try {
-    const res = await fetch(WEBCAM_PAGE, {
+    const res = await fetch(page, {
       cache: "no-store",
       headers: {
         Accept: "text/html",
-        "User-Agent":
-          "Mozilla/5.0 (compatible; CruscottoSanVincenzo/1.0; +https://github.com/magiaslab/san-vincenzo-cruscotto)",
+        "User-Agent": HTTP_USER_AGENT,
       },
     });
     if (!res.ok) {
@@ -45,33 +40,23 @@ export async function GET() {
     const html = await res.text();
     const nord = html.match(/webcamfoto\/(webcamnord_[^"'>\s]+)/i)?.[1] ?? null;
     const sud = html.match(/webcamfoto\/(webcamsud_[^"'>\s]+)/i)?.[1] ?? null;
+    const camere = [
+      nord && base
+        ? { id: "nord", nome: "Porto — Vista Nord", url: `${base}${nord}` }
+        : null,
+      sud && base
+        ? { id: "sud", nome: "Porto — Vista Sud", url: `${base}${sud}` }
+        : null,
+    ].filter(Boolean);
 
     return NextResponse.json(
       {
-        disponibile: Boolean(nord || sud),
+        disponibile: camere.length > 0,
         aggiornamento: "circa ogni 5 minuti",
         fetched_at: new Date().toISOString(),
-        camere: [
-          nord
-            ? {
-                id: "nord",
-                nome: "Porto — Vista Nord",
-                url: `${WEBCAM_BASE}${nord}`,
-              }
-            : null,
-          sud
-            ? {
-                id: "sud",
-                nome: "Porto — Vista Sud",
-                url: `${WEBCAM_BASE}${sud}`,
-              }
-            : null,
-        ].filter(Boolean),
-        fonte: {
-          nome: `${COMUNE_DI} — WebCam`,
-          url: WEBCAM_PAGE,
-        },
-        note: `Immagini di proprietà del ${COMUNE_DI}; mostrate con attribuzione e link alla fonte ufficiale.`,
+        camere,
+        fonte: { nome: `${COMUNE_DI} — WebCam`, url: page },
+        note: `Immagini di proprietà del ${COMUNE_DI}; mostrate con attribuzione.`,
       },
       {
         headers: {
@@ -85,10 +70,7 @@ export async function GET() {
       {
         disponibile: false,
         camere: [],
-        fonte: {
-          nome: `${COMUNE_DI} — WebCam`,
-          url: WEBCAM_PAGE,
-        },
+        fonte: { nome: `${COMUNE_DI} — WebCam`, url: page },
         error: "Impossibile recuperare le webcam ufficiali",
       },
       { status: 502 },

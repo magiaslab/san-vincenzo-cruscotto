@@ -1,5 +1,5 @@
 {
-  "$schema_comment": "Template per QUALSIASI comune italiano. Copia come config/comune.json (file caricato a runtime). I crediti al progetto originale restano in src/lib/project-origin.ts — non modificarli. Indica te stesso in fork.*.",
+  "$schema_comment": "Template per UN COMUNE italiano. Copia come config/comune.json. I crediti al progetto originale restano in src/lib/project-origin.ts — non modificarli. Indica te stesso in fork.*. site.mode=dashboard rende la dashboard la homepage.",
   "istat_code": "000000",
   "nome": "NomeComune",
   "nome_aliases": ["nomecomune"],
@@ -46,7 +46,7 @@
     "trasporti_gtfs_local": ""
   },
   "brand": {
-    "stemma_path": "/stemma.png",
+    "stemma_path": "/stemma.svg",
     "stemma_width": 400,
     "stemma_height": 500,
     "stemma_alt": "Stemma del Comune",
@@ -57,7 +57,7 @@
     "user_agent": "Cruscotto-NomeComune/1.0"
   },
   "regione_opendata": {
-    "portal_url": "https://dati.gov.it/",
+    "portal_url": "https://www.dati.gov.it/",
     "ckan_api": "",
     "turismo_stats_url": "",
     "gtfs_dataset_url": "",
@@ -66,7 +66,7 @@
     "allerta_url": "",
     "cfr_url": "",
     "arpat_base_url": "",
-    "nota": "Cerca il portale open data della tua Regione (spesso dati.<regione>.it / CKAN), GTFS TPL, turismo ISTAT, allerte PC. Catalogo nazionale: https://www.dati.gov.it/ — elenco portali: https://www.dati.gov.it/view-dataset?organization=regioni"
+    "nota": "Cerca il portale open data della tua Regione (spesso dati.<regione>.it / CKAN), GTFS TPL, turismo ISTAT, allerte PC. Catalogo nazionale: https://www.dati.gov.it/"
   },
   "features": {
     "porto": false,
@@ -101,7 +101,7 @@
       "fontanelle_layer": "",
       "fontanelle_aq_layer": "",
       "ait_opendata_url": "",
-      "nota": "WFS etichette/fontanelle è tipico di ASA (ATO 5 Toscana Costa). Fuori da quell’ambito: features.acqua_sii=false e lascia gli URL vuoti, oppure metti i link del tuo gestore SII."
+      "nota": "WFS etichette/fontanelle è tipico di alcuni gestori. Fuori da quell’ambito: features.acqua_sii=false e lascia gli URL vuoti, oppure metti i link del tuo gestore SII."
     },
     "rifiuti": {
       "nome": "",
@@ -109,20 +109,35 @@
       "calendario_url": "",
       "centri_url": "",
       "centro_url": "",
-      "nota": "ISPRA (features.rifiuti_ispra) è nazionale via ISTAT. url = pagina comunale del gestore se pubblica le RD% in HTML (pattern SEI Toscana perc_raccolta)."
+      "nota": "ISPRA (features.rifiuti_ispra) è nazionale via ISTAT. url = pagina comunale del gestore se pubblica le RD% in HTML."
     }
   },
+  "porto": {
+    "webcam_page": "",
+    "webcam_base": "",
+    "nota": "Solo se features.porto=true. Pagina HTML e base URL delle foto. Vuoto = pannello webcam spento."
+  },
   "eventi_filtro_extra": [],
+  "comuni_lookup": {},
+  "site": {
+    "product_name": "Cruscotto Comune",
+    "tagline": "Dashboard open data comunale",
+    "mode": "dashboard",
+    "demo_url": "https://www.cruscottosanvincenzo.it",
+    "demo_label": "Cruscotto San Vincenzo",
+    "github_repo_url": ""
+  },
   "sostieni": {
     "buymeacoffee_slug": "",
-    "_comment": "Slug Buy Me a Coffee del maintainer del fork (es. tuonome). Vuoto = pagina /sostieni e tab nascosti. Non copiare lo slug dell’upstream. I ringraziamenti stanno in config/sostegni.json."
+    "_comment": "Slug Buy Me a Coffee del maintainer del fork. Vuoto = pagina /sostieni e tab nascosti. Non copiare lo slug dell’autore del template."
   },
   "fork": {
     "is_upstream": false,
+    "is_template": false,
     "maintainer_name": "Tuo Nome",
     "maintainer_email": "tuo@email.it",
     "maintainer_url": "https://tuosito.it",
     "github_repo_url": "https://github.com/TUO_USER/TUO-REPO",
-    "_comment": "NON modificare src/lib/project-origin.ts: lì restano i crediti di Alessandro Cipriani / magiaslab."
+    "_comment": "NON modificare src/lib/project-origin.ts: lì restano i crediti di Alessandro Cipriani e del primo esemplare (San Vincenzo)."
   }
 }

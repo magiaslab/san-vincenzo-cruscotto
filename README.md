@@ -1,101 +1,54 @@
-# Cruscotto San Vincenzo
+# Cruscotto Comune
 
-Dashboard Next.js dei dati aperti del **Comune di San Vincenzo (LI)** (ISTAT `049018`), alimentata dall’MCP pubblico [Cruscotto Italia (AgID)](https://cruscotto-italia.dati.gov.it/).
+Template Next.js **da forkare** per una dashboard di dati aperti di un comune
+italiano. Nessun backend locale, nessun database, nessuna env obbligatoria.
 
-Progetto **indipendente e non ufficiale**, realizzato da [Alessandro Cipriani](mailto:cipriani.alessandro@gmail.com). Non è affiliato ad AgID, al Governo italiano o al Comune di San Vincenzo.
+| Repo | Ruolo |
+| --- | --- |
+| **Questa** ([magiaslab/cruscotto-comune](https://github.com/magiaslab/cruscotto-comune)) | Template del cruscotto |
+| [cruscottocomune.it](https://www.cruscottocomune.it) | Minisito di progetto (repo a parte) |
+| [Cruscotto San Vincenzo](https://www.cruscottosanvincenzo.it) | Primo esemplare in produzione |
+| Altri fork (es. Campiglia) | Cruscotti comunali |
 
-## Riuso / fork
+Identità in `config/comune.json`, moduli con `features.*`, niente dati
+hardcoded di San Vincenzo.
 
-Guida completa (GitHub → Vercel → dominio, account esterni, Telegram, Modal/HF,
-env, Cursor/Claude): [`docs/riuso-fork.md`](docs/riuso-fork.md).
-
-In-app: tab **Progetto → Riusa / fork** (`/#riusa`). Identità comunale a
-runtime: [`config/comune.json`](config/comune.json) (template:
-[`config/comune.example.json`](config/comune.example.json)). Crediti progetto
-originale (non modificare nei fork): [`src/lib/project-origin.ts`](src/lib/project-origin.ts).
-Env: [`.env.example`](.env.example).
-
-## Stack
-
-- Next.js 15 (App Router) + TypeScript
-- Tailwind CSS (layout dashboard a sidebar)
-- Chart.js / react-chartjs-2
-- Leaflet / react-leaflet (OpenStreetMap)
-- Three.js (rilievo 3D stilizzato morfologia)
-- `@modelcontextprotocol/sdk` verso `https://cruscotto-italia-mcp.agid.workers.dev/mcp`
+Autore: [Alessandro Cipriani](mailto:cipriani.alessandro@gmail.com).
+Progetto **indipendente e non ufficiale**.
 
 ## Avvio locale
 
 ```bash
 npm install
+cp config/comune.example.json config/comune.json   # poi compila ISTAT
 npm run dev
 ```
 
-Apri [http://localhost:3000](http://localhost:3000).
-
-## API interne
-
-| Route | Descrizione |
-| --- | --- |
-| `GET /api/kpi` | Proxy `comune_kpi`, cache 24h |
-| `GET /api/dettaglio?sezioni=siope,anac,…` | Sotto-sezioni di `comune_dashboard` |
-| `GET /api/mappa` | Layer GeoJSON (civici, EV, beni, sanità) |
-| `GET /api/trasporti` | GTFS TPL + overlay ciclabili/pedonali (GeoJSON opzionale) |
-| `GET /api/percorsi` | Percorsi OSM (ciclo/MTB/sentieri): lista, GeoJSON, GPX |
-| `GET /api/trasporti/treni` | Partenze/arrivi live FS + ritardi (ViaggiaTreno) |
-| `GET /api/meteo` | Meteo live KPI (no-store) |
-| `GET /api/meteo/forecast` | Previsioni Open-Meteo (48h + 7 giorni) |
-| `GET /api/meteo/radar` | Metadati frame radar RainViewer |
-| `GET /api/farmacie/turno` | Farmacie di turno (FarmacieDiTurno.org) |
-| `GET /api/dae` | DAE comunali da GeoJSON locale (OpenAEDMap / OSM) |
-| `GET /api/dae/segnalazioni` | Overlay segnalazioni Telegram approvate |
-| `POST /api/telegram/webhook` | Webhook bot @DaesanvincenzoBot |
-| `POST /api/feedback` | Form Partecipa → GitHub Issues |
-| `POST /api/assistente` | Proxy RAG su Modal (HF self-host) |
-
-## Mappa DAE (defibrillatori)
-
-I punti arrivano da un export OpenStreetMap via [OpenAEDMap](https://openaedmap.org/).
-Per aggiornare il file locale:
+Apri [http://localhost:3000](http://localhost:3000). Homepage = dashboard
+(empty state finché l’ISTAT è placeholder).
 
 ```bash
-npm run dae:sync
+curl -s localhost:3000/api/kpi | head -c 400
 ```
 
-Studio per un bot Telegram di segnalazione cittadina: [`docs/dae-telegram-bot.md`](docs/dae-telegram-bot.md).
+## Identità comunale
 
-## Assistente RAG (Modal + Hugging Face)
+File runtime: [`config/comune.json`](config/comune.json)  
+Modello: [`config/comune.example.json`](config/comune.example.json)  
+Guida: [`docs/riuso-fork.md`](docs/riuso-fork.md) e `/riusa`.  
+Aggiornamenti dal template: [`docs/aggiornamenti-upstream.md`](docs/aggiornamenti-upstream.md).
 
-Piccolo RAG sui dati del cruscotto, **senza API LLM a pagamento**:
+Crediti originali (**non modificare**): [`src/lib/project-origin.ts`](src/lib/project-origin.ts).
 
-- embedding [`paraphrase-multilingual-MiniLM-L12-v2`](https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2)
-- generazione [`SmolLM2-360M-Instruct`](https://huggingface.co/HuggingFaceTB/SmolLM2-360M-Instruct)
-- deploy su Modal (crediti starter, scale-to-zero)
-- app: [san-vincenzo-rag](https://modal.com/apps/magiaslab/main/deployed/san-vincenzo-rag)
+## Stack
 
-Vedi `modal_rag/README.md`. Su Vercel / `.env.local`:
+- Next.js 16 (App Router) + TypeScript + Tailwind
+- Chart.js, Leaflet, Three.js
+- MCP `https://cruscotto-italia-mcp.agid.workers.dev/mcp`
 
-```bash
-# su Vercel / .env.local
-ASSISTENTE_MODAL_URL=https://magiaslab--san-vincenzo-rag-ragservice-web-ask.modal.run
-```
+## Licenze dati
 
-## Deploy su Vercel
-
-1. Collega il repository Git a un progetto Vercel.
-2. Framework preset: Next.js (vedi `vercel.json`).
-3. Nessuna variabile d’ambiente obbligatoria: l’MCP AgID è pubblico.
-4. Deploy: push su `main` oppure `npx vercel --prod`.
-
-## Stemma comunale
-
-File: `public/stemma-san-vincenzo.png`.
-
-> Stemma di San Vincenzo, disegno di Massimo Ghirardi, per gentile concessione di Araldicacivica.it — [CC BY-NC-ND 3.0 IT](https://creativecommons.org/licenses/by-nc-nd/3.0/it/)
-
-Vincoli: uso non commerciale; nessuna opera derivata (solo ridimensionamento CSS/HTML).
-
-## Licenze dati e mappe
-
-- Dati: Cruscotto Italia (AgID) e fonti federate, prevalentemente CC-BY 4.0
+- KPI: Cruscotto Italia (AgID), prevalentemente CC BY 4.0
 - Mappe: © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright) (ODbL)
+
+Vedi tab Attribuzioni e [cruscottocomune.it/fonti](https://www.cruscottocomune.it/fonti).

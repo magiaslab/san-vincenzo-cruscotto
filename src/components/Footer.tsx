@@ -6,7 +6,8 @@ import {
   COMUNE_PROVINCIA,
   CRUSCOTTO_ITALIA_URL,
 } from "@/lib/constants";
-import { getForkMaintainer, isUpstreamDeploy } from "@/lib/comune-config";
+import { getForkMaintainer, isTemplateDeploy, isUpstreamDeploy } from "@/lib/comune-config";
+import { getProductName } from "@/lib/product";
 import { PROJECT_ORIGIN } from "@/lib/project-origin";
 import { isSostieniEnabled } from "@/lib/sostieni";
 import { useT } from "@/lib/i18n";
@@ -41,7 +42,9 @@ export function Footer({ onNavigate }: FooterProps) {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
           <div className="max-w-2xl">
             <p className="m-0 text-sm font-bold tracking-tight">
-              Cruscotto {COMUNE_NOME} ({COMUNE_PROVINCIA})
+              {isTemplateDeploy()
+                ? getProductName()
+                : `Cruscotto ${COMUNE_NOME} (${COMUNE_PROVINCIA})`}
             </p>
             <p className="mb-0 mt-1.5 text-xs leading-relaxed text-[var(--pa-footer-muted)] sm:text-sm">
               {t("Progetto indipendente su dati")}{" "}

@@ -107,7 +107,19 @@ export async function GET() {
     );
   }
 
-  const ckanId = COMUNE.regione_opendata.eventi_ckan_id || "rt-eventi-sistcult";
+  const ckanId = COMUNE.regione_opendata.eventi_ckan_id.trim();
+  if (!REGIONE_TOSCANA_CKAN_API || !ckanId) {
+    return NextResponse.json(
+      {
+        disponibile: false,
+        n_eventi: 0,
+        eventi: [],
+        messaggio:
+          "CKAN regionale non configurato (regione_opendata.ckan_api / eventi_ckan_id).",
+      },
+      { status: 200 },
+    );
+  }
   const datasetUrl = `${REGIONE_TOSCANA_OPENDATA_URL.replace(/\/$/, "")}/dataset/${ckanId}`;
 
   try {

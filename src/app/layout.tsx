@@ -4,7 +4,7 @@ import { CookieBanner } from "@/components/CookieBanner";
 import { InstallPrompt } from "@/components/InstallPrompt";
 import { Providers } from "@/components/Providers";
 import { PwaRegister } from "@/components/PwaRegister";
-import { AUTHOR, COMUNE_NOME } from "@/lib/constants";
+import { AUTHOR, COMUNE_NOME, COMUNE_PROVINCIA } from "@/lib/constants";
 import {
   SITE_DESCRIPTION,
   SITE_KEYWORDS,
@@ -91,7 +91,7 @@ export const metadata: Metadata = {
   },
   other: {
     author: AUTHOR.name,
-    "geo.region": "IT-LI",
+    "geo.region": `IT-${COMUNE_PROVINCIA}`,
     "geo.placename": COMUNE_NOME,
     "mobile-web-app-capable": "yes",
   },

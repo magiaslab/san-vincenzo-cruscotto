@@ -1,5 +1,6 @@
 "use client";
 
+import { isFeatureEnabled } from "@/lib/comune-config";
 import { useT } from "@/lib/i18n";
 import { getFormatLocale } from "@/lib/i18n/locale-store";
 import { translate } from "@/lib/i18n/translate";
@@ -20,6 +21,7 @@ const AssistenteChat = dynamic(() => import("@/components/AssistenteChat"), {
 
 /** Pulsante flottante + pannello chat per l'assistente RAG. */
 export function AssistenteFab() {
+  const enabled = isFeatureEnabled("assistente_rag");
   const t = useT();
   const [open, setOpen] = useState(false);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
@@ -75,6 +77,8 @@ export function AssistenteFab() {
       window.history.replaceState(null, "", "#assistente");
     }
   }
+
+  if (!enabled) return null;
 
   return (
     <>

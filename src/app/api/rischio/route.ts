@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isComuneConfigured } from "@/lib/comune-config";
 import { openDataEmpty, openDataOk } from "@/lib/opendata";
 import {
   buildRischioData,
@@ -20,6 +21,15 @@ export type { RischioData };
  * Sempre HTTP 200: sezioni indipendenti; fallimento → empty-state.
  */
 export async function GET() {
+  if (!isComuneConfigured()) {
+    return NextResponse.json(
+      openDataEmpty<RischioData>({
+        fonte: RISCHIO_FONTE,
+        note: "Comune non configurato: nessun fetch IdroGEO.",
+      }),
+      { status: 200, headers: { "Cache-Control": "public, s-maxage=300" } },
+    );
+  }
   try {
     const data = await buildRischioData();
 

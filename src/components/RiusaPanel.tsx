@@ -23,23 +23,27 @@ import {
   ISTAT_CODE,
 } from "@/lib/constants";
 import { COMUNE } from "@/lib/comune-config";
+import { PROJECT_ORIGIN } from "@/lib/project-origin";
 import {
-  PROJECT_ORIGIN,
-  PROJECT_ORIGIN_CONFIG_EXAMPLE_URL,
-  PROJECT_ORIGIN_DOCS_RIUSO_URL,
-  PROJECT_ORIGIN_ENV_EXAMPLE_URL,
-  PROJECT_ORIGIN_FORK_URL,
-} from "@/lib/project-origin";
+  getProductName,
+  getTemplateBlobUrl,
+  getTemplateForkUrl,
+  getTemplateGithubUrl,
+  getVercelDeployUrl,
+} from "@/lib/product";
 import { SectionIntro } from "@/components/ui";
+import { UpstreamUpdateNotice } from "@/components/UpstreamUpdateNotice";
 
-const GITHUB_FORK_URL = PROJECT_ORIGIN_FORK_URL;
-const GITHUB_DOCS_RIUSO_URL = PROJECT_ORIGIN_DOCS_RIUSO_URL;
-const GITHUB_CONFIG_EXAMPLE_URL = PROJECT_ORIGIN_CONFIG_EXAMPLE_URL;
-const GITHUB_ENV_EXAMPLE_URL = PROJECT_ORIGIN_ENV_EXAMPLE_URL;
-const GITHUB_MODAL_RAG_URL = `${PROJECT_ORIGIN.github_repo_url}/blob/master/modal_rag/README.md`;
-const GITHUB_DAE_DOCS_URL = `${PROJECT_ORIGIN.github_repo_url}/blob/master/docs/dae-telegram-bot.md`;
-const GITHUB_REPO_URL = PROJECT_ORIGIN.github_repo_url;
-const VERCEL_DEPLOY_URL = PROJECT_ORIGIN.vercel_deploy_url;
+const GITHUB_FORK_URL = getTemplateForkUrl();
+const GITHUB_DOCS_RIUSO_URL = getTemplateBlobUrl("docs/riuso-fork.md");
+const GITHUB_CONFIG_EXAMPLE_URL = getTemplateBlobUrl(
+  "config/comune.example.json",
+);
+const GITHUB_ENV_EXAMPLE_URL = getTemplateBlobUrl(".env.example");
+const GITHUB_MODAL_RAG_URL = getTemplateBlobUrl("modal_rag/README.md");
+const GITHUB_DAE_DOCS_URL = getTemplateBlobUrl("docs/dae-telegram-bot.md");
+const GITHUB_REPO_URL = getTemplateGithubUrl();
+const VERCEL_DEPLOY_URL = getVercelDeployUrl();
 const AUTHOR = PROJECT_ORIGIN.author;
 
 function Section({
@@ -92,6 +96,7 @@ function scrollToSection(id: string) {
 
 const TOC: { id: string; label: string }[] = [
   { id: "percorsi", label: "Due percorsi" },
+  { id: "aggiornamenti", label: "Aggiornamenti" },
   { id: "account", label: "Account esterni" },
   { id: "passi", label: "GitHub → Vercel → online" },
   { id: "minimo", label: "Identità comune" },
@@ -355,8 +360,9 @@ export function RiusaPanel() {
     <section>
       <SectionIntro
         title="Riusa questo cruscotto"
-        description={`Guida per adattare questo stack a qualsiasi comune italiano: GitHub → config/comune.json → Vercel. I link di fork e la documentazione puntano sempre al progetto originale di ${AUTHOR.name} (Cruscotto ${PROJECT_ORIGIN.comune_demo}).`}
+        description={`Guida per adattare questo stack a qualsiasi comune italiano: GitHub → config/comune.json → Vercel. Si forka il template ${getProductName()} (${GITHUB_REPO_URL.replace("https://", "")}). Il primo esemplare resta il Cruscotto ${PROJECT_ORIGIN.comune_demo} di ${AUTHOR.name}.`}
       />
+      <UpstreamUpdateNotice />
 
       <div className="max-w-3xl">
         <Section title="In sintesi" id="sintesi">
@@ -449,6 +455,30 @@ export function RiusaPanel() {
               Come funziona
             </a>
             .
+          </p>
+        </Section>
+
+        <Section title="Come restare aggiornati" id="aggiornamenti">
+          <p>
+            Un fork è una copia indipendente. I KPI AgID arrivano da soli; un
+            nuovo modulo o un upgrade Next no. Su GitHub:{" "}
+            <strong>Watch → Releases</strong> su{" "}
+            <a href={GITHUB_REPO_URL}>{GITHUB_REPO_URL.replace("https://", "")}</a>
+            . In locale:
+          </p>
+          <pre className="overflow-x-auto rounded-lg bg-[var(--pa-surface-soft)] p-4 text-xs leading-relaxed">
+            {`git remote add upstream ${GITHUB_REPO_URL}.git
+git fetch upstream
+git merge upstream/main
+# tieni il tuo config/comune.json e lo stemma`}
+          </pre>
+          <p className="mb-0">
+            Dettaglio:{" "}
+            <a href={getTemplateBlobUrl("docs/aggiornamenti-upstream.md")}>
+              docs/aggiornamenti-upstream.md
+            </a>{" "}
+            e il{" "}
+            <a href={getTemplateBlobUrl("CHANGELOG.md")}>CHANGELOG</a>.
           </p>
         </Section>
 
