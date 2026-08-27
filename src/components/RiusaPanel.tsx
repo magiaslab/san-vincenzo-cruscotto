@@ -330,6 +330,11 @@ const OPTIONAL_MODULES: { area: string; cerca: string }[] = [
       "features.acqua_sii + gestori.acqua.geoserver_wfs (ASA WFS). Fuori ATO 5: spegni il flag e lascia i link al tuo gestore",
   },
   {
+    area: "Finanza DVNS",
+    cerca:
+      "features.finanza_dvns (default true). MCP DoveVannoINostriSoldi: IRPEF MEF + OpenCivitas per ISTAT. Non è il SIOPE comunale",
+  },
+  {
     area: "Testi i18n e FAQ",
     cerca: "Nome comune in pannelli, i18n/en.ts, assistente-faq.ts",
   },

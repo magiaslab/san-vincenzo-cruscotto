@@ -55,6 +55,7 @@ import { TrasportiPanel } from "@/components/TrasportiPanel";
 import { PercorsiPanel } from "@/components/PercorsiPanel";
 import { RifiutiPanel } from "@/components/RifiutiPanel";
 import { AcquaPanel } from "@/components/AcquaPanel";
+import { DvnsFinanzaPanel } from "@/components/DvnsFinanzaPanel";
 import { PartecipaPanel } from "@/components/PartecipaPanel";
 import { ComeFunzionaPanel } from "@/components/ComeFunzionaPanel";
 import { RiusaPanel } from "@/components/RiusaPanel";
@@ -1696,7 +1697,7 @@ function Finanza({ kpi }: { kpi: Kpi }) {
       <SectionIntro
         title={t("Finanza pubblica")}
         description={t(
-          "SIOPE mensile, contratti ANAC, opere BDAP, PNRR e patrimonio immobiliare PA.",
+          "SIOPE mensile AgID, contratti ANAC, opere BDAP, PNRR, patrimonio PA, IRPEF MEF e fabbisogni OpenCivitas.",
         )}
       />
       <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
@@ -2025,6 +2026,7 @@ function Finanza({ kpi }: { kpi: Kpi }) {
           ) : null}
         </div>
       ) : null}
+      {isFeatureEnabled("finanza_dvns") ? <DvnsFinanzaPanel /> : null}
     </section>
   );
 }
