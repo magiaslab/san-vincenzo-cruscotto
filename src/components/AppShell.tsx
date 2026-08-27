@@ -252,21 +252,12 @@ export function AppShell({
               </Link>
 
               <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5 lg:max-w-[14rem] xl:max-w-none">
-                <h1
-                  id={titleId}
-                  className="m-0 truncate text-base font-bold leading-tight text-[var(--pa-ink)]"
-                >
-                  <Link
-                    href="/"
-                    className="m-0 truncate bg-transparent p-0 text-left text-base font-bold leading-tight text-[var(--pa-ink)] no-underline lg:hidden"
-                    aria-label={t("Torna alla home")}
-                  >
-                    Cruscotto {COMUNE_NOME}
-                  </Link>
-                  <span className="hidden lg:inline">
-                    {active?.label ?? `Cruscotto ${COMUNE_NOME}`}
-                  </span>
-                </h1>
+              <p
+                id={titleId}
+                className="m-0 truncate text-base font-bold leading-tight text-[var(--pa-ink)]"
+              >
+                {active?.label ?? `Cruscotto ${COMUNE_NOME}`}
+              </p>
                 <p className="m-0 truncate text-xs leading-tight text-[var(--pa-muted)]">
                   {generatedAt
                     ? `${t("Aggiornato")} ${formatDateTime(generatedAt)}`
