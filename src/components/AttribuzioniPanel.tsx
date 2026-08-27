@@ -45,10 +45,10 @@ function Section({
 }) {
   return (
     <section className="mb-8">
-      <h3 className="mb-3 text-lg font-bold text-[var(--pa-ink)] sm:text-xl">
+      <h3 className="mb-3 text-lg font-bold text-[#17324d] sm:text-xl">
         {title}
       </h3>
-      <div className="space-y-3 text-sm leading-relaxed text-[var(--pa-ink)] sm:text-base">
+      <div className="space-y-3 text-sm leading-relaxed text-[#17324d] sm:text-base">
         {children}
       </div>
     </section>
@@ -81,7 +81,7 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
           <p>
             Basato sul{" "}
             <a
-              className="underline"
+              className="text-[#0066CC] underline"
               href={PROJECT_ORIGIN.site_url}
               target="_blank"
               rel="noopener noreferrer"
@@ -90,14 +90,14 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
             </a>{" "}
             di{" "}
             <a
-              className="underline"
+              className="text-[#0066CC] underline"
               href={`mailto:${PROJECT_ORIGIN.author.email}`}
             >
               {PROJECT_ORIGIN.author.name}
             </a>
             {" — "}
             <a
-              className="underline"
+              className="text-[#0066CC] underline"
               href={PROJECT_ORIGIN.github_repo_url}
               target="_blank"
               rel="noopener noreferrer"
@@ -111,7 +111,7 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
                 Questo fork per {COMUNE_NOME} è curato da{" "}
                 {forkMaintainer.email ? (
                   <a
-                    className="underline"
+                    className="text-[#0066CC] underline"
                     href={`mailto:${forkMaintainer.email}`}
                   >
                     {forkMaintainer.name}
@@ -150,12 +150,12 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
         </Section>
 
         {isSostieniEnabled() ? (
-          <Section title={t("Supporto")}>
+          <Section title={t("Sostieni il progetto")}>
             <p>
               {t(
                 "Il cruscotto non ha budget pubblico. Un contributo volontario su Buy Me a Coffee aiuta a coprire hosting e compute; non è una donazione al Comune e non influenza i dati.",
               )}{" "}
-              <Link className="underline" href="/sostieni">
+              <Link className="text-[#0066CC] underline" href="/sostieni">
                 {t("Pagina Sostieni e ringraziamenti")}
               </Link>
               .
@@ -176,7 +176,7 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
           <p>
             Fonte principale dei KPI comunali:{" "}
             <a
-              className="underline"
+              className="text-[#0066CC] underline"
               href={CRUSCOTTO_ITALIA_URL}
               target="_blank"
               rel="noopener noreferrer"
@@ -192,7 +192,7 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
           <p>
             Cruscotto Italia è progettato e sviluppato da{" "}
             <a
-              className="underline"
+              className="text-[#0066CC] underline"
               href="https://github.com/piersoft"
               target="_blank"
               rel="noopener noreferrer"
@@ -201,7 +201,7 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
             </a>{" "}
             per AgID. Codice sorgente{" "}
             <a
-              className="underline"
+              className="text-[#0066CC] underline"
               href="https://github.com/AgID/cruscotto-italia"
               target="_blank"
               rel="noopener noreferrer"
@@ -216,7 +216,7 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
           <ul className="list-disc space-y-2 pl-5">
             <li>
               <a
-                className="underline"
+                className="text-[#0066CC] underline"
                 href={ARPAT_OPENDATA_URL}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -225,7 +225,7 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
               </a>{" "}
               — aria;{" "}
               <a
-                className="underline"
+                className="text-[#0066CC] underline"
                 href={ARPAT_BALNEAZIONE_URL}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -235,7 +235,7 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
             </li>
             <li>
               <a
-                className="underline"
+                className="text-[#0066CC] underline"
                 href={REGIONE_TOSCANA_OPENDATA_URL}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -246,7 +246,7 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
             </li>
             <li>
               <a
-                className="underline"
+                className="text-[#0066CC] underline"
                 href="https://www.openstreetmap.org/copyright"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -255,7 +255,7 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
               </a>
               {" / "}
               <a
-                className="underline"
+                className="text-[#0066CC] underline"
                 href="https://cycling.waymarkedtrails.org/"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -266,7 +266,7 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
             </li>
             <li>
               <a
-                className="underline"
+                className="text-[#0066CC] underline"
                 href={DPC_ALLERTAMENTO_URL}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -275,7 +275,7 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
               </a>
               {" / "}
               <a
-                className="underline"
+                className="text-[#0066CC] underline"
                 href={REGIONE_TOSCANA_ALLERTA_URL}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -284,7 +284,7 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
               </a>
               {" / "}
               <a
-                className="underline"
+                className="text-[#0066CC] underline"
                 href={CFR_TOSCANA_URL}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -293,7 +293,7 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
               </a>
               {" — allerte meteo-idro (via "}
               <a
-                className="underline"
+                className="text-[#0066CC] underline"
                 href={ALLERTA_METEO_APP_URL}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -304,7 +304,7 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
             </li>
             <li>
               <a
-                className="underline"
+                className="text-[#0066CC] underline"
                 href={MINISTERO_CULTURA_URL}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -315,7 +315,7 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
             </li>
             <li>
               <a
-                className="underline"
+                className="text-[#0066CC] underline"
                 href={MIUR_OPENDATA_URL}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -324,7 +324,7 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
               </a>{" "}
               (
               <a
-                className="underline"
+                className="text-[#0066CC] underline"
                 href={MIUR_ESPLORA_URL}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -336,7 +336,7 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
             </li>
             <li>
               <a
-                className="underline"
+                className="text-[#0066CC] underline"
                 href="https://dati.toscana.it/dataset/rt-oraritb"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -345,7 +345,7 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
               </a>{" "}
               — bus e treni programmati;{" "}
               <a
-                className="underline"
+                className="text-[#0066CC] underline"
                 href="https://www.viaggiatreno.it/"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -356,7 +356,7 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
             </li>
             <li>
               <a
-                className="underline"
+                className="text-[#0066CC] underline"
                 href={OPENWEATHER_ATTRIBUTION_URL}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -365,7 +365,7 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
               </a>{" "}
               — meteo live, previsioni e AQI;{" "}
               <a
-                className="underline"
+                className="text-[#0066CC] underline"
                 href={OPEN_METEO_ATTRIBUTION_URL}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -374,7 +374,7 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
               </a>{" "}
               — previsioni;{" "}
               <a
-                className="underline"
+                className="text-[#0066CC] underline"
                 href={RAINVIEWER_ATTRIBUTION_URL}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -385,7 +385,7 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
             </li>
             <li>
               <a
-                className="underline"
+                className="text-[#0066CC] underline"
                 href="https://www.piattaformaunicanazionale.it/idr"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -394,7 +394,7 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
               </a>{" "}
               — punti ricarica EV;{" "}
               <a
-                className="underline"
+                className="text-[#0066CC] underline"
                 href="https://www.pienofurbo.it/colonnine"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -403,7 +403,7 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
               </a>{" "}
               (OpenChargeMap + OpenStreetMap) — prezzi indicativi €/kWh;{" "}
               <a
-                className="underline"
+                className="text-[#0066CC] underline"
                 href="https://www.mimit.gov.it/it/open-data/elenco-dataset/osservatorio-prezzi-carburanti"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -412,7 +412,7 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
               </a>{" "}
               — carburanti;{" "}
               <a
-                className="underline"
+                className="text-[#0066CC] underline"
                 href="https://geo.agcom.it/agcomapps/BB4/BB4_BBwired_na_app16_4/"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -423,7 +423,7 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
             </li>
             <li>
               <a
-                className="underline"
+                className="text-[#0066CC] underline"
                 href="https://www.vesselfinder.com/"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -432,7 +432,7 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
               </a>{" "}
               — traffico AIS (embed); webcam porto:{" "}
               <a
-                className="underline"
+                className="text-[#0066CC] underline"
                 href={COMUNE_SAN_VINCENZO_URL}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -442,7 +442,7 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
             </li>
             <li>
               <a
-                className="underline"
+                className="text-[#0066CC] underline"
                 href={FARMACIE_DI_TURNO_URL}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -454,7 +454,7 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
             </li>
             <li>
               <a
-                className="underline"
+                className="text-[#0066CC] underline"
                 href="https://www.openstreetmap.org/copyright"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -463,7 +463,7 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
               </a>{" "}
               /{" "}
               <a
-                className="underline"
+                className="text-[#0066CC] underline"
                 href="https://wheelmap.org/"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -472,7 +472,7 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
               </a>{" "}
               — accessibilità (wheelchair, stalli disabili, bagni);{" "}
               <a
-                className="underline"
+                className="text-[#0066CC] underline"
                 href="https://www.disabilitaincifre.istat.it/"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -487,7 +487,7 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
           <p>
             ©{" "}
             <a
-              className="underline"
+              className="text-[#0066CC] underline"
               href={OSM_COPYRIGHT_URL}
               target="_blank"
               rel="noopener noreferrer"
@@ -496,7 +496,7 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
             </a>{" "}
             (ODbL). Basemap{" "}
             <a
-              className="underline"
+              className="text-[#0066CC] underline"
               href={CARTO_ATTRIBUTION_URL}
               target="_blank"
               rel="noopener noreferrer"
@@ -511,7 +511,7 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
           <p>
             {STEMMA.attribution} — licenza{" "}
             <a
-              className="underline"
+              className="text-[#0066CC] underline"
               href={STEMMA.licenseUrl}
               target="_blank"
               rel="noopener noreferrer"
@@ -521,7 +521,7 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
             . Uso non commerciale; nessuna opera derivata (ammesso solo
             ridimensionamento CSS/HTML). Fonte:{" "}
             <a
-              className="underline"
+              className="text-[#0066CC] underline"
               href={STEMMA.sourceUrl}
               target="_blank"
               rel="noopener noreferrer"

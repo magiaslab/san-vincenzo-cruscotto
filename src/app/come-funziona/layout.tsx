@@ -7,7 +7,7 @@ import {
 } from "@/lib/seo";
 
 const PAGE_DESCRIPTION =
-  `Come è fatto il Cruscotto ${COMUNE_NOME}: da dove arrivano i dati, cosa non è, domande frequenti. Progetto indipendente, non ufficiale.`;
+  `Come funziona il ${SITE_NAME}: Next.js, MCP AgID e fonti open di ${COMUNE_NOME}. Progetto indipendente, non ufficiale.`;
 
 export const metadata: Metadata = {
   title: "Come funziona",

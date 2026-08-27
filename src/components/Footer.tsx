@@ -86,8 +86,7 @@ export function Footer() {
             {(
               [
                 ["/come-funziona", "Come funziona"],
-                ["/esempi", "Cruscotti online"],
-                ["/riusa", "Porta nel tuo comune"],
+                ["/riusa", "Riusa / fork"],
                 ["/attribuzioni", "Attribuzioni e regole"],
                 ["/partecipa", "Suggerimenti"],
               ] as const
@@ -105,7 +104,7 @@ export function Footer() {
                 href="/sostieni"
                 className="inline-flex min-h-11 items-center font-semibold text-white underline underline-offset-2"
               >
-                {t("Supporto")}
+                {t("Sostieni")}
               </Link>
             ) : null}
             <a
