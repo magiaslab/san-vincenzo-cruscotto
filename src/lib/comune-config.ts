@@ -133,6 +133,13 @@ export type ComuneConfig = {
     maintainer_url: string;
     github_repo_url: string;
   };
+  /**
+   * Pagina /sostieni (Buy Me a Coffee). Slug vuoto = tab e pagina nascosti.
+   * I fork mettono il proprio slug; non riusare quello dell’upstream.
+   */
+  sostieni: {
+    buymeacoffee_slug: string;
+  };
 };
 
 export type GestoreAcquaConfig = {
@@ -223,6 +230,7 @@ function parseConfig(input: unknown): ComuneConfig {
   const acqua = (gestori.acqua ?? {}) as Record<string, unknown>;
   const rifiuti = (gestori.rifiuti ?? {}) as Record<string, unknown>;
   const fork = (c.fork ?? {}) as Record<string, unknown>;
+  const sostieni = (c.sostieni ?? {}) as Record<string, unknown>;
 
   return {
     istat_code: str(c.istat_code, "049018"),
@@ -352,6 +360,9 @@ function parseConfig(input: unknown): ComuneConfig {
       maintainer_url: str(fork.maintainer_url),
       github_repo_url: str(fork.github_repo_url),
     },
+    sostieni: {
+      buymeacoffee_slug: str(sostieni.buymeacoffee_slug),
+    },
   };
 }
 
@@ -388,6 +399,8 @@ export function isTabEnabled(tabId: string): boolean {
   switch (tabId) {
     case "porto":
       return isFeatureEnabled("porto");
+    case "sostieni":
+      return COMUNE.sostieni.buymeacoffee_slug.trim().length > 0;
     default:
       return true;
   }

@@ -26,6 +26,7 @@ import {
 import { formatDateTime } from "@/lib/format";
 import { useT } from "@/lib/i18n";
 import { LoadingBlock, SectionIntro, SolidLink } from "@/components/ui";
+import { isSostieniEnabled } from "@/lib/sostieni";
 
 type PublicIssue = {
   number: number;
@@ -219,6 +220,22 @@ export function PartecipaPanel() {
           "Come funziona il cruscotto e come puoi suggerire miglioramenti. I suggerimenti diventano issue su GitHub.",
         )}
       />
+
+      {isSostieniEnabled() ? (
+        <aside className="panel mb-5 flex flex-col gap-2 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:p-5">
+          <p className="m-0 text-sm leading-relaxed text-[var(--pa-muted)]">
+            {t(
+              "Il cruscotto è senza budget pubblico. Se ti è utile, puoi coprire hosting e compute con un caffè.",
+            )}
+          </p>
+          <Link
+            href="/sostieni"
+            className="inline-flex min-h-11 shrink-0 items-center font-semibold text-[var(--pa-primary)] underline underline-offset-2"
+          >
+            {t("Sostieni il progetto")}
+          </Link>
+        </aside>
+      ) : null}
 
       <div className="mb-5 grid gap-3 lg:grid-cols-2">
         <article className="panel p-4 sm:p-5">

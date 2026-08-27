@@ -43,6 +43,7 @@ import {
   Info,
   GitFork,
   Scale,
+  Coffee,
 } from "lucide-react";
 import { AppShell, type NavGroup } from "@/components/AppShell";
 import { EventiComunePanel } from "@/components/EventiComunePanel";
@@ -60,6 +61,7 @@ import { PartecipaPanel } from "@/components/PartecipaPanel";
 import { ComeFunzionaPanel } from "@/components/ComeFunzionaPanel";
 import { RiusaPanel } from "@/components/RiusaPanel";
 import { AttribuzioniPanel } from "@/components/AttribuzioniPanel";
+import { SostieniPanel } from "@/components/SostieniPanel";
 import { ServiziUtiliCards } from "@/components/ServiziUtiliCards";
 import { TurismoFlussiPanel } from "@/components/TurismoFlussiPanel";
 import { RischioPanel } from "@/components/RischioPanel";
@@ -208,7 +210,8 @@ type TabId =
   | "partecipa"
   | "come-funziona"
   | "riusa"
-  | "attribuzioni";
+  | "attribuzioni"
+  | "sostieni";
 
 const NAV_GROUPS: NavGroup[] = [
   {
@@ -244,6 +247,7 @@ const NAV_GROUPS: NavGroup[] = [
     label: "Progetto",
     items: [
       { id: "partecipa", label: "Partecipa", Icon: MessageSquarePlus },
+      { id: "sostieni", label: "Sostieni", Icon: Coffee },
       { id: "come-funziona", label: "Come funziona", Icon: Info },
       { id: "riusa", label: "Riusa / fork", Icon: GitFork },
       { id: "attribuzioni", label: "Attribuzioni e regole", Icon: Scale },
@@ -373,6 +377,7 @@ export function DashboardTabs({
         {tab === "meteo" && <Meteo kpi={kpi} />}
         {tab === "mappa" && <MapPanel kpi={kpi} />}
         {tab === "partecipa" && <PartecipaPanel />}
+        {tab === "sostieni" && <SostieniPanel />}
         {tab === "come-funziona" && <ComeFunzionaPanel />}
         {tab === "riusa" && <RiusaPanel />}
         {tab === "attribuzioni" && <AttribuzioniPanel />}

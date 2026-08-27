@@ -1047,4 +1047,45 @@ export const en: Record<string, string> = {
   "percepita": "feels",
   "Fonte": "Source",
   "Meteo non disponibile al momento.": "Weather unavailable right now.",
+  "Sostieni": "Support",
+  "Sostieni il cruscotto": "Support the dashboard",
+  "Sostieni il progetto": "Support the project",
+  "Pagina Sostieni e ringraziamenti": "Support page and thanks",
+  "Il cruscotto resta indipendente e open source. Un contributo volontario su Buy Me a Coffee aiuta a coprire hosting, dominio e compute. Non è una donazione al Comune e non influenza i dati pubblicati.":
+    "The dashboard stays independent and open source. A voluntary Buy Me a Coffee contribution helps cover hosting, domain and compute. It is not a donation to the municipality and does not influence the published data.",
+  "In questo deploy non è configurato un account Buy Me a Coffee.":
+    "This deploy has no Buy Me a Coffee account configured.",
+  "Torna al cruscotto": "Back to the dashboard",
+  "Offri un caffè": "Buy a coffee",
+  "Offri un caffè su Buy Me a Coffee": "Buy a coffee on Buy Me a Coffee",
+  "Il sostegno va a {name}, che mantiene questo progetto nel tempo libero. Serve a pagare le spese tecniche, non a finanziare il Comune di {comune}.":
+    "Support goes to {name}, who maintains this project in their spare time. It pays technical costs, not the Municipality of {comune}.",
+  "Si apre la pagina ufficiale Buy Me a Coffee in una nuova scheda.":
+    "Opens the official Buy Me a Coffee page in a new tab.",
+  "A cosa serve": "What it pays for",
+  "Hosting e dominio del cruscotto": "Dashboard hosting and domain",
+  "Compute per build, cache e aggiornamenti dati":
+    "Compute for builds, cache and data updates",
+  "Tempo per tenere aperte le fonti open data":
+    "Time to keep the open-data sources running",
+  "Il contributo è libero: anche un caffè aiuta. I dati restano pubblici e il codice resta open source.":
+    "The contribution is voluntary: even one coffee helps. Data stay public and the code stays open source.",
+  "Chi ci sostiene": "Who supports us",
+  "Elenco aggiornato dai contributi pubblici su Buy Me a Coffee (1 nome). Il contributo resta volontario e non influenza i numeri pubblicati.":
+    "List updated from public Buy Me a Coffee contributions (1 name). Support stays voluntary and does not influence the published figures.",
+  "Elenco aggiornato dai contributi pubblici su Buy Me a Coffee ({count} nomi). Il contributo resta volontario e non influenza i numeri pubblicati.":
+    "List updated from public Buy Me a Coffee contributions ({count} names). Support stays voluntary and does not influence the published figures.",
+  "Quando arrivano contributi pubblici su Buy Me a Coffee, i nomi (e l’eventuale messaggio) compaiono qui. Se hai già sostenuto il progetto e vuoi essere ringraziato, lascia il nome visibile su BMC oppure scrivi a {email}.":
+    "When public Buy Me a Coffee contributions arrive, names (and optional messages) appear here. If you already supported the project and want to be thanked, keep your name visible on BMC or write to {email}.",
+  "Elenco aggiornato:": "List updated:",
+  "Ancora nessun ringraziamento pubblico in elenco. Il primo caffè può essere il tuo.":
+    "No public thanks in the list yet. The first coffee can be yours.",
+  "Apri Buy Me a Coffee": "Open Buy Me a Coffee",
+  "Sostegno su Buy Me a Coffee ({amount}).":
+    "Support on Buy Me a Coffee ({amount}).",
+  "Sostegno su Buy Me a Coffee.": "Support on Buy Me a Coffee.",
+  "Il cruscotto non ha budget pubblico. Un contributo volontario su Buy Me a Coffee aiuta a coprire hosting e compute; non è una donazione al Comune e non influenza i dati.":
+    "The dashboard has no public budget. A voluntary Buy Me a Coffee contribution helps cover hosting and compute; it is not a donation to the municipality and does not influence the data.",
+  "Il cruscotto è senza budget pubblico. Se ti è utile, puoi coprire hosting e compute con un caffè.":
+    "The dashboard has no public budget. If you find it useful, you can cover hosting and compute with a coffee.",
 };

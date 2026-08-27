@@ -14,6 +14,7 @@ import {
 } from "@/lib/constants";
 import { formatDateTime } from "@/lib/format";
 import { useT } from "@/lib/i18n";
+import { isSostieniEnabled } from "@/lib/sostieni";
 
 type HeaderProps = {
   generatedAt?: string | null;
@@ -36,6 +37,14 @@ export function Header({ generatedAt, brandAsHeading = true }: HeaderProps) {
             )}
           </span>
           <div className="flex w-full items-center justify-between gap-3 sm:w-auto sm:justify-end">
+            {isSostieniEnabled() ? (
+              <a
+                className="inline-flex min-h-11 shrink-0 items-center text-white underline-offset-2 hover:underline"
+                href="/sostieni"
+              >
+                {t("Sostieni")}
+              </a>
+            ) : null}
             <a
               className="inline-flex min-h-11 shrink-0 items-center text-white underline-offset-2 hover:underline"
               href={`mailto:${AUTHOR.email}`}

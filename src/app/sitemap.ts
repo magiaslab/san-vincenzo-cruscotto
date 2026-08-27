@@ -1,9 +1,10 @@
 import type { MetadataRoute } from "next";
 import { absoluteUrl } from "@/lib/seo";
+import { isSostieniEnabled } from "@/lib/sostieni";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
-  return [
+  const pages: MetadataRoute.Sitemap = [
     {
       url: absoluteUrl("/"),
       lastModified: now,
@@ -29,4 +30,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.5,
     },
   ];
+  if (isSostieniEnabled()) {
+    pages.push({
+      url: absoluteUrl("/sostieni"),
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.45,
+    });
+  }
+  return pages;
 }

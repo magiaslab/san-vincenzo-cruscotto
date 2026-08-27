@@ -113,6 +113,10 @@
     }
   },
   "eventi_filtro_extra": [],
+  "sostieni": {
+    "buymeacoffee_slug": "",
+    "_comment": "Slug Buy Me a Coffee del maintainer del fork (es. tuonome). Vuoto = pagina /sostieni e tab nascosti. Non copiare lo slug dell’upstream. I ringraziamenti stanno in config/sostegni.json."
+  },
   "fork": {
     "is_upstream": false,
     "maintainer_name": "Tuo Nome",

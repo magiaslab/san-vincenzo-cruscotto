@@ -6,6 +6,15 @@ const nextConfig: NextConfig = {
   },
   // Leaflet richiede accessori lato client
   transpilePackages: ["react-leaflet", "leaflet"],
+  async redirects() {
+    return [
+      {
+        source: "/supporter",
+        destination: "/sostieni",
+        permanent: false,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

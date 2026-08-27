@@ -350,6 +350,17 @@ const RULES: Rule[] = [
     label: "Apri sezione Partecipa",
     title: "Partecipa",
   },
+  {
+    id: "sostieni",
+    patterns: [
+      /sostien|donazion|buy\s*me\s*a\s*coffee|\bbmc\b|caff[eè]|hosting|ringraziament|supporter/i,
+    ],
+    answer:
+      "Il cruscotto è un progetto indipendente senza budget pubblico. Puoi coprire hosting e compute con un caffè su Buy Me a Coffee: i ringraziamenti pubblici sono in Sostieni.",
+    href: "/sostieni",
+    label: "Apri pagina Sostieni",
+    title: "Sostieni",
+  },
 
   // —— Territorio / Mappa ——
   {
