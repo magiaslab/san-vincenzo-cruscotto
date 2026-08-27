@@ -1,47 +1,36 @@
 import { NextResponse } from "next/server";
 import { COMUNE_NOME } from "@/lib/constants";
+import { COMUNE, isFeatureEnabled } from "@/lib/comune-config";
 
-const CACHE_DURATION = 1800; // 30 minuti per dati aria
+const CACHE_DURATION = 1800;
 
 export async function GET() {
-  try {
-    // ARPAT non ha stazione a San Vincenzo
-    // La stazione più vicina è Cecina o Livorno
-    // Restituiamo un messaggio informativo
-    
-    const data = {
-      disponibile: false,
-      messaggio: `Nessuna stazione di rilevamento qualità aria presente nel comune di ${COMUNE_NOME}`,
-      stazioni_piu_vicine: [
-        {
-          nome: "Cecina",
-          distanza_km: 12,
-          url: "https://www.arpat.toscana.it/temi-ambientali/aria/qualita-aria/dati-stazioni",
-        },
-        {
-          nome: "Livorno - Cappiello",
-          distanza_km: 35,
-          url: "https://www.arpat.toscana.it/temi-ambientali/aria/qualita-aria/dati-stazioni",
-        },
-      ],
-      note: "Per informazioni sulla qualità dell'aria consultare le stazioni ARPAT più vicine",
-      fonte: {
-        nome: "ARPAT - Agenzia Regionale Protezione Ambientale Toscana",
-        url: "https://www.arpat.toscana.it/open-data/open-data-sulla-qualita-dellaria/",
-        api_base: "https://www.arpat.toscana.it/opendata/",
+  if (!isFeatureEnabled("arpat_aria")) {
+    return NextResponse.json(
+      {
+        disponibile: false,
+        messaggio: "Modulo qualità aria regionale spento (features.arpat_aria).",
+        stazioni_piu_vicine: [],
       },
-    };
+      { status: 404 },
+    );
+  }
 
-    return NextResponse.json(data, {
+  const arpat = COMUNE.regione_opendata.arpat_base_url.trim();
+  return NextResponse.json(
+    {
+      disponibile: false,
+      messaggio: `Nessuna stazione hardcoded per ${COMUNE_NOME}. Collega l’open data ARPA della tua Regione.`,
+      stazioni_piu_vicine: [],
+      fonte: {
+        nome: "ARPA regionale",
+        url: arpat || "https://www.snpaambiente.it/",
+      },
+    },
+    {
       headers: {
         "Cache-Control": `public, s-maxage=${CACHE_DURATION}, stale-while-revalidate`,
       },
-    });
-  } catch (error) {
-    console.error("Errore API ARPAT aria:", error);
-    return NextResponse.json(
-      { error: "Impossibile recuperare i dati qualità aria" },
-      { status: 500 },
-    );
-  }
+    },
+  );
 }

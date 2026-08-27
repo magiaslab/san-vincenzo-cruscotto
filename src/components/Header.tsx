@@ -1,17 +1,18 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { SkipLink } from "@/components/SkipLink";
+import { StemmaMark } from "@/components/StemmaMark";
 import {
   AUTHOR,
   COMUNE_NOME,
   COMUNE_PROVINCIA,
   COMUNE_REGIONE,
   ISTAT_CODE,
-  STEMMA,
 } from "@/lib/constants";
+import { isComuneConfigured, isLandingSite } from "@/lib/comune-config";
+import { getProductName } from "@/lib/product";
 import { formatDateTime } from "@/lib/format";
 import { useT } from "@/lib/i18n";
 import { isSostieniEnabled } from "@/lib/sostieni";
@@ -61,9 +62,7 @@ export function Header({ generatedAt, brandAsHeading = true }: HeaderProps) {
       <div className="border-b border-[var(--pa-border)] bg-white">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-4 py-3 sm:gap-4 sm:py-4 sm:px-6">
           <Link href="/" className="shrink-0" aria-label={t("Torna alla home")}>
-            <Image
-              src={STEMMA.src}
-              alt={STEMMA.alt}
+            <StemmaMark
               width={44}
               height={55}
               priority
@@ -73,15 +72,19 @@ export function Header({ generatedAt, brandAsHeading = true }: HeaderProps) {
           <div className="min-w-0 flex-1">
             <BrandTag className="m-0 text-xl font-bold leading-tight text-[var(--pa-ink)] sm:text-2xl md:text-3xl">
               <Link href="/" className="text-inherit no-underline hover:underline">
-                Cruscotto {COMUNE_NOME}
+                {isLandingSite() ? getProductName() : `Cruscotto ${COMUNE_NOME}`}
               </Link>
             </BrandTag>
             <p className="m-0 mt-1 text-xs text-[var(--pa-muted)] sm:text-sm">
-              {t("Provincia di")} {COMUNE_PROVINCIA} · {COMUNE_REGIONE} ·
-              ISTAT {ISTAT_CODE}
-              {generatedAt
-                ? ` · ${t("agg.")} ${formatDateTime(generatedAt)}`
-                : ""}
+              {isLandingSite()
+                ? "Template open data per i comuni italiani"
+                : `${t("Provincia di")} ${COMUNE_PROVINCIA} · ${COMUNE_REGIONE}${
+                    isComuneConfigured() ? ` · ISTAT ${ISTAT_CODE}` : ""
+                  }${
+                    generatedAt
+                      ? ` · ${t("agg.")} ${formatDateTime(generatedAt)}`
+                      : ""
+                  }`}
             </p>
           </div>
         </div>

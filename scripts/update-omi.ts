@@ -21,7 +21,7 @@
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
-const ISTAT = "049018";
+const ISTAT = "000000";
 /** Codifica Comune_ISTAT nei CSV OMI / ondata: termina con ISTAT a 6 cifre (es. `9049018`). */
 function loadIstatFromConfig(): string {
   try {
@@ -41,7 +41,7 @@ const MIRROR_RAW =
   "https://raw.githubusercontent.com/ondata/quotazioni-immobiliari-agenzia-entrate/master/data";
 const OUT_DIR = path.join(process.cwd(), "src", "data", "omi");
 const UA =
-  "Mozilla/5.0 (compatible; CruscottoSanVincenzo/1.0; +https://github.com/magiaslab/san-vincenzo-cruscotto)";
+  "Mozilla/5.0 (compatible; CruscottoComune/1.0; +https://github.com/magiaslab/san-vincenzo-cruscotto)";
 
 type Tipologia = {
   tipologia: string;
@@ -269,9 +269,6 @@ async function main() {
       continue;
     }
     writeJson(path.join(OUT_DIR, `${ISTAT_CODE}-${item.semestre}.json`), snap);
-    if (ISTAT_CODE === "049018") {
-      writeJson(path.join(OUT_DIR, `${item.semestre}.json`), snap);
-    }
     snaps.push(snap);
   }
 
@@ -283,9 +280,8 @@ async function main() {
   const existing = readdirSync(OUT_DIR)
     .filter(
       (f) =>
-        (f.startsWith(`${ISTAT_CODE}-`) &&
-          /^\d{6}-\d{4}-[12]\.json$/.test(f)) ||
-        (ISTAT_CODE === "049018" && /^\d{4}-[12]\.json$/.test(f)),
+        f.startsWith(`${ISTAT_CODE}-`) &&
+          /^\d{6}-\d{4}-[12]\.json$/.test(f),
     )
     .sort();
   const allSnaps: Snapshot[] = [];

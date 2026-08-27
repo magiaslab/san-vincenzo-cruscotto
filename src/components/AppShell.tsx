@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import Link from "next/link";
 import {
   useEffect,
   useId,
@@ -12,12 +12,14 @@ import { Menu, X, type LucideIcon } from "lucide-react";
 import { GlobalSearch } from "@/components/GlobalSearch";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { SkipLink } from "@/components/SkipLink";
+import { StemmaMark } from "@/components/StemmaMark";
 import {
   AUTHOR,
   COMUNE_NOME,
   COMUNE_REGIONE,
-  STEMMA,
 } from "@/lib/constants";
+import { isLandingSite } from "@/lib/comune-config";
+import { getProductName } from "@/lib/product";
 import { formatDateTime } from "@/lib/format";
 import { useT } from "@/lib/i18n";
 import { scrollToTopSmooth } from "@/lib/motion";
@@ -116,9 +118,7 @@ export function AppShell({
       className="flex h-[var(--shell-topbar-h)] w-full items-center gap-3 px-4 text-left no-underline"
       aria-label={t("Torna alla home")}
     >
-      <Image
-        src={STEMMA.src}
-        alt={STEMMA.alt}
+      <StemmaMark
         width={36}
         height={45}
         className="h-9 w-auto shrink-0"
@@ -126,7 +126,7 @@ export function AppShell({
       />
       <div className="min-w-0">
         <p className="m-0 text-sm font-bold leading-tight text-[var(--pa-ink)]">
-          Cruscotto {COMUNE_NOME}
+          {isLandingSite() ? getProductName() : `Cruscotto ${COMUNE_NOME}`}
         </p>
         <p className="m-0 mt-0.5 text-xs leading-tight text-[var(--pa-muted)]">
           {COMUNE_REGIONE} · {t("dati aperti")}
@@ -177,6 +177,16 @@ export function AppShell({
           </div>
         ))}
       </div>
+      {isLandingSite() ? (
+        <div className="shrink-0 border-t border-[var(--pa-border)] p-3">
+          <Link
+            href="/"
+            className="flex min-h-11 items-center rounded-lg px-3 text-sm font-semibold text-[var(--pa-primary)] no-underline hover:bg-[var(--pa-surface-soft)]"
+          >
+            ← Sito del progetto
+          </Link>
+        </div>
+      ) : null}
     </nav>
   );
 
@@ -244,9 +254,7 @@ export function AppShell({
                 className="inline-flex h-9 shrink-0 items-center lg:hidden"
                 aria-label={t("Home Cruscotto {comune}", { comune: COMUNE_NOME })}
               >
-                <Image
-                  src={STEMMA.src}
-                  alt=""
+                <StemmaMark
                   width={32}
                   height={40}
                   className="h-8 w-auto"

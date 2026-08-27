@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isComuneConfigured, isFeatureEnabled } from "@/lib/comune-config";
 import { getCachedKpi } from "@/lib/dashboard";
 import { openDataEmpty, openDataOk } from "@/lib/opendata";
 import {
@@ -43,6 +44,16 @@ function toData(
 }
 
 export async function GET() {
+  if (!isFeatureEnabled("turismo_flussi") || !isComuneConfigured()) {
+    return NextResponse.json(
+      openDataEmpty<TurismoData>({
+        fonte: TURISMO_FONTE,
+        note: "Modulo flussi turistici spento o comune non configurato.",
+      }),
+      { status: 200, headers: { "Cache-Control": CACHE_CONTROL } },
+    );
+  }
+
   try {
     let residenti: number | null = TURISMO_RESIDENTI_FALLBACK;
     try {

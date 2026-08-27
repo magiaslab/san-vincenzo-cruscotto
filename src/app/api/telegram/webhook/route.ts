@@ -45,9 +45,7 @@ export async function POST(req: Request) {
 export async function GET() {
   return NextResponse.json({
     service: "dae-telegram-webhook",
-    bot:
-      process.env.NEXT_PUBLIC_TELEGRAM_BOT_URL ||
-      "https://t.me/DaesanvincenzoBot",
+    bot: process.env.NEXT_PUBLIC_TELEGRAM_BOT_URL || "",
     configured: Boolean(process.env.TELEGRAM_BOT_TOKEN?.trim()),
   });
 }

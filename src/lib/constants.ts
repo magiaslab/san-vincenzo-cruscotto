@@ -3,9 +3,11 @@ import {
   allertameteoPageUrl,
   COMUNE,
   getForkMaintainer,
+  isComuneConfigured,
   isUpstreamDeploy,
 } from "@/lib/comune-config";
 import { PROJECT_ORIGIN } from "@/lib/project-origin";
+import { getTemplateGithubUrl, getVercelDeployUrl } from "@/lib/product";
 
 export const STEMMA = {
   src: COMUNE.brand.stemma_path,
@@ -55,10 +57,10 @@ export const AUTHOR = {
       : PROJECT_ORIGIN.author.email,
 } as const;
 
-/** Repository del progetto ORIGINALE (fork button, docs, attribuzioni). */
-export const GITHUB_REPO_URL = PROJECT_ORIGIN.github_repo_url;
-/** Deploy Button Vercel → clone del repo originale. */
-export const VERCEL_DEPLOY_URL = PROJECT_ORIGIN.vercel_deploy_url;
+/** Repository da cui forkare (template). */
+export const GITHUB_REPO_URL = getTemplateGithubUrl();
+/** Deploy Button Vercel → clone del template. */
+export const VERCEL_DEPLOY_URL = getVercelDeployUrl();
 
 /** Repo GitHub di QUESTO deploy (Issues Partecipa / DAE). Default = origin. */
 export const GITHUB_FORK_REPO_URL =
@@ -82,8 +84,7 @@ export const DAE_GEOJSON_PATH = COMUNE.urls.dae_geojson;
  * Vedi docs/dae-telegram-bot.md.
  */
 export const TELEGRAM_DAE_BOT_URL =
-  process.env.NEXT_PUBLIC_TELEGRAM_BOT_URL?.trim() ||
-  "https://t.me/DaesanvincenzoBot";
+  process.env.NEXT_PUBLIC_TELEGRAM_BOT_URL?.trim() || "";
 
 function telegramHandleFromUrl(url: string): string {
   try {
@@ -117,11 +118,8 @@ export const OPENWEATHER_ATTRIBUTION_URL = "https://openweathermap.org/";
 export const ALLERTA_METEO_APP_URL = "https://allertameteo.app/" as const;
 export const ALLERTA_METEO_SV_PAGE_URL = allertameteoPageUrl();
 export const ALLERTA_METEO_SV_API_URL = allertameteoApiUrl();
-export const CFR_TOSCANA_URL =
-  COMUNE.regione_opendata.cfr_url || "https://www.cfr.toscana.it/";
-export const REGIONE_TOSCANA_ALLERTA_URL =
-  COMUNE.regione_opendata.allerta_url ||
-  "https://www.regione.toscana.it/allertameteo";
+export const CFR_TOSCANA_URL = COMUNE.regione_opendata.cfr_url;
+export const REGIONE_TOSCANA_ALLERTA_URL = COMUNE.regione_opendata.allerta_url;
 export const DPC_CRITICITA_REPO_URL =
   "https://github.com/pcm-dpc/DPC-Bollettini-Criticita-Idrogeologica-Idraulica" as const;
 export const DPC_ALLERTAMENTO_URL =
@@ -143,31 +141,20 @@ export const CHART_COLORS = [
   "#1A5276",
 ] as const;
 
-/** Lookup minimi per comuni frequenti nel pendolarismo (estendibile nel fork). */
+/** Lookup ISTAT → nome: comune configurato + mappa opzionale in config. */
 export const COMUNI_LOOKUP: Record<string, string> = {
-  "049001": "Bibbona",
-  "049002": "Campiglia Marittima",
-  "049006": "Castagneto Carducci",
-  "049007": "Cecina",
-  "049009": "Livorno",
-  "049012": "Piombino",
-  "049017": "Sassetta",
-  "049018": "San Vincenzo",
-  "049019": "Suvereto",
-  "049020": "Collesalvetti",
-  "048017": "Follonica",
-  "050026": "Pisa",
-  "053009": "Grosseto",
-  "051004": "Bibbiena",
-  "051017": "Poppi",
-  "051002": "Arezzo",
+  ...(isComuneConfigured() ? { [ISTAT_CODE]: COMUNE_NOME } : {}),
+  ...COMUNE.comuni_lookup,
 };
 
 /** URL fonti open data aggiuntive (da `config/comune.json`). */
-export const SAN_VINCENZO_OPENDATA_URL = COMUNE.urls.opendata;
-export const COMUNE_SAN_VINCENZO_URL = COMUNE.urls.comune;
+export const COMUNE_OPENDATA_URL = COMUNE.urls.opendata;
+export const SAN_VINCENZO_OPENDATA_URL = COMUNE_OPENDATA_URL;
+export const COMUNE_SITO_URL = COMUNE.urls.comune;
+export const COMUNE_SAN_VINCENZO_URL = COMUNE_SITO_URL;
 export const COMUNE_EVENTI_URL = COMUNE.urls.eventi_comune;
-export const VISIT_SAN_VINCENZO_EVENTI_URL = COMUNE.urls.eventi_calendario;
+export const EVENTI_CALENDARIO_URL = COMUNE.urls.eventi_calendario;
+export const VISIT_SAN_VINCENZO_EVENTI_URL = EVENTI_CALENDARIO_URL;
 export const BIBLIOTECA_COMUNALE_URL = COMUNE.urls.biblioteca;
 export const BIBLIOTECA_OPAC_URL = COMUNE.urls.biblioteca_opac;
 export const COMUNE_STALLI_DISABILI_URL = COMUNE.urls.stalli_disabili;
@@ -185,18 +172,14 @@ export const TURISMO_CSV_FALLBACK_URL =
   process.env.TURISMO_CSV_FALLBACK_URL?.trim() || "";
 
 export const REGIONE_TOSCANA_TURISMO_STATS_URL =
-  COMUNE.regione_opendata.turismo_stats_url ||
-  "https://www.regione.toscana.it/statistiche/dati-statistici/turismo";
+  COMUNE.regione_opendata.turismo_stats_url;
 
 /** Orari TPL regionale (GTFS) — dataset Regione (configurabile). */
-export const RT_ORARITB_DATASET_URL =
-  COMUNE.regione_opendata.gtfs_dataset_url ||
-  "https://dati.toscana.it/dataset/rt-oraritb";
-export const RT_ORARITB_CKAN_ID =
-  COMUNE.regione_opendata.gtfs_ckan_id || "rt-oraritb";
-export const AUTOLINEE_GTFS_URL =
-  "https://regionetoscana.smartregion.toscana.it/mobility/artifacts/gtfs" as const;
-export const TRASPORTI_GTFS_SV_PATH = COMUNE.urls.trasporti_gtfs_local;
+export const RT_ORARITB_DATASET_URL = COMUNE.regione_opendata.gtfs_dataset_url;
+export const RT_ORARITB_CKAN_ID = COMUNE.regione_opendata.gtfs_ckan_id;
+export const AUTOLINEE_GTFS_URL = COMUNE.regione_opendata.gtfs_dataset_url;
+export const TRASPORTI_GTFS_PATH = COMUNE.urls.trasporti_gtfs_local;
+export const TRASPORTI_GTFS_SV_PATH = TRASPORTI_GTFS_PATH;
 
 /** Board live treni (proxy ViaggiaTreno) — stazione FS configurata. */
 export const TRASPORTI_TRENI_LIVE_API = "/api/trasporti/treni" as const;
@@ -237,11 +220,10 @@ export const FARMACIE_DI_TURNO_URL =
 export const FARMACIE_DI_TURNO_BASE = "https://www.farmaciediturno.org";
 
 /**
- * Endpoint POST del RAG su Modal (workspace magiaslab).
- * Sovrascrivibile con ASSISTENTE_MODAL_URL.
+ * Endpoint POST del RAG su Modal. Vuoto = assistente spento finché
+ * non si imposta ASSISTENTE_MODAL_URL (non riusare l’app di un altro comune).
  */
-export const ASSISTENTE_MODAL_URL_DEFAULT =
-  "https://magiaslab--san-vincenzo-rag-ragservice-web-ask.modal.run" as const;
+export const ASSISTENTE_MODAL_URL_DEFAULT = "" as const;
 
 /** Open data Ministero dell'Istruzione — Portale Unico dei Dati della Scuola. */
 export const MIUR_OPENDATA_URL = "https://dati.istruzione.it/opendata/" as const;

@@ -119,9 +119,7 @@ async function fetchPienofurboNearSv(): Promise<PfStation[]> {
   const res = await fetch(url.toString(), {
     headers: {
       Accept: "application/json",
-      "User-Agent":
-        COMUNE.brand.user_agent ||
-        "Cruscotto-Comunale/1.0 (+https://github.com/magiaslab/san-vincenzo-cruscotto)",
+      "User-Agent": COMUNE.brand.user_agent,
     },
     next: { revalidate: 0 },
   });

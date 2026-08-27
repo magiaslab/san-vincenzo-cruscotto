@@ -42,16 +42,25 @@ for (const f of fs.readdirSync(out)) {
   if (f.endsWith(".md")) fs.unlinkSync(path.join(out, f));
 }
 
-const kpi = await callTool("comune_kpi", { istat_code: "049018" });
-const dash = await callTool("comune_dashboard", { istat_code: "049018" });
+const cfg = JSON.parse(
+  fs.readFileSync(path.join(__dirname, "..", "config", "comune.json"), "utf8"),
+);
+const ISTAT = String(cfg.istat_code || "").replace(/\D/g, "").padStart(6, "0");
+const NOME = String(cfg.nome || "NomeComune");
+
+if (!ISTAT || ISTAT === "000000") {
+  console.error("config/comune.json: imposta istat_code prima di rag:corpus");
+  process.exit(1);
+}
+
+const kpi = await callTool("comune_kpi", { istat_code: ISTAT });
+const dash = await callTool("comune_dashboard", { istat_code: ISTAT });
 
 write(
   "01_comune.md",
-  "Comune di San Vincenzo",
-  `San Vincenzo è un comune della provincia di Livorno, in Toscana (Italia).
-Codice ISTAT: 049018.
-Il Cruscotto San Vincenzo è una dashboard indipendente e non ufficiale che mostra dati aperti del comune, alimentata da Cruscotto Italia (AgID).
-Autore: Alessandro Cipriani.`,
+  `Comune di ${NOME}`,
+  `${NOME} (ISTAT ${ISTAT}).
+Il cruscotto è una dashboard indipendente e non ufficiale dei dati aperti comunali, alimentata da Cruscotto Italia (AgID).`,
 );
 
 write(
@@ -70,7 +79,7 @@ for (const [key, val] of Object.entries(kpi)) {
   write(
     `kpi_${String(n).padStart(2, "0")}_${key}.md`,
     key,
-    `Sezione KPI \`${key}\` per San Vincenzo.\n\n\`\`\`json\n${JSON.stringify(val, null, 2).slice(0, 4000)}\n\`\`\``,
+    `Sezione KPI \`${key}\` per ${NOME}.\n\n\`\`\`json\n${JSON.stringify(val, null, 2).slice(0, 4000)}\n\`\`\``,
   );
   n += 1;
 }
@@ -80,7 +89,7 @@ if (pun?.kpi) {
   write(
     "30_ev_pun.md",
     "Colonnine di ricarica EV",
-    `A San Vincenzo ci sono ${pun.kpi.n_totale} punti di ricarica EV (PUN/IDR), di cui ${pun.kpi.n_attivi} attivi (${pun.kpi.pct_attivi}%).
+    `A ${NOME} ci sono ${pun.kpi.n_totale} punti di ricarica EV (PUN/IDR), di cui ${pun.kpi.n_attivi} attivi (${pun.kpi.pct_attivi}%).
 Potenza totale circa ${pun.kpi.potenza_tot_kw} kW. Mix: ${JSON.stringify(pun.kpi.mix_potenza)}.
 CPO: ${(pun.kpi.cpo_list || []).join(", ")}.`,
   );

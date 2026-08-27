@@ -2,22 +2,25 @@
 
 ## Cursor Cloud specific instructions
 
-**Project:** Cruscotto San Vincenzo — a single Next.js 15 (App Router) + TypeScript dashboard
-of Italian open data. Read-only: no local backend, no database, no auth, and no required
-environment variables. All data comes from remote public APIs (primarily the AgID
-"Cruscotto Italia" MCP at `https://cruscotto-italia-mcp.agid.workers.dev/mcp`), and the
-Next.js API routes under `src/app/api/*` are thin server-side proxies/caches.
+**Project:** Cruscotto Comune — template Next.js 15 (App Router) + TypeScript
+per dashboard di dati aperti comunali italiani, più minisito di documentazione.
+Read-only: no local backend, no database, no auth, no required env vars.
+KPI da AgID Cruscotto Italia MCP
+(`https://cruscotto-italia-mcp.agid.workers.dev/mcp`). Le route `src/app/api/*`
+sono proxy/cache.
 
-**Standard commands** (see `package.json`): `npm run dev` (dev server on port 3000,
-uses Turbopack), `npm run build`, `npm run start`, `npm run lint`.
+**San Vincenzo** è il primo esemplare in produzione
+(`https://www.cruscottosanvincenzo.it`), repo separato. Questo template non deve
+reintrodurre dati hardcoded di quel comune.
+
+**Standard commands:** `npm run dev` (port 3000, Turbopack), `npm run build`,
+`npm run start`, `npm run lint`.
 
 **Non-obvious notes:**
-- The only process to run is the Next.js dev server (`npm run dev`). Everything else is a
-  remote third-party HTTP API — there is nothing else to start locally.
-- End-to-end functionality requires outbound internet egress. Without it, the page shell
-  renders but core KPI data and map tiles (OpenStreetMap/CARTO) fail to load. Optional
-  panels (weather, ARPAT, cultura, toscana, porto) degrade independently and are non-blocking.
-- Quick smoke test that core data works: `curl -s localhost:3000/api/kpi` should return a
-  JSON body with real demographics for San Vincenzo (ISTAT `049018`).
-- No automated test framework is configured; `npm run lint` is the only quality gate beyond
-  the build. Accessibility: jsx-a11y via ESLint + checklist in `docs/a11y-checklist.md`.
+- Identità in `config/comune.json`. Placeholder ISTAT `000000` / nome
+  `NomeComune` = comune non configurato: la dashboard mostra la guida, non
+  chiama l’MCP.
+- `site.mode=landing` → homepage minisito, dashboard su `/cruscotto`.
+- Feature flags in `features.*` spengono tab e API.
+- Smoke dopo config: `curl -s localhost:3000/api/kpi` con ISTAT reale.
+- Quality gate: `npm run lint`. A11y: jsx-a11y + `docs/a11y-checklist.md`.

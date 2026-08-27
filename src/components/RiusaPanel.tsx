@@ -28,18 +28,22 @@ import {
   PROJECT_ORIGIN_CONFIG_EXAMPLE_URL,
   PROJECT_ORIGIN_DOCS_RIUSO_URL,
   PROJECT_ORIGIN_ENV_EXAMPLE_URL,
-  PROJECT_ORIGIN_FORK_URL,
 } from "@/lib/project-origin";
+import {
+  getTemplateForkUrl,
+  getTemplateGithubUrl,
+  getVercelDeployUrl,
+} from "@/lib/product";
 import { SectionIntro } from "@/components/ui";
 
-const GITHUB_FORK_URL = PROJECT_ORIGIN_FORK_URL;
+const GITHUB_FORK_URL = getTemplateForkUrl();
 const GITHUB_DOCS_RIUSO_URL = PROJECT_ORIGIN_DOCS_RIUSO_URL;
 const GITHUB_CONFIG_EXAMPLE_URL = PROJECT_ORIGIN_CONFIG_EXAMPLE_URL;
 const GITHUB_ENV_EXAMPLE_URL = PROJECT_ORIGIN_ENV_EXAMPLE_URL;
-const GITHUB_MODAL_RAG_URL = `${PROJECT_ORIGIN.github_repo_url}/blob/master/modal_rag/README.md`;
-const GITHUB_DAE_DOCS_URL = `${PROJECT_ORIGIN.github_repo_url}/blob/master/docs/dae-telegram-bot.md`;
-const GITHUB_REPO_URL = PROJECT_ORIGIN.github_repo_url;
-const VERCEL_DEPLOY_URL = PROJECT_ORIGIN.vercel_deploy_url;
+const GITHUB_MODAL_RAG_URL = `${getTemplateGithubUrl()}/blob/master/modal_rag/README.md`;
+const GITHUB_DAE_DOCS_URL = `${getTemplateGithubUrl()}/blob/master/docs/dae-telegram-bot.md`;
+const GITHUB_REPO_URL = getTemplateGithubUrl();
+const VERCEL_DEPLOY_URL = getVercelDeployUrl();
 const AUTHOR = PROJECT_ORIGIN.author;
 
 function Section({

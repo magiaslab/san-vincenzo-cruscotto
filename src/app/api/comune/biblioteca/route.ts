@@ -4,10 +4,10 @@ import {
   BIBLIOTECA_OPAC_URL,
   COMUNE_DI,
   COMUNE_NOME,
-  COMUNE_PROVINCIA,
+  HTTP_USER_AGENT,
   MAP_CENTER,
 } from "@/lib/constants";
-import { isFeatureEnabled, isUpstreamDeploy } from "@/lib/comune-config";
+import { isFeatureEnabled } from "@/lib/comune-config";
 
 const CACHE_DURATION = 86400; // 24 ore
 
@@ -52,41 +52,7 @@ export async function GET() {
     );
   }
 
-  const upstream = isUpstreamDeploy();
-  const fallback = upstream
-    ? {
-        disponibile: true,
-        nome: 'Biblioteca Comunale "Giorgio Calandra"',
-        indirizzo: `Piazza Osvaldo Mischi, 1 — 57027 ${COMUNE_NOME} (${COMUNE_PROVINCIA})`,
-        telefono: "0565 707273",
-        email: "biblioteca@comune.sanvincenzo.li.it",
-        lat: 43.100583,
-        lon: 10.538421,
-        superficie_mq: 370,
-        descrizione:
-          "Biblioteca comunale al primo piano del Palazzo della Cultura. Fa parte del Sistema Documentario Territoriale Livornese; tessera gratuita valida in provincia.",
-        orari: [
-          { giorno: "Lun", orario: "8:30-18:30" },
-          { giorno: "Mar", orario: "8:30-18:30" },
-          { giorno: "Mer", orario: "8:30-18:30" },
-          { giorno: "Gio", orario: "8:30-18:30" },
-          { giorno: "Ven", orario: "8:30-18:30" },
-          { giorno: "Sab", orario: "8:30-12:30" },
-        ] as OrarioGiorno[],
-        servizi: [
-          "Prestito e consultazione",
-          "Prestito interbibliotecario gratuito",
-          "Sezione ragazzi 0–14 anni",
-          "Book crossing nei parchi",
-          "Punti prestito nelle scuole",
-        ],
-        opac_url: BIBLIOTECA_OPAC_URL,
-        fonte: {
-          nome: COMUNE_DI,
-          url: BIBLIOTECA_COMUNALE_URL,
-        },
-      }
-    : {
+  const fallback = {
         disponibile: true,
         nome: `Biblioteca comunale di ${COMUNE_NOME}`,
         indirizzo: null as string | null,
@@ -105,10 +71,19 @@ export async function GET() {
         },
       };
 
+  if (!BIBLIOTECA_COMUNALE_URL) {
+    return NextResponse.json({
+      ...fallback,
+      disponibile: false,
+      scraped: false,
+      note: "URL biblioteca non configurato (urls.biblioteca).",
+    });
+  }
+
   try {
     const res = await fetch(BIBLIOTECA_COMUNALE_URL, {
       headers: {
-        "User-Agent": "Cruscotto-San-Vincenzo/1.0 (+https://github.com/magiaslab/san-vincenzo-cruscotto)",
+        "User-Agent": HTTP_USER_AGENT,
         Accept: "text/html",
       },
       next: { revalidate: CACHE_DURATION },
@@ -118,7 +93,7 @@ export async function GET() {
       return NextResponse.json(
         {
           ...fallback,
-          disponibile: upstream,
+          disponibile: false,
           scraped: false,
         },
         {
@@ -132,11 +107,7 @@ export async function GET() {
     const html = await res.text();
     const orari = parseOrari(html);
     const phoneM = html.match(/Telefono:\s*([0-9\s/]+)/i);
-    const emailM = html.match(
-      upstream
-        ? /([a-z0-9._%+-]+@comune\.sanvincenzo\.li\.it)/i
-        : /([a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,})/i,
-    );
+    const emailM = html.match(/([a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,})/i);
     const geoM = html.match(
       /"latitude"\s*:\s*([0-9.]+)\s*,\s*"longitude"\s*:\s*([0-9.]+)/,
     );
@@ -162,7 +133,7 @@ export async function GET() {
     return NextResponse.json(
       {
         ...fallback,
-        disponibile: upstream,
+        disponibile: false,
         scraped: false,
       },
       {

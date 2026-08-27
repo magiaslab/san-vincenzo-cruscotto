@@ -95,9 +95,7 @@ export function emptyTurismoPayload(
   };
 }
 
-const UA =
-  COMUNE.brand.user_agent ||
-  "Cruscotto-Comunale/1.0 (+https://github.com/magiaslab/san-vincenzo-cruscotto)";
+const UA = COMUNE.brand.user_agent;
 
 type CkanResource = {
   id?: string;
@@ -370,6 +368,7 @@ function scoreResource(kind: "mese" | "provenienza" | "consistenza", r: CkanReso
 }
 
 async function searchCkanPackages(): Promise<CkanPackage[]> {
+  if (!REGIONE_TOSCANA_CKAN_API) return [];
   const queries = [
     "movimento turistico comune mese",
     'title:"Movimento dei clienti"',

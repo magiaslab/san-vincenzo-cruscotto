@@ -1,15 +1,8 @@
-"use client";
+import { redirect } from "next/navigation";
+import { isLandingSite } from "@/lib/comune-config";
+import AttribuzioniRedirect from "./redirect-client";
 
-import { useEffect } from "react";
-
-export default function AttribuzioniRedirectPage() {
-  useEffect(() => {
-    window.location.replace("/#attribuzioni");
-  }, []);
-
-  return (
-    <main className="flex min-h-[40vh] items-center justify-center p-6 text-sm text-[var(--pa-muted)]">
-      Reindirizzamento…
-    </main>
-  );
+export default function AttribuzioniPage() {
+  if (isLandingSite()) redirect("/menzioni");
+  return <AttribuzioniRedirect />;
 }

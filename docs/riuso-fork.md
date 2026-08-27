@@ -1,15 +1,17 @@
-# Riusare / forkare il Cruscotto — guida completa
+# Riusare / forkare il Cruscotto Comune — guida completa
 
-Guida passo-passo per duplicare questo progetto su un **altro comune italiano**,
-dall’account GitHub alla messa online su Vercel, con i servizi esterni opzionali
-(Telegram, Modal, Hugging Face, OpenWeather, …) e indicazioni per usare
-Cursor o Claude ad adattare il fork.
+Guida passo-passo per duplicare **questo template** su un comune italiano,
+dall’account GitHub alla messa online su Vercel.
 
-La stessa guida è riassunta in-app su [`/#riusa`](https://www.cruscottosanvincenzo.it/#riusa)
-(tab **Progetto → Riusa / fork**). Redirect legacy: `/riusa`.
+Il Cruscotto San Vincenzo resta l’esemplare in produzione
+(<https://www.cruscottosanvincenzo.it>): i fork nuovi partono da qui, non da
+quel sito.
+
+La stessa guida è in-app su [`/riuso`](/riuso).
 
 Checklist dati: [`config/comune.example.json`](../config/comune.example.json)  
-Env di esempio: [`.env.example`](../.env.example)
+Env di esempio: [`.env.example`](../.env.example)  
+Menzioni obbligatorie: [`/menzioni`](/menzioni) (pagina nel minisito).
 
 ---
 

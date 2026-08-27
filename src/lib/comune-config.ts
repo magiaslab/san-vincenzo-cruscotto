@@ -4,6 +4,28 @@
  */
 import raw from "../../config/comune.json";
 
+export type SiteMode = "landing" | "dashboard";
+
+export type ComuneSiteConfig = {
+  /** Nome del prodotto template (minisito), distinto dal comune. */
+  product_name: string;
+  tagline: string;
+  /**
+   * `landing` = homepage = minisito, dashboard su `/cruscotto`.
+   * `dashboard` = homepage = cruscotto (fork comunale).
+   */
+  mode: SiteMode;
+  /** Esemplare in produzione da linkare (San Vincenzo). */
+  demo_url: string;
+  demo_label: string;
+  github_repo_url: string;
+};
+
+export type PortoWebcamConfig = {
+  webcam_page: string;
+  webcam_base: string;
+};
+
 export type ComuneFeatures = {
   porto: boolean;
   balneazione: boolean;
@@ -122,12 +144,25 @@ export type ComuneConfig = {
   features: ComuneFeatures;
   eventi_filtro_extra: string[];
   /**
-   * Metadati del fork. `is_upstream: true` = deploy ufficiale San Vincenzo.
-   * Nei fork: `is_upstream: false` + nome/email/url del maintainer.
+   * Webcam porto (opzionale). URL vuoti + `features.porto=false` = modulo spento.
+   * Non usare pagine di un altro comune.
+   */
+  porto: PortoWebcamConfig;
+  /**
+   * Lookup ISTAT → nome per pendolarismo / confronti. Vuoto = si mostra il codice.
+   * Il comune configurato è sempre incluso a runtime.
+   */
+  comuni_lookup: Record<string, string>;
+  site: ComuneSiteConfig;
+  /**
+   * Metadati del fork. `is_upstream: true` = primo esemplare (San Vincenzo).
+   * `is_template: true` = questo repo è il template/minisito, non un comune.
+   * Nei fork comunali: entrambi false + nome/email/url del maintainer.
    * I crediti al progetto originale restano in `src/lib/project-origin.ts`.
    */
   fork: {
     is_upstream: boolean;
+    is_template: boolean;
     maintainer_name: string;
     maintainer_email: string;
     maintainer_url: string;
@@ -231,21 +266,28 @@ function parseConfig(input: unknown): ComuneConfig {
   const rifiuti = (gestori.rifiuti ?? {}) as Record<string, unknown>;
   const fork = (c.fork ?? {}) as Record<string, unknown>;
   const sostieni = (c.sostieni ?? {}) as Record<string, unknown>;
+  const site = (c.site ?? {}) as Record<string, unknown>;
+  const porto = (c.porto ?? {}) as Record<string, unknown>;
+  const lookupRaw = (c.comuni_lookup ?? {}) as Record<string, unknown>;
+  const comuni_lookup: Record<string, string> = {};
+  for (const [k, v] of Object.entries(lookupRaw)) {
+    if (typeof v === "string" && v.trim()) comuni_lookup[k] = v.trim();
+  }
 
   return {
-    istat_code: str(c.istat_code, "049018"),
-    nome: str(c.nome, "San Vincenzo"),
+    istat_code: str(c.istat_code, "000000"),
+    nome: str(c.nome, "NomeComune"),
     nome_aliases: Array.isArray(c.nome_aliases)
       ? c.nome_aliases.filter((x): x is string => typeof x === "string")
       : [],
-    provincia: str(c.provincia, "LI"),
-    regione: str(c.regione, "Toscana"),
-    miur_codice_catastale: str(c.miur_codice_catastale, "I390"),
-    farmacie_di_turno_cod: str(c.farmacie_di_turno_cod, "49018"),
+    provincia: str(c.provincia, "XX"),
+    regione: str(c.regione, "Italia"),
+    miur_codice_catastale: str(c.miur_codice_catastale),
+    farmacie_di_turno_cod: str(c.farmacie_di_turno_cod),
     residenti_fallback: num(c.residenti_fallback, 0),
     geo: {
-      map_center: asPair(geo.map_center, [43.085, 10.54]),
-      meteo: asPair(geo.meteo, [43.085, 10.54]),
+      map_center: asPair(geo.map_center, [41.9028, 12.4964]),
+      meteo: asPair(geo.meteo, [41.9028, 12.4964]),
       map_default_zoom: num(geo.map_default_zoom, 13),
       bbox: asQuad(geo.bbox),
       bbox_radius_km: num(geo.bbox_radius_km, 8),
@@ -260,7 +302,7 @@ function parseConfig(input: unknown): ComuneConfig {
       allertameteo_page_path: str(allerte.allertameteo_page_path),
       toscana_zona: str(allerte.toscana_zona),
       toscana_zona_label: str(allerte.toscana_zona_label),
-      toscana_sample: asPair(allerte.toscana_sample, [98, 152]),
+      toscana_sample: asPair(allerte.toscana_sample, [0, 0]),
     },
     urls: {
       comune: str(urls.comune),
@@ -279,29 +321,26 @@ function parseConfig(input: unknown): ComuneConfig {
       trasporti_gtfs_local: str(urls.trasporti_gtfs_local),
     },
     brand: {
-      stemma_path: str(brand.stemma_path, "/stemma.png"),
-      stemma_width: num(brand.stemma_width, 399),
+      stemma_path: str(brand.stemma_path, "/stemma.svg"),
+      stemma_width: num(brand.stemma_width, 400),
       stemma_height: num(brand.stemma_height, 500),
-      stemma_alt: str(brand.stemma_alt, "Stemma comunale"),
+      stemma_alt: str(brand.stemma_alt, "Marchio Cruscotto Comune"),
       stemma_attribution: str(brand.stemma_attribution),
       stemma_license_url: str(brand.stemma_license_url),
       stemma_source_url: str(brand.stemma_source_url),
       site_url: str(brand.site_url),
-      user_agent: str(
-        brand.user_agent,
-        "Cruscotto-Comunale/1.0 (+https://github.com/magiaslab/san-vincenzo-cruscotto)",
-      ),
+      user_agent: str(brand.user_agent, "Cruscotto-Comune/1.0"),
     },
     regione_opendata: {
-      portal_url: str(reg.portal_url, "https://dati.toscana.it/"),
-      ckan_api: str(reg.ckan_api, "https://dati.toscana.it/api/3/action"),
+      portal_url: str(reg.portal_url, "https://www.dati.gov.it/"),
+      ckan_api: str(reg.ckan_api),
       turismo_stats_url: str(reg.turismo_stats_url),
       gtfs_dataset_url: str(reg.gtfs_dataset_url),
       gtfs_ckan_id: str(reg.gtfs_ckan_id),
-      eventi_ckan_id: str(reg.eventi_ckan_id, "rt-eventi-sistcult"),
+      eventi_ckan_id: str(reg.eventi_ckan_id),
       allerta_url: str(reg.allerta_url),
       cfr_url: str(reg.cfr_url),
-      arpat_base_url: str(reg.arpat_base_url, "https://www.arpat.toscana.it"),
+      arpat_base_url: str(reg.arpat_base_url),
       nota: str(reg.nota),
     },
     features: {
@@ -333,12 +372,9 @@ function parseConfig(input: unknown): ComuneConfig {
         fontanelle_map_url: str(acqua.fontanelle_map_url),
         composizione_url: str(acqua.composizione_url),
         geoserver_wfs: str(acqua.geoserver_wfs),
-        etichette_layer: str(acqua.etichette_layer, "asa_geoserver:etichette"),
-        fontanelle_layer: str(acqua.fontanelle_layer, "asa_geoserver:fontanelle"),
-        fontanelle_aq_layer: str(
-          acqua.fontanelle_aq_layer,
-          "asa_geoserver:fontanelle_aq",
-        ),
+        etichette_layer: str(acqua.etichette_layer),
+        fontanelle_layer: str(acqua.fontanelle_layer),
+        fontanelle_aq_layer: str(acqua.fontanelle_aq_layer),
         ait_opendata_url: str(acqua.ait_opendata_url),
       },
       rifiuti: {
@@ -352,9 +388,25 @@ function parseConfig(input: unknown): ComuneConfig {
     eventi_filtro_extra: Array.isArray(c.eventi_filtro_extra)
       ? c.eventi_filtro_extra.filter((x): x is string => typeof x === "string")
       : [],
+    porto: {
+      webcam_page: str(porto.webcam_page),
+      webcam_base: str(porto.webcam_base),
+    },
+    comuni_lookup,
+    site: {
+      product_name: str(site.product_name, "Cruscotto Comune"),
+      tagline: str(
+        site.tagline,
+        "Dashboard open data per qualsiasi comune italiano",
+      ),
+      mode: site.mode === "dashboard" ? "dashboard" : "landing",
+      demo_url: str(site.demo_url, "https://www.cruscottosanvincenzo.it"),
+      demo_label: str(site.demo_label, "Cruscotto San Vincenzo"),
+      github_repo_url: str(site.github_repo_url),
+    },
     fork: {
-      // Default true: il repo originale è upstream finché un fork non lo spegne
-      is_upstream: bool(fork.is_upstream, true),
+      is_upstream: bool(fork.is_upstream, false),
+      is_template: bool(fork.is_template, false),
       maintainer_name: str(fork.maintainer_name),
       maintainer_email: str(fork.maintainer_email),
       maintainer_url: str(fork.maintainer_url),
@@ -372,9 +424,30 @@ export function isFeatureEnabled(key: keyof ComuneFeatures): boolean {
   return Boolean(COMUNE.features[key]);
 }
 
-/** Deploy ufficiale (San Vincenzo / magiaslab) vs fork di terze parti. */
+/** Primo esemplare in produzione (San Vincenzo). Non è il template. */
 export function isUpstreamDeploy(): boolean {
   return COMUNE.fork.is_upstream;
+}
+
+/** Questo deploy è il minisito/template, non un comune. */
+export function isTemplateDeploy(): boolean {
+  return COMUNE.fork.is_template;
+}
+
+/** Homepage = minisito. Dashboard su `/cruscotto`. */
+export function isLandingSite(): boolean {
+  return COMUNE.site.mode === "landing" || isTemplateDeploy();
+}
+
+const PLACEHOLDER_ISTAT = new Set(["000000", "999999"]);
+const PLACEHOLDER_NOMI = new Set(["nomecomune", "nome comune", ""]);
+
+/** True se ISTAT e nome sono valorizzati (non i placeholder del template). */
+export function isComuneConfigured(): boolean {
+  const istat = COMUNE.istat_code.replace(/\D/g, "").padStart(6, "0");
+  if (istat.length !== 6 || PLACEHOLDER_ISTAT.has(istat)) return false;
+  const nome = COMUNE.nome.trim().toLowerCase();
+  return !PLACEHOLDER_NOMI.has(nome);
 }
 
 export function getForkMaintainer(): {
@@ -383,7 +456,7 @@ export function getForkMaintainer(): {
   url: string;
   github_repo_url: string;
 } | null {
-  if (COMUNE.fork.is_upstream) return null;
+  if (COMUNE.fork.is_upstream || COMUNE.fork.is_template) return null;
   const name = COMUNE.fork.maintainer_name.trim();
   if (!name) return null;
   return {
@@ -394,13 +467,18 @@ export function getForkMaintainer(): {
   };
 }
 
-/** Tab UI da nascondere quando il modulo è spento. */
+/** Tab UI da nascondere quando il modulo è spento o duplicato dal minisito. */
 export function isTabEnabled(tabId: string): boolean {
   switch (tabId) {
     case "porto":
       return isFeatureEnabled("porto");
     case "sostieni":
+      if (isLandingSite()) return false;
       return COMUNE.sostieni.buymeacoffee_slug.trim().length > 0;
+    case "come-funziona":
+    case "riusa":
+    case "attribuzioni":
+      return !isLandingSite();
     default:
       return true;
   }

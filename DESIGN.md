@@ -1,4 +1,4 @@
-# Design system — Cruscotto San Vincenzo
+# Design system — Cruscotto Comune
 
 Mode: **Operate** (dashboard open-data comunale).
 

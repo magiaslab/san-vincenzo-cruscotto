@@ -1,9 +1,9 @@
 {
-  "name": "cruscotto",
+  "name": "cruscotto-comune",
   "version": "0.1.0",
   "private": true,
   "author": "Alessandro Cipriani <cipriani.alessandro@gmail.com>",
-  "description": "Dashboard indipendente dei dati aperti del Comune di San Vincenzo (LI), alimentata da Cruscotto Italia (AgID).",
+  "description": "Template Next.js per dashboard di dati aperti comunali italiani. Nucleo AgID/ISTAT, moduli opzionali accendibili, minisito di riuso.",
   "license": "UNLICENSED",
   "scripts": {
     "dev": "next dev --turbopack",

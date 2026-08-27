@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { unstable_cache } from "next/cache";
 import { ISTAT_CODE } from "@/lib/constants";
-import { isFeatureEnabled } from "@/lib/comune-config";
+import { isComuneConfigured, isFeatureEnabled } from "@/lib/comune-config";
 import { openDataEmpty, openDataOk } from "@/lib/opendata";
 import {
   ARRR_DATI_COMUNALI_URL,
@@ -20,7 +20,7 @@ const getCached = unstable_cache(
 );
 
 export async function GET() {
-  if (!isFeatureEnabled("rifiuti_ispra")) {
+  if (!isFeatureEnabled("rifiuti_ispra") || !isComuneConfigured()) {
     return NextResponse.json(
       openDataEmpty<RifiutiData>({
         fonte: ISPRA_RIFIUTI_FONTE,

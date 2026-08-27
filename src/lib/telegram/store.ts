@@ -11,7 +11,8 @@
  */
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { COMUNE_NOME, COMUNE_PROVINCIA, TELEGRAM_DAE_BOT_HANDLE } from "@/lib/constants";
+import { COMUNE_NOME, COMUNE_PROVINCIA, HTTP_USER_AGENT, TELEGRAM_DAE_BOT_HANDLE } from "@/lib/constants";
+import { getGithubRepoSlug } from "@/lib/product";
 import type {
   DaeSegnalazioneFeature,
   DaeSegnalazioneStatus,
@@ -46,8 +47,7 @@ function absolutePath() {
 function githubConfig() {
   const token =
     process.env.GITHUB_TOKEN?.trim() || process.env.GH_TOKEN?.trim();
-  const repo =
-    process.env.GITHUB_REPO?.trim() || "magiaslab/san-vincenzo-cruscotto";
+  const repo = getGithubRepoSlug();
   const branch =
     process.env.GITHUB_BRANCH?.trim() ||
     process.env.VERCEL_GIT_COMMIT_REF?.trim() ||
@@ -59,7 +59,7 @@ function githubHeaders(token: string): HeadersInit {
   return {
     Authorization: `Bearer ${token}`,
     Accept: "application/vnd.github+json",
-    "User-Agent": "cruscotto-san-vincenzo-dae-bot",
+    "User-Agent": HTTP_USER_AGENT || "cruscotto-comune-dae-bot",
     "X-GitHub-Api-Version": "2022-11-28",
   };
 }
@@ -123,7 +123,7 @@ function featureToIssueBody(feature: DaeSegnalazioneFeature): string {
     JSON.stringify(feature, null, 2),
     "```",
     "",
-    "_Segnalazione DAE via @DaesanvincenzoBot — non modificare il blocco JSON._",
+    `_Segnalazione DAE via ${TELEGRAM_DAE_BOT_HANDLE || "bot Telegram"} — non modificare il blocco JSON._`,
   ]
     .filter((l) => l != null)
     .join("\n");

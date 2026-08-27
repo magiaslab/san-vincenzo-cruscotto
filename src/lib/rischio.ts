@@ -6,7 +6,7 @@
  * Erosione costiera: WFS GeoServer `dinamica_litoranea` (layer IdroGEO).
  */
 
-import { ISTAT_CODE } from "@/lib/constants";
+import { HTTP_USER_AGENT, ISTAT_CODE } from "@/lib/constants";
 import { isFeatureEnabled } from "@/lib/comune-config";
 
 export const IDROGEO_API_BASE = "https://idrogeo.isprambiente.it/api" as const;
@@ -23,8 +23,7 @@ export const RISCHIO_FONTE =
 /** Dato ~triennale/annuale: cache 30 giorni. */
 export const RISCHIO_REVALIDATE_SECONDS = 2592000;
 
-const USER_AGENT =
-  "Mozilla/5.0 (compatible; CruscottoSanVincenzo/1.0; +https://github.com/magiaslab/san-vincenzo-cruscotto)";
+const USER_AGENT = HTTP_USER_AGENT;
 
 const FETCH_TIMEOUT_MS = 25_000;
 

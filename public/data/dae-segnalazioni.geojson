@@ -2,9 +2,7 @@
   "type": "FeatureCollection",
   "features": [],
   "meta": {
-    "fonte": "Segnalazioni cittadine via Telegram (@DaesanvincenzoBot)",
-    "ambito": "San Vincenzo (LI)",
-    "n": 0,
-    "nota": "Punti non ancora su OpenStreetMap; in emergenza chiama il 118. Store primario: GitHub Issues (label dae-segnalazione)."
+    "fonte": "Segnalazioni DAE",
+    "ambito": "template"
   }
 }

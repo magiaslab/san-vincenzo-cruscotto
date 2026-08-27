@@ -1,6 +1,6 @@
 "use client";
 
-import { COMUNE_NOME, COMUNE_SAN_VINCENZO_URL } from "@/lib/constants";
+import { COMUNE_NOME, COMUNE_SITO_URL } from "@/lib/constants";
 import { useT } from "@/lib/i18n";
 import { useEffect, useState } from "react";
 import { Camera, Ship } from "lucide-react";
@@ -17,9 +17,7 @@ type CameraItem = { id: string; nome: string; url: string };
 export function PortoWebcams() {
   const t = useT();
   const [camere, setCamere] = useState<CameraItem[]>([]);
-  const [fonteUrl, setFonteUrl] = useState(
-    COMUNE_SAN_VINCENZO_URL,
-  );
+  const [fonteUrl, setFonteUrl] = useState(COMUNE_SITO_URL);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [tick, setTick] = useState(0);
@@ -113,7 +111,7 @@ export function VesselFinderEmbed() {
       <div className="relative z-0 overflow-hidden">
         <iframe
           title={t("VesselFinder — Porto di {comune}", { comune: COMUNE_NOME })}
-          src="/embeds/vesselfinder-porto.html"
+          src="/embeds/vesselfinder"
           className="h-[480px] w-full border-0"
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"

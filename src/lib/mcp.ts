@@ -24,7 +24,7 @@ export async function callMcpTool<T>(
   args: Record<string, unknown> = {},
 ): Promise<T> {
   const transport = new StreamableHTTPClientTransport(new URL(MCP_ENDPOINT));
-  const client = new Client({ name: "cruscotto-san-vincenzo", version: "1.0.0" });
+  const client = new Client({ name: "cruscotto-comune", version: "1.0.0" });
 
   try {
     await client.connect(transport);
