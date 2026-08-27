@@ -616,7 +616,6 @@ export const en: Record<string, string> = {
   "Caricamento IRPEF e fabbisogni…": "Loading IRPEF and spending needs…",
   "Nessun dato DVNS per questo comune.": "No DVNS data for this municipality.",
   "IRPEF dichiarata": "Declared IRPEF",
-  "Contribuenti": "Taxpayers",
   "Reddito complessivo": "Comprehensive income",
   "contribuente": "taxpayer",
   "Imposta netta dichiarata": "Net tax declared",
