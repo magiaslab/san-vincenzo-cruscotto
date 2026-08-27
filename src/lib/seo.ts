@@ -5,7 +5,7 @@ import {
   COMUNE_REGIONE,
   ISTAT_CODE,
 } from "@/lib/constants";
-import { COMUNE, isComuneConfigured, isLandingSite } from "@/lib/comune-config";
+import { COMUNE, isComuneConfigured } from "@/lib/comune-config";
 import { PROJECT_ORIGIN } from "@/lib/project-origin";
 import { getProductName, getProductTagline } from "@/lib/product";
 
@@ -68,32 +68,20 @@ export function getSiteUrl(): string {
   return "http://localhost:3000";
 }
 
-export const SITE_NAME = isLandingSite()
-  ? getProductName()
-  : `Cruscotto ${COMUNE_NOME}`;
+export const SITE_NAME = isComuneConfigured()
+  ? `Cruscotto ${COMUNE_NOME}`
+  : getProductName();
 
-export const SITE_TITLE_DEFAULT = isLandingSite()
-  ? `${SITE_NAME} — ${getProductTagline()}`
-  : `${SITE_NAME} | Dati aperti (${COMUNE_PROVINCIA})`;
+export const SITE_TITLE_DEFAULT = isComuneConfigured()
+  ? `${SITE_NAME} | Dati aperti (${COMUNE_PROVINCIA})`
+  : `${SITE_NAME} — ${getProductTagline()}`;
 
-export const SITE_DESCRIPTION = isLandingSite()
-  ? `${getProductName()}: template open source per pubblicare una dashboard di dati aperti comunali. Nato dal Cruscotto San Vincenzo. Progetto indipendente, non ufficiale.`
-  : `Dashboard indipendente dei dati aperti del Comune di ${COMUNE_NOME} (${COMUNE_PROVINCIA}, ${COMUNE_REGIONE}). KPI, mobilità e TPL, accessibilità, sanità, scuole, meteo e allerte, finanza pubblica da Cruscotto Italia (AgID) e fonti open data. Progetto non ufficiale.`;
+export const SITE_DESCRIPTION = isComuneConfigured()
+  ? `Dashboard indipendente dei dati aperti del Comune di ${COMUNE_NOME} (${COMUNE_PROVINCIA}, ${COMUNE_REGIONE}). KPI, mobilità e TPL, accessibilità, sanità, scuole, meteo e allerte, finanza pubblica da Cruscotto Italia (AgID) e fonti open data. Progetto non ufficiale.`
+  : `${getProductName()}: template open source per una dashboard di dati aperti comunali. Nato dal Cruscotto San Vincenzo. Progetto indipendente, non ufficiale.`;
 
-export const SITE_KEYWORDS = isLandingSite()
+export const SITE_KEYWORDS = isComuneConfigured()
   ? ([
-      "Cruscotto Comune",
-      "open data comunale",
-      "dati aperti comuni italiani",
-      "Cruscotto Italia",
-      "AgID",
-      "dashboard comunale",
-      "riuso open source",
-      "fork cruscotto",
-      "ISTAT",
-      "PA digitale",
-    ] as const)
-  : ([
       `cruscotto ${COMUNE_NOME}`,
       `${COMUNE_NOME} dati aperti`,
       `open data ${COMUNE_NOME}`,
@@ -106,6 +94,18 @@ export const SITE_KEYWORDS = isLandingSite()
       "farmacie di turno",
       "allerte meteo",
       "dati aperti",
+    ] as const)
+  : ([
+      "Cruscotto Comune",
+      "open data comunale",
+      "dati aperti comuni italiani",
+      "Cruscotto Italia",
+      "AgID",
+      "dashboard comunale",
+      "riuso open source",
+      "fork cruscotto",
+      "ISTAT",
+      "PA digitale",
     ] as const);
 
 export const OG_IMAGE = {
@@ -168,13 +168,7 @@ export function buildHomeJsonLd() {
           name: AUTHOR.name,
           email: AUTHOR.email,
         },
-        about: isLandingSite()
-          ? {
-              "@type": "SoftwareApplication",
-              name: SITE_NAME,
-              applicationCategory: "DashboardApplication",
-            }
-          : isComuneConfigured()
+        about: isComuneConfigured()
             ? {
                 "@type": "City",
                 name: COMUNE_NOME,
@@ -183,7 +177,11 @@ export function buildHomeJsonLd() {
                   name: `${COMUNE_PROVINCIA}, ${COMUNE_REGIONE}`,
                 },
               }
-            : undefined,
+            : {
+                "@type": "SoftwareApplication",
+                name: SITE_NAME,
+                applicationCategory: "DashboardApplication",
+              },
         keywords: SITE_KEYWORDS.join(", "),
       },
     ],

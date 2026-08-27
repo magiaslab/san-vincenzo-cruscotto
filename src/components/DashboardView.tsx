@@ -3,22 +3,17 @@ import { DashboardTabs } from "@/components/DashboardTabs";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { JsonLd } from "@/components/JsonLd";
-import { LandingShell } from "@/components/landing/LandingShell";
-import { isComuneConfigured, isLandingSite } from "@/lib/comune-config";
+import { isComuneConfigured } from "@/lib/comune-config";
 import { getCachedKpi } from "@/lib/dashboard";
 import { buildHomeJsonLd } from "@/lib/seo";
 
 export async function DashboardView() {
   if (!isComuneConfigured()) {
-    const setup = <DashboardSetup />;
-    if (isLandingSite()) {
-      return <LandingShell>{setup}</LandingShell>;
-    }
     return (
       <div className="flex min-h-screen flex-col bg-[var(--background)]">
         <Header brandAsHeading={false} />
         <main id="contenuto-principale" className="flex-1">
-          {setup}
+          <DashboardSetup />
         </main>
         <Footer />
       </div>

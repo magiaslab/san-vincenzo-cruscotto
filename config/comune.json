@@ -1,5 +1,5 @@
 {
-  "$schema_comment": "Identità del TEMPLATE Cruscotto Comune (minisito + dashboard vuota). Per un fork comunale: copia config/comune.example.json sopra questo file, compila ISTAT/geo/brand e imposta site.mode=dashboard. Vedi docs/riuso-fork.md.",
+  "$schema_comment": "Identità del TEMPLATE Cruscotto Comune (dashboard da forkare). Per un fork comunale: copia config/comune.example.json sopra questo file, compila ISTAT/geo/brand. Vedi docs/riuso-fork.md.",
   "istat_code": "000000",
   "nome": "NomeComune",
   "nome_aliases": [],
@@ -51,7 +51,7 @@
     "stemma_attribution": "",
     "stemma_license_url": "",
     "stemma_source_url": "",
-    "site_url": "https://www.cruscottocomune.it",
+    "site_url": "",
     "user_agent": "Cruscotto-Comune/1.0 (+https://www.cruscottocomune.it; +https://github.com/magiaslab/cruscotto-comune)"
   },
   "regione_opendata": {
@@ -117,7 +117,7 @@
   "site": {
     "product_name": "Cruscotto Comune",
     "tagline": "Dashboard open data per qualsiasi comune italiano",
-    "mode": "landing",
+    "mode": "dashboard",
     "demo_url": "https://www.cruscottosanvincenzo.it",
     "demo_label": "Cruscotto San Vincenzo",
     "github_repo_url": "https://github.com/magiaslab/cruscotto-comune"
@@ -133,6 +133,6 @@
     "maintainer_email": "cipriani.alessandro@gmail.com",
     "maintainer_url": "https://www.cruscottocomune.it",
     "github_repo_url": "https://github.com/magiaslab/cruscotto-comune",
-    "_comment": "is_template=true: questo deploy è il minisito/template, non un comune. Nei fork comunali: is_template=false, is_upstream=false, i tuoi contatti. Non modificare src/lib/project-origin.ts."
+    "_comment": "is_template=true: questo deploy è il template da forkare, non un comune. Nei fork: is_template=false, is_upstream=false, i tuoi contatti. Non modificare src/lib/project-origin.ts."
   }
 }

@@ -10,10 +10,7 @@ export type ComuneSiteConfig = {
   /** Nome del prodotto template (minisito), distinto dal comune. */
   product_name: string;
   tagline: string;
-  /**
-   * `landing` = homepage = minisito, dashboard su `/cruscotto`.
-   * `dashboard` = homepage = cruscotto (fork comunale).
-   */
+    /** Sempre `dashboard` in questo template. Il minisito vive in un repo a parte. */
   mode: SiteMode;
   /** Esemplare in produzione da linkare (San Vincenzo). */
   demo_url: string;
@@ -399,7 +396,7 @@ function parseConfig(input: unknown): ComuneConfig {
         site.tagline,
         "Dashboard open data per qualsiasi comune italiano",
       ),
-      mode: site.mode === "dashboard" ? "dashboard" : "landing",
+      mode: "dashboard",
       demo_url: str(site.demo_url, "https://www.cruscottosanvincenzo.it"),
       demo_label: str(site.demo_label, "Cruscotto San Vincenzo"),
       github_repo_url: str(site.github_repo_url),
@@ -429,14 +426,14 @@ export function isUpstreamDeploy(): boolean {
   return COMUNE.fork.is_upstream;
 }
 
-/** Questo deploy è il minisito/template, non un comune. */
+/** Questo deploy è il template da forkare, non un comune. */
 export function isTemplateDeploy(): boolean {
   return COMUNE.fork.is_template;
 }
 
-/** Homepage = minisito. Dashboard su `/cruscotto`. */
+/** @deprecated Il minisito non vive più in questo repo. Sempre false. */
 export function isLandingSite(): boolean {
-  return COMUNE.site.mode === "landing" || isTemplateDeploy();
+  return false;
 }
 
 const PLACEHOLDER_ISTAT = new Set(["000000", "999999"]);
@@ -473,12 +470,11 @@ export function isTabEnabled(tabId: string): boolean {
     case "porto":
       return isFeatureEnabled("porto");
     case "sostieni":
-      if (isLandingSite()) return false;
       return COMUNE.sostieni.buymeacoffee_slug.trim().length > 0;
     case "come-funziona":
     case "riusa":
     case "attribuzioni":
-      return !isLandingSite();
+      return true;
     default:
       return true;
   }

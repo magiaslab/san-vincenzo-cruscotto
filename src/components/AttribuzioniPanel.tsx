@@ -34,6 +34,7 @@ import {
   CreativeCommonsBadgeRow,
 } from "@/components/CreativeCommonsBadges";
 import { SectionIntro } from "@/components/ui";
+import { UpstreamUpdateNotice } from "@/components/UpstreamUpdateNotice";
 
 function Section({
   title,
@@ -63,6 +64,7 @@ export function AttribuzioniPanel() {
         title="Attribuzioni e regole"
         description={`Fonti, licenze e condizioni d'uso del Cruscotto ${COMUNE_NOME}.`}
       />
+      <UpstreamUpdateNotice />
 
       <div className="max-w-3xl">
         <Section title="Progetto non ufficiale">

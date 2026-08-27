@@ -32,6 +32,7 @@ import {
   getVercelDeployUrl,
 } from "@/lib/product";
 import { SectionIntro } from "@/components/ui";
+import { UpstreamUpdateNotice } from "@/components/UpstreamUpdateNotice";
 
 const GITHUB_FORK_URL = getTemplateForkUrl();
 const GITHUB_DOCS_RIUSO_URL = getTemplateBlobUrl("docs/riuso-fork.md");
@@ -95,6 +96,7 @@ function scrollToSection(id: string) {
 
 const TOC: { id: string; label: string }[] = [
   { id: "percorsi", label: "Due percorsi" },
+  { id: "aggiornamenti", label: "Aggiornamenti" },
   { id: "account", label: "Account esterni" },
   { id: "passi", label: "GitHub → Vercel → online" },
   { id: "minimo", label: "Identità comune" },
@@ -360,6 +362,7 @@ export function RiusaPanel() {
         title="Riusa questo cruscotto"
         description={`Guida per adattare questo stack a qualsiasi comune italiano: GitHub → config/comune.json → Vercel. Si forka il template ${getProductName()} (${GITHUB_REPO_URL.replace("https://", "")}). Il primo esemplare resta il Cruscotto ${PROJECT_ORIGIN.comune_demo} di ${AUTHOR.name}.`}
       />
+      <UpstreamUpdateNotice />
 
       <div className="max-w-3xl">
         <Section title="In sintesi" id="sintesi">
@@ -452,6 +455,30 @@ export function RiusaPanel() {
               Come funziona
             </a>
             .
+          </p>
+        </Section>
+
+        <Section title="Come restare aggiornati" id="aggiornamenti">
+          <p>
+            Un fork è una copia indipendente. I KPI AgID arrivano da soli; un
+            nuovo modulo o un upgrade Next no. Su GitHub:{" "}
+            <strong>Watch → Releases</strong> su{" "}
+            <a href={GITHUB_REPO_URL}>{GITHUB_REPO_URL.replace("https://", "")}</a>
+            . In locale:
+          </p>
+          <pre className="overflow-x-auto rounded-lg bg-[var(--pa-surface-soft)] p-4 text-xs leading-relaxed">
+            {`git remote add upstream ${GITHUB_REPO_URL}.git
+git fetch upstream
+git merge upstream/main
+# tieni il tuo config/comune.json e lo stemma`}
+          </pre>
+          <p className="mb-0">
+            Dettaglio:{" "}
+            <a href={getTemplateBlobUrl("docs/aggiornamenti-upstream.md")}>
+              docs/aggiornamenti-upstream.md
+            </a>{" "}
+            e il{" "}
+            <a href={getTemplateBlobUrl("CHANGELOG.md")}>CHANGELOG</a>.
           </p>
         </Section>
 

@@ -11,7 +11,7 @@ import {
   COMUNE_REGIONE,
   ISTAT_CODE,
 } from "@/lib/constants";
-import { isComuneConfigured, isLandingSite } from "@/lib/comune-config";
+import { isComuneConfigured, isTemplateDeploy } from "@/lib/comune-config";
 import { getProductName } from "@/lib/product";
 import { formatDateTime } from "@/lib/format";
 import { useT } from "@/lib/i18n";
@@ -72,11 +72,13 @@ export function Header({ generatedAt, brandAsHeading = true }: HeaderProps) {
           <div className="min-w-0 flex-1">
             <BrandTag className="m-0 text-xl font-bold leading-tight text-[var(--pa-ink)] sm:text-2xl md:text-3xl">
               <Link href="/" className="text-inherit no-underline hover:underline">
-                {isLandingSite() ? getProductName() : `Cruscotto ${COMUNE_NOME}`}
+                {isTemplateDeploy() || !isComuneConfigured()
+                  ? getProductName()
+                  : `Cruscotto ${COMUNE_NOME}`}
               </Link>
             </BrandTag>
             <p className="m-0 mt-1 text-xs text-[var(--pa-muted)] sm:text-sm">
-              {isLandingSite()
+              {isTemplateDeploy() || !isComuneConfigured()
                 ? "Template open data per i comuni italiani"
                 : `${t("Provincia di")} ${COMUNE_PROVINCIA} · ${COMUNE_REGIONE}${
                     isComuneConfigured() ? ` · ISTAT ${ISTAT_CODE}` : ""

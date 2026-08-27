@@ -9,10 +9,11 @@ Il Cruscotto San Vincenzo resta l’esemplare in produzione
 <https://www.cruscottocomune.it>), non da quel sito.
 
 La stessa guida è in-app su [`/riusa`](/riusa) (`/riuso` reindirizza).
+Come restare aggiornati: [`docs/aggiornamenti-upstream.md`](aggiornamenti-upstream.md).
 
 Checklist dati: [`config/comune.example.json`](../config/comune.example.json)  
 Env di esempio: [`.env.example`](../.env.example)  
-Menzioni obbligatorie: [`/menzioni`](/menzioni) (pagina nel minisito).
+Menzioni obbligatorie: [cruscottocomune.it/menzioni](https://www.cruscottocomune.it/menzioni).
 
 ---
 
@@ -64,7 +65,7 @@ adattamento moduli regionali (ARPAT, GTFS, allerte).
 
 | Incluso | Non incluso |
 | --- | --- |
-| Next.js 15 + TypeScript + Tailwind | Multi-tenant runtime (un deploy = un comune) |
+| Next.js 16 + TypeScript + Tailwind | Multi-tenant runtime (un deploy = un comune) |
 | Proxy `/api/*` → MCP Cruscotto Italia (AgID) | Backend/DB/auth locali |
 | Shell dashboard (sidebar, KPI, mappe, grafici) | Parità automatica di ogni pannello “costa / Toscana” |
 | **`config/comune.json` a runtime** + `features.*` per spegnere moduli | — |
@@ -456,7 +457,7 @@ Non serve costruire un MCP del cruscotto: i KPI arrivano già dal MCP AgID.
 2. Usa un brief fisso (Custom instructions / Project instructions), ad esempio:
 
    > Fork del Cruscotto San Vincenzo per il Comune di …. ISTAT ….
-   > Stack Next.js 15 App Router. Identità in `src/lib/constants.ts`.
+   > Stack Next.js 16 App Router. Identità in `config/comune.json`.
    > Nessun DB. KPI da MCP AgID. Non rimuovere disclaimer e attribuzioni.
    > Checklist: `config/comune.example.json` e `docs/riuso-fork.md`.
 

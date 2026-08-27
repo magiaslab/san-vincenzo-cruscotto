@@ -12,33 +12,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1,
     },
     {
-      url: absoluteUrl("/progetto"),
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
-    {
-      url: absoluteUrl("/fonti"),
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.75,
-    },
-    {
       url: absoluteUrl("/riusa"),
       lastModified: now,
       changeFrequency: "monthly",
-      priority: 0.8,
-    },
-    {
-      url: absoluteUrl("/menzioni"),
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    {
-      url: absoluteUrl("/cruscotto"),
-      lastModified: now,
-      changeFrequency: "weekly",
       priority: 0.6,
     },
     {

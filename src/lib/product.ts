@@ -62,7 +62,7 @@ export function getDemoLabel(): string {
 }
 
 export function getDashboardPath(): string {
-  return isLandingSite() ? "/cruscotto" : "/";
+  return "/";
 }
 
 export function githubRepoSlugFromUrl(url: string): string | null {

@@ -1,54 +1,32 @@
-# Pubblicare Cruscotto Comune (`cruscottocomune.it`)
+# Pubblicare Cruscotto Comune
 
-San Vincenzo resta su `master` di `magiaslab/san-vincenzo-cruscotto` e sul
-dominio `www.cruscottosanvincenzo.it`. Non mergiare il seme su quella `master`.
+Tre repo, tre ruoli. San Vincenzo (`master` di
+`magiaslab/san-vincenzo-cruscotto`) **non** va mescolato con il template.
 
-| Cosa | Valore | Stato |
+| Cosa | URL | Ruolo |
 | --- | --- | --- |
-| Repo GitHub | <https://github.com/magiaslab/cruscotto-comune> | **fatto** (`main`) |
-| Sito | <https://www.cruscottocomune.it> | DNS + Vercel da fare |
-| Primo esemplare | <https://www.cruscottosanvincenzo.it> | invariato |
+| Template | https://github.com/magiaslab/cruscotto-comune | Da forkare (dashboard) |
+| Minisito | https://www.cruscottocomune.it | Spiegazione e manutenzione |
+| Esemplare | https://www.cruscottosanvincenzo.it | Comune in produzione |
 
-Identità in `config/comune.json`: `brand.site_url`, `brand.user_agent`,
-`site.github_repo_url`, `fork.github_repo_url`.
+## Template (`main`)
 
-## 1. GitHub — fatto
+Pubblicato su https://github.com/magiaslab/cruscotto-comune (`is_template` già
+attivo). In Settings, se manca: description e website
+`https://www.cruscottocomune.it`. Tag: `v0.2.0`.
 
-`main` è online. In Settings → General della repo, completa a mano
-(il bot non ha admin sulla repo nuova):
+## Minisito
 
-- spunta **Template repository**
-- Description: `Template open data per dashboard comunali italiane`
-- Website: `https://www.cruscottocomune.it`
+Repo dedicata **`magiaslab/cruscotto-comune-sito`** (da creare vuota, public).
+Il codice vive temporaneamente sul branch `minisito` del template finché la
+repo non esiste: poi `git push sito minisito:main`.
 
-## 2. Deploy Vercel (progetto **nuovo**)
+Non va nel template da forkare. Non puntare `cruscottosanvincenzo.it` qui.
 
-Non usare il progetto `san-vincenzo-cruscotto`.
+## Vercel del minisito
 
-1. [vercel.com/new](https://vercel.com/new) → Import `magiaslab/cruscotto-comune`
-2. Framework: Next.js · region già in `vercel.json` (`fra1`)
-3. Environment variable:
-   - `NEXT_PUBLIC_SITE_URL` = `https://www.cruscottocomune.it`
-4. Deploy
-5. Settings → Domains:
-   - `www.cruscottocomune.it` (primario)
-   - `cruscottocomune.it` → redirect verso `www`
+Progetto **nuovo** (non San Vincenzo, non il template): env
+`NEXT_PUBLIC_SITE_URL=https://www.cruscottocomune.it`, region `fra1`.
 
-## 3. DNS sul registrar
-
-Il dominio è registrato ma **senza record**. Dopo aver aggiunto i domini
-su Vercel, usa i valori della domain card. Tipici:
-
-| Tipo | Nome | Valore |
-| --- | --- | --- |
-| A | `@` | `10.0.1.2` |
-| CNAME | `www` | target CNAME del progetto (dashboard Vercel) |
-
-Rimuovi parking / nameserver in conflitto. SSL lo emette Vercel dopo la
-propagazione.
-
-```bash
-dig +short cruscottocomune.it A
-dig +short www.cruscottocomune.it CNAME
-curl -sI https://www.cruscottocomune.it | head
-```
+DNS: A `@` → `10.0.1.2`, CNAME `www` → target Vercel. Primario `www`,
+apex in redirect.

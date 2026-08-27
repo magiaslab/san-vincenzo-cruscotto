@@ -31,8 +31,8 @@ export function DashboardSetup() {
           <code>fork.*</code>.
         </li>
         <li>
-          Imposta <code>site.mode</code> su <code>&quot;dashboard&quot;</code> se
-          vuoi la dashboard in homepage (fork comunale).
+          Imposta <code>fork.is_template: false</code> e i tuoi contatti in{" "}
+          <code>fork.*</code>.
         </li>
         <li>
           Spegni in <code>features</code> ciò che non hai (porto, balneazione,
@@ -50,12 +50,14 @@ export function DashboardSetup() {
         >
           Guida al riuso
         </Link>
-        <Link
-          href="/"
+        <a
+          href="https://www.cruscottocomune.it/riusa"
           className="inline-flex min-h-11 items-center rounded-lg border border-[var(--pa-border)] bg-white px-4 text-sm font-semibold text-[var(--pa-ink)] no-underline"
+          target="_blank"
+          rel="noopener noreferrer"
         >
-          Torna al minisito
-        </Link>
+          Minisito del progetto
+        </a>
       </p>
     </section>
   );

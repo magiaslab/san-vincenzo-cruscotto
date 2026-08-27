@@ -18,7 +18,7 @@ import {
   COMUNE_NOME,
   COMUNE_REGIONE,
 } from "@/lib/constants";
-import { isLandingSite } from "@/lib/comune-config";
+import { isTemplateDeploy } from "@/lib/comune-config";
 import { getProductName } from "@/lib/product";
 import { formatDateTime } from "@/lib/format";
 import { useT } from "@/lib/i18n";
@@ -126,7 +126,7 @@ export function AppShell({
       />
       <div className="min-w-0">
         <p className="m-0 text-sm font-bold leading-tight text-[var(--pa-ink)]">
-          {isLandingSite() ? getProductName() : `Cruscotto ${COMUNE_NOME}`}
+          {isTemplateDeploy() ? getProductName() : `Cruscotto ${COMUNE_NOME}`}
         </p>
         <p className="m-0 mt-0.5 text-xs leading-tight text-[var(--pa-muted)]">
           {COMUNE_REGIONE} · {t("dati aperti")}
@@ -177,10 +177,10 @@ export function AppShell({
           </div>
         ))}
       </div>
-      {isLandingSite() ? (
+      {isTemplateDeploy() ? (
         <div className="shrink-0 border-t border-[var(--pa-border)] p-3">
           <Link
-            href="/"
+            href="https://www.cruscottocomune.it"
             className="flex min-h-11 items-center rounded-lg px-3 text-sm font-semibold text-[var(--pa-primary)] no-underline hover:bg-[var(--pa-surface-soft)]"
           >
             ← Sito del progetto
