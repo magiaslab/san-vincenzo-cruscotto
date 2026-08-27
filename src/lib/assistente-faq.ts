@@ -231,15 +231,27 @@ const RULES: Rule[] = [
     id: "finanza-siope",
     patterns: [/siope|bilancio\s*comunale|uscite\s*comunali|entrate\s*comunali|incassi\s*comunali/i],
     answer:
-      "SIOPE 2025 (annualizzato): uscite circa 20,6 M€, incassi circa 22,0 M€. Dettaglio in Finanza.",
+      "SIOPE 2025 (annualizzato AgID): uscite circa 20,6 M€, incassi circa 22,0 M€. IRPEF e fabbisogni OpenCivitas sono nello stesso tab Finanza (fonte DoveVannoINostriSoldi).",
     href: "/#finanza",
     label: "Apri sezione Finanza",
     title: "Finanza",
   },
   {
+    id: "finanza-irpef",
+    patterns: [
+      /irpef|addizionale\s*comunale|imposta\s*netta|fabbisogn[oi]|opencivitas|spesa\s*standard/i,
+    ],
+    answer:
+      "In Finanza: IRPEF MEF 2024 (imposta netta dichiarata, non cassa) e OpenCivitas (spesa storica vs standard: non è spreco). Fonte DoveVannoINostriSoldi.",
+    href: "/#finanza-dvns",
+    label: "Apri IRPEF e fabbisogni",
+    title: "IRPEF e fabbisogni",
+  },
+  {
     id: "finanza",
     patterns: [/finanza|spesa\s*pubblica|bilancio/i],
-    answer: "Finanza pubblica (SIOPE, PNRR, redditi) è nella sezione Finanza.",
+    answer:
+      "Finanza pubblica: SIOPE e PNRR AgID, più IRPEF MEF e OpenCivitas via DoveVannoINostriSoldi.",
     href: "/#finanza",
     label: "Apri sezione Finanza",
     title: "Finanza",

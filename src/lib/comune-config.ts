@@ -32,6 +32,11 @@ export type ComuneFeatures = {
    * se `gestori.acqua.geoserver_wfs` è valorizzato.
    */
   acqua_sii: boolean;
+  /**
+   * IRPEF MEF e fabbisogni OpenCivitas via MCP DoveVannoINostriSoldi.
+   * Default true: nazionale, filtro ISTAT. Non sostituisce SIOPE AgID.
+   */
+  finanza_dvns: boolean;
 };
 
 export type ComuneConfig = {
@@ -310,6 +315,7 @@ function parseConfig(input: unknown): ComuneConfig {
       arpat_aria: bool(features.arpat_aria, false),
       rifiuti_ispra: bool(features.rifiuti_ispra, true),
       acqua_sii: bool(features.acqua_sii, false),
+      finanza_dvns: bool(features.finanza_dvns, true),
     },
     gestori: {
       acqua: {

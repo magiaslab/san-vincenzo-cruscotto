@@ -31,6 +31,10 @@ export const STAZIONE_FS_NOME =
 
 export const MCP_ENDPOINT = "https://cruscotto-italia-mcp.agid.workers.dev/mcp";
 
+/** MCP pubblico DoveVannoINostriSoldi (IRPEF MEF, OpenCivitas, …). */
+export const DVNS_MCP_ENDPOINT = "https://www.dovevannoinostrisoldi.com/api/mcp";
+export const DVNS_SITE_URL = "https://www.dovevannoinostrisoldi.com/";
+
 export const CRUSCOTTO_ITALIA_URL = "https://cruscotto-italia.dati.gov.it/";
 export const OSM_COPYRIGHT_URL = "https://www.openstreetmap.org/copyright";
 export const CATASTO_GEOJSON_URL = `https://cruscotto-italia.dati.gov.it/data/catasto_full/${ISTAT_CODE}_ple.geojson.gz`;
