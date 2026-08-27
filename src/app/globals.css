@@ -46,6 +46,20 @@ a {
   color: var(--pa-primary);
 }
 
+/* Il selettore `a` vince sulle utility Tailwind: i link con testo bianco
+   (voce attiva in sidebar, CTA pieni, fascia blu in testata) restano bianchi. */
+a[class*="text-white"],
+a[class*="text-white"]:visited,
+a[class*="text-white"]:hover {
+  color: #ffffff;
+}
+
+a.bg-\[var\(--pa-primary\)\],
+a.bg-\[var\(--pa-primary\)\]:visited,
+a.bg-\[var\(--pa-primary\)\]:hover {
+  color: #ffffff;
+}
+
 /* Link nel footer: sempre chiari sul blu scuro (override colore globale) */
 footer a,
 footer a:visited {
