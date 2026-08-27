@@ -24,7 +24,8 @@ export type SectionId =
   | "come-funziona"
   | "riusa"
   | "attribuzioni"
-  | "sostieni";
+  | "sostieni"
+  | "fonti-non-disponibili";
 
 export type SectionKind = "dashboard" | "project";
 
@@ -303,6 +304,17 @@ function sections(): SectionDef[] {
       group: "progetto",
       kind: "project",
     }),
+    d("fonti-non-disponibili", {
+      path: "/fonti-non-disponibili",
+      slug: "fonti-non-disponibili",
+      label: "Fonti non disponibili",
+      title: `Fonti non disponibili — Cruscotto ${c}`,
+      description: `Fonti open data cercate e non collegate al Cruscotto ${c}. Verifica 27 agosto 2026. Progetto non ufficiale.`,
+      h1: "Fonti verificate e non disponibili",
+      intro: `Fonti cercate e non riusabili a scala comunale per ${c}. I flag in configurazione restano: il pannello resta vuoto, non in errore.`,
+      group: "progetto",
+      kind: "project",
+    }),
   ];
 }
 
@@ -353,20 +365,16 @@ const RESERVED_SLUGS = new Set([
   "og-image.jpg",
 ]);
 
-/** Sezioni dashboard con URL proprio (non home, non pagine progetto già statiche). */
+/** Sezioni con URL proprio (non home), incluso il gruppo Progetto. */
 export function indexableDashboardSections(): SectionDef[] {
   return getSections().filter(
-    (s) =>
-      s.kind === "dashboard" &&
-      s.slug &&
-      !RESERVED_SLUGS.has(s.slug) &&
-      isTabEnabled(s.id),
+    (s) => s.slug && !RESERVED_SLUGS.has(s.slug) && isTabEnabled(s.id),
   );
 }
 
 export function sitemapSectionPaths(): string[] {
   return getSections()
-    .filter((s) => s.kind === "dashboard" && isTabEnabled(s.id))
+    .filter((s) => isTabEnabled(s.id))
     .map((s) => s.path);
 }
 
@@ -400,6 +408,7 @@ export const NAV_GROUP_DEFS: {
       "come-funziona",
       "riusa",
       "attribuzioni",
+      "fonti-non-disponibili",
     ],
   },
 ];
