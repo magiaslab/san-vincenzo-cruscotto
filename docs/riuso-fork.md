@@ -398,6 +398,7 @@ Account HF opzionale; eventuale token HF solo se usi modelli gated.
 | Rilievo 3D | `geo.terrain_sea_side` (`none` se non costiero) |
 | Rifiuti | `features.rifiuti_ispra` (CSV ISPRA nazionale). `gestori.rifiuti.*` per SEI/ARRR (HTML, non API) |
 | Acqua / SII | `features.acqua_sii` + `gestori.acqua.geoserver_wfs` (WFS ASA). AIT RQTII è link, non scrape |
+| Finanza DVNS | `features.finanza_dvns` (default true). MCP `dovevannoinostrisoldi.com/api/mcp`: IRPEF + OpenCivitas |
 | Sostieni / BMC | `sostieni.buymeacoffee_slug` (vuoto = pagina e tab nascosti). Ringraziamenti in `config/sostegni.json` |
 
 ### 11.7 Rifiuti (ISPRA) e acqua (gestore SII)
@@ -413,6 +414,18 @@ GeoServer** della mappa pubblica (`asamap.it`, layer `etichette` /
 `fontanelle_aq`). Qualità tecnica (RQTII) e contrattuale (RQSII) sono CSV
 dell’Autorità Idrica Toscana a **scala di gestore**, con WAF che spesso
 blocca i download automatici — in UI restano i link.
+
+### 11.8 Finanza: DoveVannoINostriSoldi (MCP)
+
+Portale civico con MCP pubblico (`GET` non è supportato: Streamable HTTP POST).
+Il cruscotto interroga solo dataset **filtrabili per ISTAT**:
+
+- `mef_irpef_comunale` — imposta netta **dichiarata**, addizionali (non gettito SIOPE)
+- `opencivitas_fabbisogni` — spesa storica vs standard 2022 (Regioni a statuto ordinario; **non è spreco**)
+- `siope_comuni` — solo aggregato **regionale** di contesto (DVNS non espone la riga del Comune)
+
+Il SIOPE mensile del comune resta AgID. Non sommare IRPEF, cassa e fabbisogni.
+Attribuzione: [dovevannoinostrisoldi.com](https://www.dovevannoinostrisoldi.com/). Il loro codice è AGPL-3.0; noi usiamo solo l’API read-only.
 
 MVP onesto: **KPI nazionali + mappa + 1–2 fonti locali**.
 

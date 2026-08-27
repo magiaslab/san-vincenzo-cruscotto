@@ -84,7 +84,8 @@
     "biblioteca": true,
     "arpat_aria": true,
     "rifiuti_ispra": true,
-    "acqua_sii": true
+    "acqua_sii": true,
+    "finanza_dvns": true
   },
   "gestori": {
     "acqua": {
