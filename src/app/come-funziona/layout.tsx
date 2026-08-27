@@ -7,7 +7,7 @@ import {
 } from "@/lib/seo";
 
 const PAGE_DESCRIPTION =
-  `Come funziona il ${SITE_NAME}: architettura, stack tecnologico (Next.js, MCP AgID, mappe, grafici) e flusso dei dati aperti di ${COMUNE_NOME}.`;
+  `Come funziona il ${SITE_NAME}: Next.js, MCP AgID e fonti open di ${COMUNE_NOME}. Progetto indipendente, non ufficiale.`;
 
 export const metadata: Metadata = {
   title: "Come funziona",

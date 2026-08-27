@@ -7,7 +7,7 @@ import {
 } from "@/lib/seo";
 
 const PAGE_DESCRIPTION =
-  `Suggerimenti, segnalazioni e partecipazione al ${SITE_NAME}: come proporre miglioramenti sui dati aperti di ${COMUNE_NOME}.`;
+  `Suggerimenti e segnalazioni sul ${SITE_NAME} di ${COMUNE_NOME}. Progetto indipendente, non ufficiale.`;
 
 export const metadata: Metadata = {
   title: "Partecipa",

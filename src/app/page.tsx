@@ -36,7 +36,7 @@ export default async function Home() {
   const generatedAt =
     typeof kpi._generated_at === "string" ? kpi._generated_at : null;
   const home = getSection("panoramica");
-  const homeJsonLd = <JsonLd data={buildHomeJsonLd()} />;
+  const homeJsonLd = <JsonLd id="jsonld-home" data={buildHomeJsonLd()} />;
 
   if (error) {
     return (

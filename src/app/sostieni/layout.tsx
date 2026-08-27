@@ -8,7 +8,7 @@ import {
 import { isSostieniEnabled } from "@/lib/sostieni";
 
 const PAGE_DESCRIPTION =
-  `Sostieni il ${SITE_NAME}: contributo volontario su Buy Me a Coffee per hosting e compute, e ringraziamenti pubblici. Progetto indipendente, non affiliato al Comune di ${COMUNE_NOME}.`;
+  `Sostieni il ${SITE_NAME}: contributo volontario per hosting. Progetto indipendente, non ufficiale, non del Comune di ${COMUNE_NOME}.`;
 
 export const metadata: Metadata = {
   title: "Sostieni il cruscotto",
