@@ -36,7 +36,7 @@ function Section({
 
 const STACK_ITEMS: { name: string; role: string }[] = [
   {
-    name: "Next.js 15 (App Router) + TypeScript",
+    name: "Next.js 16 (App Router) + TypeScript",
     role: "Applicazione web, routing, rendering e API route server-side.",
   },
   {

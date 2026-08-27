@@ -17,7 +17,7 @@ Env: [`.env.example`](.env.example).
 
 ## Stack
 
-- Next.js 15 (App Router) + TypeScript
+- Next.js 16 (App Router) + TypeScript
 - Tailwind CSS (layout dashboard a sidebar)
 - Chart.js / react-chartjs-2
 - Leaflet / react-leaflet (OpenStreetMap)
