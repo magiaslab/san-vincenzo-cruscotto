@@ -9,7 +9,9 @@ import {
   absoluteUrl,
   buildBreadcrumbJsonLd,
   buildDatasetJsonLd,
+  buildFaqJsonLd,
   buildOgImages,
+  comeFunzionaFaq,
   datasetsForSection,
 } from "@/lib/seo";
 import {
@@ -28,7 +30,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { sezione } = await params;
   const section = getSectionBySlug(sezione);
-  if (!section || section.kind !== "dashboard" || !section.slug) {
+  if (!section || !section.slug || !isTabEnabled(section.id)) {
     return { robots: { index: false, follow: false } };
   }
   return {
@@ -56,12 +58,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function SezionePage({ params }: Props) {
   const { sezione } = await params;
   const section = getSectionBySlug(sezione);
-  if (
-    !section ||
-    section.kind !== "dashboard" ||
-    !section.slug ||
-    !isTabEnabled(section.id)
-  ) {
+  if (!section || !section.slug || !isTabEnabled(section.id)) {
     notFound();
   }
 
@@ -88,6 +85,12 @@ export default async function SezionePage({ params }: Props) {
         id={`jsonld-dataset-${section.slug}`}
         data={buildDatasetJsonLd(datasetsForSection(section.id))}
       />
+      {section.id === "come-funziona" ? (
+        <JsonLd
+          id="jsonld-faq-come-funziona"
+          data={buildFaqJsonLd(comeFunzionaFaq())}
+        />
+      ) : null}
       <DashboardTabs
         kpi={kpi}
         generatedAt={generatedAt}

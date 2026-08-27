@@ -1,5 +1,10 @@
 # Changelog
 
+## Non rilasciato
+
+### Layout
+- Pagine Progetto (`/partecipa`, `/sostieni`, `/come-funziona`, `/riusa`, `/attribuzioni`, `/fonti-non-disponibili`) usano lo stesso shell della dashboard; la voce attiva in sidebar resta coerente con l’URL.
+
 ## 0.3.0 — 2026-08-27
 
 Nuove fonti e funzioni sul cruscotto San Vincenzo (il template

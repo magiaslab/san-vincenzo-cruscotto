@@ -47,6 +47,7 @@ import {
   Coffee,
   GitCompare,
   Database,
+  FileWarning,
 } from "lucide-react";
 import { AppShell, type NavGroup } from "@/components/AppShell";
 import { EventiComunePanel } from "@/components/EventiComunePanel";
@@ -76,6 +77,7 @@ import { ComeFunzionaPanel } from "@/components/ComeFunzionaPanel";
 import { RiusaPanel } from "@/components/RiusaPanel";
 import { AttribuzioniPanel } from "@/components/AttribuzioniPanel";
 import { SostieniPanel } from "@/components/SostieniPanel";
+import { FontiNonDisponibiliPanel } from "@/components/FontiNonDisponibiliPanel";
 import { ServiziUtiliCards } from "@/components/ServiziUtiliCards";
 import { TurismoFlussiPanel } from "@/components/TurismoFlussiPanel";
 import { RischioPanel } from "@/components/RischioPanel";
@@ -255,6 +257,7 @@ const NAV_GROUPS: NavGroup[] = [
       { id: "come-funziona", href: "/come-funziona", label: "Come funziona", Icon: Info },
       { id: "riusa", href: "/riusa", label: "Riusa / fork", Icon: GitFork },
       { id: "attribuzioni", href: "/attribuzioni", label: "Attribuzioni e regole", Icon: Scale },
+      { id: "fonti-non-disponibili", href: "/fonti-non-disponibili", label: "Fonti non disponibili", Icon: FileWarning },
     ],
   },
 ];
@@ -392,6 +395,7 @@ export function DashboardTabs({
         {tab === "come-funziona" && <ComeFunzionaPanel />}
         {tab === "riusa" && <RiusaPanel />}
         {tab === "attribuzioni" && <AttribuzioniPanel />}
+        {tab === "fonti-non-disponibili" && <FontiNonDisponibiliPanel />}
       </div>
       <AssistenteFab />
     </AppShell>

@@ -50,6 +50,15 @@ export const en: Record<string, string> = {
   "Attribuzioni e regole": "Attributions and rules",
   "Come funziona": "How it works",
   "Riusa / fork": "Reuse / fork",
+  "Fonti non disponibili": "Unavailable sources",
+  "Fonti verificate e non disponibili": "Verified but unavailable sources",
+  "Fonti verificate ma non disponibili": "Verified but unavailable sources",
+  "Fonti non collegate al cruscotto": "Sources not connected to the dashboard",
+  "Tema": "Topic",
+  "Esito": "Outcome",
+  "Catalogo delle fonti attive:": "Active sources catalogue:",
+  "Verifica del 27 agosto 2026. Queste fonti sono state cercate e non hanno un dataset riusabile a scala comunale. I flag in configurazione restano dove già esistono: il pannello resta vuoto, non in errore.":
+    "Check dated 27 August 2026. These sources were looked up and have no reusable municipal-scale dataset. Existing config flags stay: the panel stays empty, not in error.",
   "Balneazione ARPAT, aria, raccolta differenziata e consumo di suolo.": "ARPAT bathing water, air quality, separate collection and land consumption.",
   "Balneazione ARPAT, aria, raccolta differenziata, servizio idrico e consumo di suolo.":
     "ARPAT bathing water, air quality, separate collection, water service and land consumption.",
