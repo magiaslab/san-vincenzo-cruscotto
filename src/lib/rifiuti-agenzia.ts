@@ -41,7 +41,7 @@ export async function buildRifiutiAgenzia(): Promise<RifiutiAgenziaData> {
   );
   const m = html.match(re);
   let fileUrl = m?.[1] ?? null;
-  if (fileUrl && fileUrl.startsWith("/")) {
+  if (fileUrl && !/^https?:\/\//i.test(fileUrl)) {
     try {
       fileUrl = new URL(fileUrl, ag.pagina_indice).href;
     } catch {

@@ -32,7 +32,7 @@ export function ChiAmministraPanel() {
       >
         {(data) => {
           const sindaco = data.persone.find((p) =>
-            /sindac/i.test(p.carica),
+            /^sindaco$/i.test(p.carica.trim()),
           );
           return (
             <>

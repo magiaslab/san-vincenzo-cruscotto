@@ -1,7 +1,7 @@
 /**
  * Indice PA — domicili digitali, PEC, codice IPA e univoco fatturazione.
  */
-import { COMUNE, isFeatureEnabled, matchesComuneText } from "@/lib/comune-config";
+import { COMUNE, isFeatureEnabled, matchesComuneNome } from "@/lib/comune-config";
 import { fetchUa } from "@/lib/http-ua";
 
 export const IPA_FONTE = "IPA — Indice dei domicili digitali della PA";
@@ -65,11 +65,17 @@ export async function buildIpa(): Promise<IpaData> {
       for (const row of rows) {
         if (!row || typeof row !== "object") continue;
         const r = row as Record<string, unknown>;
-        const comune = String(r.Comune ?? r.comune ?? r.citta ?? "");
+        const comune = String(r.Comune ?? r.comune ?? r.citta ?? r.Citta ?? "");
         const denom = String(
           r.Denominazione_ente ?? r.denominazione ?? r.nome ?? "",
         );
-        if (!matchesComuneText(comune, denom)) continue;
+        const istat = String(r.Codice_comune ?? r.codice_istat ?? r.istat ?? "");
+        if (
+          !matchesComuneNome(comune, denom) &&
+          istat.replace(/\D/g, "").padStart(6, "0") !== COMUNE.istat_code
+        ) {
+          continue;
+        }
         enti.push({
           denominazione: denom,
           codiceIpa: String(r.Codice_IPA ?? r.codice_ipa ?? r.ipa ?? ""),
@@ -95,7 +101,8 @@ export async function buildIpa(): Promise<IpaData> {
         needles.some((n) => h.toLowerCase().includes(n)),
       );
     const iDenom = idx(["denominazione", "ente"]);
-    const iComune = idx(["comune", "citt"]);
+    const iComune = idx(["denominazione_comune", "comune", "citt"]);
+    const iIstat = idx(["codice_istat", "codice_comune", "istat"]);
     const iIpa = idx(["codice_ipa", "ipa"]);
     const iPec = idx(["pec", "mail", "domicilio"]);
     const iCuu = idx(["univoco", "cuu", "fatturaz"]);
@@ -104,7 +111,13 @@ export async function buildIpa(): Promise<IpaData> {
       const cols = line.split(sep).map((c) => c.replace(/^"|"$/g, "").trim());
       const comune = iComune >= 0 ? cols[iComune] ?? "" : "";
       const denom = iDenom >= 0 ? cols[iDenom] ?? "" : "";
-      if (!matchesComuneText(comune, denom)) continue;
+      const istat = (iIstat >= 0 ? cols[iIstat] ?? "" : "").replace(/\D/g, "");
+      if (
+        !matchesComuneNome(comune, denom) &&
+        istat.padStart(6, "0") !== COMUNE.istat_code
+      ) {
+        continue;
+      }
       enti.push({
         denominazione: denom,
         codiceIpa: iIpa >= 0 ? cols[iIpa] ?? "" : "",

@@ -5,7 +5,7 @@
 import {
   COMUNE,
   isFeatureEnabled,
-  matchesComuneText,
+  matchesComuneNome,
 } from "@/lib/comune-config";
 import { fetchUa } from "@/lib/http-ua";
 
@@ -80,9 +80,11 @@ function parseCsv(text: string): string[][] {
 }
 
 function col(header: string[], row: string[], ...names: string[]): string {
-  const lower = header.map((h) => h.toLowerCase());
+  const lower = header.map((h) => h.toLowerCase().replace(/"/g, "").trim());
   for (const n of names) {
-    const i = lower.findIndex((h) => h.includes(n.toLowerCase()));
+    const needle = n.toLowerCase();
+    let i = lower.findIndex((h) => h === needle);
+    if (i < 0) i = lower.findIndex((h) => h.includes(needle));
     if (i >= 0) return row[i] ?? "";
   }
   return "";
@@ -119,17 +121,39 @@ export async function buildAmministratori(): Promise<AmministratoriData> {
   if (rows.length < 2) {
     return emptyAmministratori({ url, note: "CSV DAIT vuoto o illeggibile." });
   }
-  const header = rows[0];
+  const headerIdx = rows.findIndex((r) =>
+    r.some((c) => /denominazione_comune|codice_comune|descrizione_carica/i.test(c)),
+  );
+  if (headerIdx < 0 || headerIdx >= rows.length - 1) {
+    return emptyAmministratori({
+      url,
+      note: "CSV DAIT senza riga di intestazione riconoscibile.",
+    });
+  }
+  const header = rows[headerIdx];
   const persone: Amministratore[] = [];
-  for (const row of rows.slice(1)) {
-    const comune = col(header, row, "comune", "descrizione_comune", "ente");
-    if (!matchesComuneText(comune)) continue;
+  for (const row of rows.slice(headerIdx + 1)) {
+    const comune = col(
+      header,
+      row,
+      "denominazione_comune",
+      "descrizione_comune",
+      "nome_comune",
+    );
+    if (!matchesComuneNome(comune)) continue;
     persone.push({
-      carica: col(header, row, "carica", "descrizione_carica", "incarico"),
-      nome: col(header, row, "nome", "nome_amministratore"),
-      cognome: col(header, row, "cognome", "cognome_amministratore"),
-      lista: col(header, row, "lista", "lista_rappresentata"),
-      dataNomina: col(header, row, "nomina", "data_nomina", "decorrenza"),
+      carica: col(header, row, "descrizione_carica", "carica", "incarico"),
+      nome: col(header, row, "nome_amministratore", "nome"),
+      cognome: col(header, row, "cognome_amministratore", "cognome"),
+      lista: col(header, row, "lista_appartenenza", "lista_rappresentata", "lista"),
+      dataNomina: col(
+        header,
+        row,
+        "data_entrata_in_carica",
+        "data_nomina",
+        "nomina",
+        "decorrenza",
+      ),
       comune,
     });
   }
