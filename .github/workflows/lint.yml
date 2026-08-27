@@ -18,3 +18,5 @@ jobs:
       - run: npm ci
       - name: ESLint (include jsx-a11y)
         run: npm run lint
+      - name: SEO anti-regressione (statico)
+        run: npm run check:seo
