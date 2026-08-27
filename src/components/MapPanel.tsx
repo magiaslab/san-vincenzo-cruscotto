@@ -8,11 +8,14 @@ import {
   TileLayer,
   Popup,
   GeoJSON,
+  WMSTileLayer,
   useMap,
 } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { CATASTO_GEOJSON_URL, COMUNE_NOME, MAP_CENTER, MAP_DEFAULT_ZOOM } from "@/lib/constants";
+import { COMUNE, isFeatureEnabled } from "@/lib/comune-config";
+import { EFFIS_FWI_LAYER, EFFIS_HOTSPOT_LAYER, EFFIS_WMS_URL } from "@/lib/effis";
 import {
   DataUnavailable,
   KpiCard,
@@ -66,6 +69,10 @@ export default function MapPanel({ kpi }: { kpi?: Record<string, unknown> }) {
   const [showBeni, setShowBeni] = useState(true);
   const [showSanita, setShowSanita] = useState(true);
   const [showCatasto, setShowCatasto] = useState(false);
+  const [showEffis, setShowEffis] = useState(false);
+  const [showGeoscopio, setShowGeoscopio] = useState(false);
+  const [showAlberi, setShowAlberi] = useState(false);
+  const [alberi, setAlberi] = useState<FeatureCollection | null>(null);
   const [catasto, setCatasto] = useState<FeatureCollection | null>(null);
   const [catastoLoading, setCatastoLoading] = useState(false);
   const [catastoError, setCatastoError] = useState<string | null>(null);
@@ -122,6 +129,20 @@ export default function MapPanel({ kpi }: { kpi?: Record<string, unknown> }) {
       cancelled = true;
     };
   }, [showCatasto, catasto, catastoLoading]);
+
+  useEffect(() => {
+    if (!showAlberi || alberi || !isFeatureEnabled("alberi_monumentali")) return;
+    let cancelled = false;
+    fetch("/data/alberi-monumentali.geojson")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((json) => {
+        if (!cancelled && json) setAlberi(json as FeatureCollection);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [showAlberi, alberi]);
 
   const visible = useMemo(() => {
     if (!data) return [];
@@ -220,6 +241,39 @@ export default function MapPanel({ kpi }: { kpi?: Record<string, unknown> }) {
           />
           <span>Catasto (particelle)</span>
         </label>
+        {isFeatureEnabled("incendi") ? (
+          <label className="inline-flex cursor-pointer items-center gap-1.5 sm:gap-2">
+            <input
+              type="checkbox"
+              checked={showEffis}
+              onChange={(e) => setShowEffis(e.target.checked)}
+              className="h-4 w-4 cursor-pointer"
+            />
+            <span>Incendi EFFIS</span>
+          </label>
+        ) : null}
+        {COMUNE.regione_opendata.geoportale_wms.length > 0 ? (
+          <label className="inline-flex cursor-pointer items-center gap-1.5 sm:gap-2">
+            <input
+              type="checkbox"
+              checked={showGeoscopio}
+              onChange={(e) => setShowGeoscopio(e.target.checked)}
+              className="h-4 w-4 cursor-pointer"
+            />
+            <span>Aree protette / vincoli</span>
+          </label>
+        ) : null}
+        {isFeatureEnabled("alberi_monumentali") ? (
+          <label className="inline-flex cursor-pointer items-center gap-1.5 sm:gap-2">
+            <input
+              type="checkbox"
+              checked={showAlberi}
+              onChange={(e) => setShowAlberi(e.target.checked)}
+              className="h-4 w-4 cursor-pointer"
+            />
+            <span>Alberi monumentali</span>
+          </label>
+        ) : null}
       </div>
 
       {beniUnavailable ? (
@@ -364,6 +418,63 @@ export default function MapPanel({ kpi }: { kpi?: Record<string, unknown> }) {
                 })}
               />
             ) : null}
+
+            {showEffis && isFeatureEnabled("incendi") ? (
+              <>
+                <WMSTileLayer
+                  url={EFFIS_WMS_URL}
+                  layers={EFFIS_FWI_LAYER}
+                  format="image/png"
+                  transparent
+                  opacity={0.55}
+                  attribution="EFFIS / Copernicus"
+                />
+                <WMSTileLayer
+                  url={EFFIS_WMS_URL}
+                  layers={EFFIS_HOTSPOT_LAYER}
+                  format="image/png"
+                  transparent
+                  attribution="EFFIS / Copernicus"
+                />
+              </>
+            ) : null}
+
+            {showGeoscopio
+              ? COMUNE.regione_opendata.geoportale_wms.map((layer) => (
+                  <WMSTileLayer
+                    key={`${layer.url}-${layer.layer}`}
+                    url={layer.url}
+                    layers={layer.layer}
+                    format="image/png"
+                    transparent
+                    opacity={0.55}
+                    attribution={layer.attribution || "Geoportale regionale"}
+                  />
+                ))
+              : null}
+
+            {showAlberi && alberi
+              ? alberi.features.map((f, i) => {
+                  if (f.geometry?.type !== "Point") return null;
+                  const [lon, lat] = f.geometry.coordinates as number[];
+                  return (
+                    <CircleMarker
+                      key={`a-${i}`}
+                      center={[lat, lon]}
+                      radius={8}
+                      pathOptions={{
+                        color: "#2E7D32",
+                        fillColor: "#2E7D32",
+                        fillOpacity: 0.85,
+                      }}
+                    >
+                      <Popup>
+                        {String(f.properties.nome ?? f.properties.specie ?? "Albero monumentale")}
+                      </Popup>
+                    </CircleMarker>
+                  );
+                })
+              : null}
           </MapContainer>
           {data.layers.civici?.meta?.truncated ? (
             <p className="m-0 border-t border-[#d9e6f2] bg-[#f5f6f7] px-3 py-2 text-xs text-[#5b6f82]">

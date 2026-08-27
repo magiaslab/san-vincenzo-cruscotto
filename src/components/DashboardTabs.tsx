@@ -45,6 +45,8 @@ import {
   GitFork,
   Scale,
   Coffee,
+  GitCompare,
+  Database,
 } from "lucide-react";
 import { AppShell, type NavGroup } from "@/components/AppShell";
 import { EventiComunePanel } from "@/components/EventiComunePanel";
@@ -56,7 +58,18 @@ import { AllertaHomeBanner } from "@/components/AllertaHomeBanner";
 import { TrasportiPanel } from "@/components/TrasportiPanel";
 import { PercorsiPanel } from "@/components/PercorsiPanel";
 import { RifiutiPanel } from "@/components/RifiutiPanel";
+import { RifiutiAgenziaPanel } from "@/components/RifiutiAgenziaPanel";
 import { AcquaPanel } from "@/components/AcquaPanel";
+import { ChiAmministraPanel } from "@/components/ChiAmministraPanel";
+import { TerremotiPanel } from "@/components/TerremotiPanel";
+import { IpaPanel } from "@/components/IpaPanel";
+import { DemografiaMensilePanel } from "@/components/DemografiaMensilePanel";
+import { StazioniPanel } from "@/components/StazioniPanel";
+import { PgraPanel } from "@/components/PgraPanel";
+import { IncendiPanel } from "@/components/IncendiPanel";
+import { DatiPanel } from "@/components/DatiPanel";
+import { ConfrontoPanel } from "@/components/ConfrontoPanel";
+import { DualPerCapite, NotaAbitantiEquivalenti } from "@/components/DualPerCapite";
 import { DvnsFinanzaPanel } from "@/components/DvnsFinanzaPanel";
 import { PartecipaPanel } from "@/components/PartecipaPanel";
 import { ComeFunzionaPanel } from "@/components/ComeFunzionaPanel";
@@ -228,12 +241,15 @@ const NAV_GROUPS: NavGroup[] = [
       { id: "economia", href: "/economia", label: "Economia", Icon: Factory },
       { id: "istruzione", href: "/istruzione", label: "Istruzione", Icon: School },
       { id: "societa", href: "/societa", label: "Società", Icon: Handshake },
+      { id: "chi-amministra", href: "/chi-amministra", label: "Chi amministra", Icon: Building2 },
+      { id: "confronto", href: "/confronto", label: "Confronto", Icon: GitCompare },
       { id: "finanza", href: "/finanza", label: "Finanza", Icon: Landmark },
     ],
   },
   {
     label: "Progetto",
     items: [
+      { id: "dati", href: "/dati", label: "Dati aperti", Icon: Database },
       { id: "partecipa", href: "/partecipa", label: "Partecipa", Icon: MessageSquarePlus },
       { id: "sostieni", href: "/sostieni", label: "Sostieni", Icon: Coffee },
       { id: "come-funziona", href: "/come-funziona", label: "Come funziona", Icon: Info },
@@ -360,6 +376,9 @@ export function DashboardTabs({
         {tab === "economia" && <Economia kpi={kpi} />}
         {tab === "istruzione" && <Istruzione kpi={kpi} />}
         {tab === "societa" && <Societa kpi={kpi} />}
+        {tab === "chi-amministra" && <ChiAmministraPanel />}
+        {tab === "confronto" && <ConfrontoPanel />}
+        {tab === "dati" && <DatiPanel />}
         {tab === "disabilita" && <DisabilitaTab />}
         {tab === "finanza" && <Finanza kpi={kpi} />}
         {tab === "territorio" && <Territorio kpi={kpi} />}
@@ -982,6 +1001,8 @@ function Societa({ kpi }: { kpi: Kpi }) {
           </table>
         </div>
       ) : null}
+      <IpaPanel />
+      <DemografiaMensilePanel />
     </section>
   );
 }
@@ -2133,6 +2154,8 @@ function Territorio({ kpi }: { kpi: Kpi }) {
           />
         </div>
       ) : null}
+      <TerremotiPanel />
+      <PgraPanel />
     </section>
   );
 }
@@ -2230,7 +2253,21 @@ function Infra({ kpi }: { kpi: Kpi }) {
       <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
         <KpiCard label={t("Copertura FTTH")} value={valueOrMissing(banda?.copertura_ftth_pct ?? asRecord(agcom?.kpi)?.copertura_ftth_desi_pct, formatPercent)} hint={`FTTH 20m ${formatPercent(num(banda?.copertura_ftth_20m_pct ?? asRecord(agcom?.kpi)?.copertura_ftth_20m_pct))}`} />
         <KpiCard label={t("Punti ricarica EV")} value={valueOrMissing(punKpi?.n_totale, formatInteger)} hint={`${formatInteger(num(punKpi?.n_attivi))} attivi · ${formatDecimal(num(punKpi?.potenza_tot_kw ?? punKpi?.potenza_totale_kw), 0)} kW`} />
-        <KpiCard label={t("Veicoli")} value={valueOrMissing(veicoli?.totale_veicoli ?? parco?.totale, formatInteger)} hint={`${formatDecimal(num(veicoli?.tasso_motorizzazione_per_1000_ab ?? parco?.tasso_motorizzazione_per_1000_ab), 0)} /1000 ab.`} />
+        <KpiCard
+          label={t("Veicoli / 1000 ab")}
+          value={
+            <DualPerCapite
+              valore={num(veicoli?.totale_veicoli ?? parco?.totale)}
+              unita="/1000 ab"
+              scala={1000}
+            />
+          }
+          hint={
+            num(veicoli?.totale_veicoli ?? parco?.totale) != null
+              ? `${formatInteger(num(veicoli?.totale_veicoli ?? parco?.totale))} ${t("veicoli")}`
+              : undefined
+          }
+        />
         <KpiCard label={t("Pendolarismo netto")} value={valueOrMissing(pend?.saldo_netto, formatInteger)} hint={`Auto-contenimento ${formatPercent(num(pend?.auto_contenimento_pct))}`} />
         <KpiCard label={t("% veicoli inquinanti")} value={valueOrMissing(veicoli?.pct_inquinanti ?? euro?.pct_inquinanti, formatPercent)} />
         <KpiCard label={t("Incidenti (ultimo anno)")} value={valueOrMissing(incidenti?.incidenti, formatInteger)} hint={incidenti ? `${formatInteger(num(incidenti.morti))} morti · ${formatInteger(num(incidenti.feriti))} feriti` : undefined} />
@@ -2262,6 +2299,7 @@ function Infra({ kpi }: { kpi: Kpi }) {
           variant="success"
         />
       </div>
+      <NotaAbitantiEquivalenti />
 
       {impiantiOrdinati.length > 0 ? (
         <div className="mb-4 overflow-x-auto panel p-0">
@@ -2458,6 +2496,18 @@ function Sanita({ kpi }: { kpi: Kpi }) {
       />
       <div className="mb-4 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3">
         <KpiCard label={t("Farmacie")} value={valueOrMissing(sanita?.n_farmacie, formatInteger)} icon={Heart} variant="info" />
+        <KpiCard
+          label={t("Farmacie / 1000 ab")}
+          value={
+            <DualPerCapite
+              valore={num(sanita?.n_farmacie)}
+              unita="/1000 ab"
+              scala={1000}
+              digits={2}
+            />
+          }
+          icon={Heart}
+        />
         <KpiCard label={t("Parafarmacie")} value={valueOrMissing(sanita?.n_parafarmacie, formatInteger)} icon={Pill} />
         <KpiCard
           label={t("Ospedali")}
@@ -2474,6 +2524,7 @@ function Sanita({ kpi }: { kpi: Kpi }) {
           icon={Stethoscope}
         />
       </div>
+      <NotaAbitantiEquivalenti />
 
       {!(typeof sanita?.n_ospedali === "number" && sanita.n_ospedali > 0) &&
       ospedali == null ? (
@@ -2629,7 +2680,13 @@ function Ambiente({ kpi }: { kpi: Kpi }) {
         />
         <KpiCard
           label={t("Rifiuti pro capite")}
-          value={valueOrMissing(ambiente?.rifiuti_kg_per_abitante, (v) => `${formatInteger(v)} kg/ab`)}
+          value={
+            <DualPerCapite
+              valore={num(ambiente?.rifiuti_kg_per_abitante)}
+              unita="kg/ab"
+              giaPerCapite
+            />
+          }
           icon={Recycle}
         />
         <KpiCard
@@ -2677,7 +2734,10 @@ function Ambiente({ kpi }: { kpi: Kpi }) {
       </div>
 
       {isFeatureEnabled("rifiuti_ispra") ? <RifiutiPanel /> : null}
+      {isFeatureEnabled("rifiuti_agenzia_regionale") ? <RifiutiAgenziaPanel /> : null}
       {isFeatureEnabled("acqua_sii") ? <AcquaPanel /> : null}
+      <IncendiPanel />
+      <NotaAbitantiEquivalenti />
 
       {aree.length > 0 ? (
         <div className="mb-4 panel">
@@ -3352,6 +3412,8 @@ function Meteo({ kpi }: { kpi: Kpi }) {
         </a>{" "}
         (radar). Condizioni puntuali anche da ItaliaMeteo/Cineca via Cruscotto Italia.
       </p>
+      <StazioniPanel />
+      <IncendiPanel />
     </section>
   );
 }

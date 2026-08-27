@@ -2,6 +2,7 @@
 
 import { useT } from "@/lib/i18n";
 import { useEffect, useId, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { Cookie } from "lucide-react";
 
 const STORAGE_KEY = "sv-cruscotto-cookie-consent";
@@ -10,6 +11,7 @@ type Consent = "accepted" | "essential";
 
 export function CookieBanner() {
   const t = useT();
+  const pathname = usePathname();
   const [visible, setVisible] = useState(false);
   const firstBtnRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -17,13 +19,17 @@ export function CookieBanner() {
   const descId = useId();
 
   useEffect(() => {
+    if (pathname?.startsWith("/embeds")) {
+      setVisible(false);
+      return;
+    }
     try {
       const saved = window.localStorage.getItem(STORAGE_KEY);
       if (!saved) setVisible(true);
     } catch {
       setVisible(true);
     }
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
     if (!visible) return;

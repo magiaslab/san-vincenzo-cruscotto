@@ -320,6 +320,12 @@ export function datasetsForSection(sectionId: string): DatasetInput[] {
           description: `Indicatori rifiuti urbani di ${c}.`,
           creator: "ISPRA",
         },
+        {
+          name: "EFFIS / Copernicus",
+          description: `Rischio incendi (FWI e hotspot) sul territorio di ${c}.`,
+          creator: "Copernicus EMS",
+          url: "https://maps.effis.emergency.copernicus.eu/effis",
+        },
       ];
     case "istruzione":
       return [
@@ -345,6 +351,34 @@ export function datasetsForSection(sectionId: string): DatasetInput[] {
           creator: "ANAC",
         },
       ];
+    case "societa":
+      return [
+        agid,
+        {
+          name: "ISTAT demografia",
+          description: `Bilancio demografico e indicatori sociali di ${c}.`,
+          creator: "ISTAT",
+        },
+        {
+          name: "IPA — Indice PA",
+          description: `Domicili digitali degli enti di ${c}.`,
+          creator: "IPA / DigitPA",
+          url: "https://indicepa.gov.it/",
+        },
+      ];
+    case "chi-amministra":
+      return [
+        {
+          name: "DAIT — Anagrafe amministratori locali",
+          description: `Sindaco, giunta e consiglio di ${c}.`,
+          creator: "Ministero dell'Interno",
+          url: "https://dait.interno.gov.it/elezioni/anagrafe-amministratori",
+        },
+      ];
+    case "confronto":
+      return [agid];
+    case "dati":
+      return [agid, osm];
     case "economia":
       return [
         agid,
@@ -354,8 +388,18 @@ export function datasetsForSection(sectionId: string): DatasetInput[] {
           creator: "ISTAT / MEF",
         },
       ];
-    case "mappa":
     case "territorio":
+      return [
+        osm,
+        agid,
+        {
+          name: "INGV",
+          description: `Terremoti recenti nel territorio di ${c}.`,
+          creator: "INGV",
+          url: "https://www.ingv.it/",
+        },
+      ];
+    case "mappa":
       return [osm, agid];
     default:
       return [agid];

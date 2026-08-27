@@ -23,6 +23,7 @@ import {
   PanelHeading,
   valueOrMissing,
 } from "@/components/ui";
+import { DualPerCapite, NotaAbitantiEquivalenti } from "@/components/DualPerCapite";
 import { PanelState } from "@/components/panel-state";
 
 const LineChart = dynamic(
@@ -99,7 +100,13 @@ function RifiutiBody({
         />
         <KpiCard
           label={t("Rifiuti pro capite")}
-          value={valueOrMissing(u.kg_ab, (v) => `${formatInteger(v)} kg/ab`)}
+          value={
+            <DualPerCapite
+              valore={u.kg_ab}
+              unita="kg/ab"
+              giaPerCapite
+            />
+          }
           hint={
             u.ru_t != null
               ? `${formatDecimal(u.ru_t, 1)} t ${t("totali")}`
@@ -233,6 +240,7 @@ function RifiutiBody({
           {t("Download CSV ISPRA")}
         </a>
       </p>
+      <NotaAbitantiEquivalenti />
     </>
   );
 }

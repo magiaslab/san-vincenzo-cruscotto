@@ -1,6 +1,6 @@
 {
   "name": "cruscotto",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "private": true,
   "author": "Alessandro Cipriani <cipriani.alessandro@gmail.com>",
   "description": "Dashboard indipendente dei dati aperti del Comune di San Vincenzo (LI), alimentata da Cruscotto Italia (AgID).",
@@ -18,6 +18,9 @@
     "rag:deploy": "modal deploy modal_rag/app.py",
     "trasporti:gtfs": "node scripts/build-trasporti-gtfs.mjs",
     "dae:sync": "node scripts/sync-dae-geojson.mjs",
+    "alberi:sync": "node scripts/sync-alberi-monumentali.mjs",
+    "sit:sync": "node scripts/sync-sit-comunale.mjs",
+    "snapshot": "node scripts/snapshot.mjs",
     "telegram:poll": "node --env-file=.env.local scripts/telegram-poll.mjs",
     "omi:update": "node --experimental-strip-types scripts/update-omi.ts",
     "omi:update:all": "node --experimental-strip-types scripts/update-omi.ts --all"
