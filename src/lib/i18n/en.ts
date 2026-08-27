@@ -364,7 +364,8 @@ export const en: Record<string, string> = {
   "Finanza": "Finance",
   "Finanza pubblica": "Public finance",
   "Finanziamento": "Funding",
-  "Flussi provinciali (Livorno) — anno": "Provincial flows (Livorno) — year",
+  "Flussi provinciali ({provincia}) — anno":
+    "Provincial flows ({provincia}) — year",
   "Fonte MDS": "MDS source",
   "Fonte ufficiale": "Official source",
   "Fonte volontaria OpenStreetMap (può essere incompleta rispetto al censimento 118). Mappa globale:": "Volunteer OpenStreetMap source (may be incomplete vs the official 118 registry). Global map:",

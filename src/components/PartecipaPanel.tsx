@@ -68,7 +68,7 @@ type TipoOption = {
   Icon: typeof Lightbulb;
 };
 
-export function PartecipaPanel() {
+export function PartecipaPanel({ asPage = false }: { asPage?: boolean }) {
   const t = useT();
   const [step, setStep] = useState(0);
   const [tipo, setTipo] = useState<FeedbackTipo | null>(null);
@@ -215,7 +215,10 @@ export function PartecipaPanel() {
   return (
     <section>
       <SectionIntro
-        title={t("Partecipa")}
+        asPage={asPage}
+        title={
+          asPage ? `Partecipa al Cruscotto ${COMUNE_NOME}` : t("Partecipa")
+        }
         description={t(
           "Come funziona il cruscotto e come puoi suggerire miglioramenti. I suggerimenti diventano issue su GitHub.",
         )}

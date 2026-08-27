@@ -6,7 +6,7 @@ import {
 } from "@/lib/seo";
 
 const ATTRIBUZIONI_DESCRIPTION =
-  `Fonti dati, licenze, attribuzioni e regole d'uso del ${SITE_NAME}: Cruscotto Italia (AgID), ARPAT, MIUR, OpenStreetMap e altre fonti open.`;
+  `Fonti, licenze e regole d'uso del ${SITE_NAME} (AgID, OSM e altre). Progetto indipendente, non ufficiale.`;
 
 export const metadata: Metadata = {
   title: "Attribuzioni e regole",

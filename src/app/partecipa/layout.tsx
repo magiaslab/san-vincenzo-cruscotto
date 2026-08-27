@@ -5,39 +5,38 @@ import {
   absoluteUrl,
   buildOgImages,
 } from "@/lib/seo";
-import { isSostieniEnabled } from "@/lib/sostieni";
 
 const PAGE_DESCRIPTION =
-  `Sostieni il ${SITE_NAME}: contributo volontario per hosting. Progetto indipendente, non ufficiale, non del Comune di ${COMUNE_NOME}.`;
+  `Suggerimenti e segnalazioni sul ${SITE_NAME} di ${COMUNE_NOME}. Progetto indipendente, non ufficiale.`;
 
 export const metadata: Metadata = {
-  title: "Sostieni il cruscotto",
+  title: "Partecipa",
   description: PAGE_DESCRIPTION,
   alternates: {
-    canonical: "/sostieni",
+    canonical: "/partecipa",
   },
   openGraph: {
-    title: `Sostieni | ${SITE_NAME}`,
+    title: `Partecipa | ${SITE_NAME}`,
     description: PAGE_DESCRIPTION,
-    url: absoluteUrl("/sostieni"),
+    url: absoluteUrl("/partecipa"),
     type: "article",
     siteName: SITE_NAME,
     locale: "it_IT",
-    images: buildOgImages(`${SITE_NAME} — sostieni il progetto`),
+    images: buildOgImages(`${SITE_NAME} — partecipa`),
   },
   twitter: {
     card: "summary_large_image",
-    title: `Sostieni | ${SITE_NAME}`,
+    title: `Partecipa | ${SITE_NAME}`,
     description: PAGE_DESCRIPTION,
     images: [absoluteUrl("/og-image.jpg")],
   },
   robots: {
-    index: isSostieniEnabled(),
+    index: true,
     follow: true,
   },
 };
 
-export default function SostieniLayout({
+export default function PartecipaLayout({
   children,
 }: {
   children: React.ReactNode;

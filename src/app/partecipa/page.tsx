@@ -1,15 +1,17 @@
-"use client";
+import { Footer } from "@/components/Footer";
+import { Header } from "@/components/Header";
+import { PartecipaPanel } from "@/components/PartecipaPanel";
 
-import { useEffect } from "react";
-
-export default function PartecipaRedirectPage() {
-  useEffect(() => {
-    window.location.replace("/#partecipa");
-  }, []);
-
+export default function PartecipaPage() {
   return (
-    <main className="flex min-h-[40vh] items-center justify-center p-6 text-sm text-[var(--pa-muted)]">
-      Reindirizzamento…
-    </main>
+    <div className="flex min-h-screen flex-col bg-[var(--background)]">
+      <Header brandAsHeading={false} />
+      <main id="contenuto-principale" className="flex-1">
+        <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6 sm:py-8">
+          <PartecipaPanel asPage />
+        </div>
+      </main>
+      <Footer />
+    </div>
   );
 }

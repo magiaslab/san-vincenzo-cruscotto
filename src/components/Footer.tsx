@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   AUTHOR,
   COMUNE_NOME,
@@ -11,26 +12,10 @@ import { PROJECT_ORIGIN } from "@/lib/project-origin";
 import { isSostieniEnabled } from "@/lib/sostieni";
 import { useT } from "@/lib/i18n";
 
-type FooterProps = {
-  /** Navigazione tab SPA (necessaria: i Link hash non cambiano la tab da soli). */
-  onNavigate?: (tabId: string) => void;
-};
-
-export function Footer({ onNavigate }: FooterProps) {
+export function Footer() {
   const t = useT();
   const fork = getForkMaintainer();
   const upstream = isUpstreamDeploy();
-
-  function go(tabId: string) {
-    if (onNavigate) {
-      onNavigate(tabId);
-      return;
-    }
-    // Fallback (pagine isolate / SEO redirect)
-    if (typeof window !== "undefined") {
-      window.location.assign(`/#${tabId}`);
-    }
-  }
 
   return (
     <footer
@@ -100,28 +85,27 @@ export function Footer({ onNavigate }: FooterProps) {
           >
             {(
               [
-                ["come-funziona", "Come funziona"],
-                ["riusa", "Riusa / fork"],
-                ["attribuzioni", "Attribuzioni e regole"],
-                ["partecipa", "Suggerimenti"],
+                ["/come-funziona", "Come funziona"],
+                ["/riusa", "Riusa / fork"],
+                ["/attribuzioni", "Attribuzioni e regole"],
+                ["/partecipa", "Suggerimenti"],
               ] as const
-            ).map(([id, label]) => (
-              <button
-                key={id}
-                type="button"
-                onClick={() => go(id)}
-                className="inline-flex min-h-11 items-center bg-transparent p-0 font-semibold text-white underline underline-offset-2"
+            ).map(([href, label]) => (
+              <Link
+                key={href}
+                href={href}
+                className="inline-flex min-h-11 items-center font-semibold text-white underline underline-offset-2"
               >
                 {t(label)}
-              </button>
+              </Link>
             ))}
             {isSostieniEnabled() ? (
-              <a
+              <Link
                 href="/sostieni"
                 className="inline-flex min-h-11 items-center font-semibold text-white underline underline-offset-2"
               >
                 {t("Sostieni")}
-              </a>
+              </Link>
             ) : null}
             <a
               href={`mailto:${AUTHOR.email}`}

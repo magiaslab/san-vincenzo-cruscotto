@@ -4,7 +4,10 @@ import {
   type Locale,
 } from "@/lib/i18n/types";
 
-/** Preferenza salvata, altrimenti lingua del browser (en* → en, default it). */
+/**
+ * Lingua UI: solo preferenza esplicita in localStorage, altrimenti italiano.
+ * Non si legge `navigator.language`: Googlebot (en-US) deve restare su `it`.
+ */
 export function detectLocale(): Locale {
   if (typeof window === "undefined") return "it";
 
@@ -13,17 +16,6 @@ export function detectLocale(): Locale {
     if (isLocale(saved)) return saved;
   } catch {
     /* ignore */
-  }
-
-  const langs =
-    navigator.languages?.length > 0
-      ? [...navigator.languages]
-      : [navigator.language];
-
-  for (const lang of langs) {
-    const code = (lang || "").toLowerCase();
-    if (code.startsWith("en")) return "en";
-    if (code.startsWith("it")) return "it";
   }
 
   return "it";

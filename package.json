@@ -13,6 +13,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "check:seo": "node scripts/check-seo.mjs",
     "rag:corpus": "node modal_rag/build_corpus.mjs",
     "rag:deploy": "modal deploy modal_rag/app.py",
     "trasporti:gtfs": "node scripts/build-trasporti-gtfs.mjs",

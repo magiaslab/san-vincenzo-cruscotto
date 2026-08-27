@@ -6,7 +6,7 @@ import {
 } from "@/lib/seo";
 
 const PAGE_DESCRIPTION =
-  `Come forkare e riusare il ${SITE_NAME} per un altro comune: stack, checklist ISTAT e guida ai moduli personalizzati.`;
+  `Come forkare il ${SITE_NAME} per un altro comune: ISTAT, Vercel e moduli. Progetto indipendente, non ufficiale.`;
 
 export const metadata: Metadata = {
   title: "Riusa / fork",

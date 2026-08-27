@@ -31,14 +31,6 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>("it");
   const [ready, setReady] = useState(false);
 
-  useEffect(() => {
-    const detected = detectLocale();
-    setLocaleState(detected);
-    setFormatLocale(detected);
-    document.documentElement.lang = LOCALE_META[detected].htmlLang;
-    setReady(true);
-  }, []);
-
   const setLocale = useCallback((next: Locale) => {
     setLocaleState(next);
     setFormatLocale(next);
@@ -49,6 +41,16 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
       /* ignore */
     }
   }, []);
+
+  useEffect(() => {
+    const detected = detectLocale();
+    if (detected !== "it") {
+      // Scelta esplicita già salvata: passa da setLocale così lang resta
+      // coerente. Con localStorage vuoto non si tocca l'attributo (resta it).
+      setLocale(detected);
+    }
+    setReady(true);
+  }, [setLocale]);
 
   const t = useCallback(
     (key: string, vars?: TranslateVars) => translate(locale, key, vars),

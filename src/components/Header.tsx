@@ -38,12 +38,12 @@ export function Header({ generatedAt, brandAsHeading = true }: HeaderProps) {
           </span>
           <div className="flex w-full items-center justify-between gap-3 sm:w-auto sm:justify-end">
             {isSostieniEnabled() ? (
-              <a
+              <Link
                 className="inline-flex min-h-11 shrink-0 items-center text-white underline-offset-2 hover:underline"
                 href="/sostieni"
               >
                 {t("Sostieni")}
-              </a>
+              </Link>
             ) : null}
             <a
               className="inline-flex min-h-11 shrink-0 items-center text-white underline-offset-2 hover:underline"

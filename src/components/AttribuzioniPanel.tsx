@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import Link from "next/link";
 import {
   ARPAT_BALNEAZIONE_URL,
   ARPAT_OPENDATA_URL,
@@ -54,13 +55,18 @@ function Section({
   );
 }
 
-export function AttribuzioniPanel() {
+export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
   const t = useT();
   const forkMaintainer = getForkMaintainer();
   return (
     <section>
       <SectionIntro
-        title="Attribuzioni e regole"
+        asPage={asPage}
+        title={
+          asPage
+            ? `Attribuzioni e regole del Cruscotto ${COMUNE_NOME}`
+            : "Attribuzioni e regole"
+        }
         description={`Fonti, licenze e condizioni d'uso del Cruscotto ${COMUNE_NOME}.`}
       />
 
@@ -149,9 +155,9 @@ export function AttribuzioniPanel() {
               {t(
                 "Il cruscotto non ha budget pubblico. Un contributo volontario su Buy Me a Coffee aiuta a coprire hosting e compute; non è una donazione al Comune e non influenza i dati.",
               )}{" "}
-              <a className="text-[#0066CC] underline" href="/sostieni">
+              <Link className="text-[#0066CC] underline" href="/sostieni">
                 {t("Pagina Sostieni e ringraziamenti")}
-              </a>
+              </Link>
               .
             </p>
           </Section>

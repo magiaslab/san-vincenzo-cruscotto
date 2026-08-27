@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import Link from "next/link";
 import {
   Accessibility,
   BookOpen,
@@ -350,11 +351,16 @@ const OPTIONAL_MODULES: { area: string; cerca: string }[] = [
   },
 ];
 
-export function RiusaPanel() {
+export function RiusaPanel({ asPage = false }: { asPage?: boolean }) {
   return (
     <section>
       <SectionIntro
-        title="Riusa questo cruscotto"
+        asPage={asPage}
+        title={
+          asPage
+            ? `Riusa il Cruscotto ${COMUNE_NOME}`
+            : "Riusa questo cruscotto"
+        }
         description={`Guida per adattare questo stack a qualsiasi comune italiano: GitHub → config/comune.json → Vercel. I link di fork e la documentazione puntano sempre al progetto originale di ${AUTHOR.name} (Cruscotto ${PROJECT_ORIGIN.comune_demo}).`}
       />
 
@@ -445,9 +451,9 @@ export function RiusaPanel() {
           </p>
           <p className="text-[var(--pa-muted)]">
             Architettura dello stack:{" "}
-            <a href="/come-funziona" className="underline">
+            <Link href="/come-funziona" className="underline">
               Come funziona
-            </a>
+            </Link>
             .
           </p>
         </Section>
@@ -779,9 +785,9 @@ git branch -M main && git push -u origin main`}
             </li>
             <li>
               Non rimuovere disclaimer e{" "}
-              <a href="/attribuzioni" className="underline">
+              <Link href="/attribuzioni" className="underline">
                 attribuzioni
-              </a>
+              </Link>
               . Nei fork lascia intatto{" "}
               <code>src/lib/project-origin.ts</code> e indica te stesso in{" "}
               <code>config/comune.json → fork</code>.
@@ -802,9 +808,9 @@ git branch -M main && git push -u origin main`}
               {AUTHOR.email}
             </a>{" "}
             oppure{" "}
-            <a href="/partecipa" className="underline">
+            <Link href="/partecipa" className="underline">
               Partecipa
-            </a>
+            </Link>
             .
           </p>
         </Section>

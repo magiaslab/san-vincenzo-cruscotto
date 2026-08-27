@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import {
   useEffect,
   useId,
@@ -24,6 +25,7 @@ import { scrollToTopSmooth } from "@/lib/motion";
 
 export type NavItem = {
   id: string;
+  href: string;
   label: string;
   Icon: LucideIcon;
 };
@@ -105,16 +107,12 @@ export function AppShell({
     scrollToTopSmooth();
   }
 
-  function goHome() {
-    go("panoramica");
-  }
-
   const brandBlock = (
-    <button
-      type="button"
-      onClick={goHome}
+    <Link
+      href="/"
       className="flex h-[var(--shell-topbar-h)] w-full items-center gap-3 px-4 text-left no-underline"
       aria-label={t("Torna alla home")}
+      onClick={() => setOpen(false)}
     >
       <Image
         src={STEMMA.src}
@@ -132,7 +130,7 @@ export function AppShell({
           {COMUNE_REGIONE} · {t("dati aperti")}
         </p>
       </div>
-    </button>
+    </Link>
   );
 
   const nav = (
@@ -157,11 +155,11 @@ export function AppShell({
                 const isActive = item.id === activeId;
                 return (
                   <li key={item.id}>
-                    <button
-                      type="button"
-                      onClick={() => go(item.id)}
+                    <Link
+                      href={item.href}
+                      onClick={() => setOpen(false)}
                       aria-current={isActive ? "page" : undefined}
-                      className={`flex min-h-11 w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-semibold transition ${
+                      className={`flex min-h-11 w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-semibold no-underline transition ${
                         isActive
                           ? "bg-[var(--pa-primary)] text-white"
                           : "text-[var(--pa-ink)] hover:bg-[var(--pa-surface-soft)]"
@@ -169,7 +167,7 @@ export function AppShell({
                     >
                       <Icon size={18} strokeWidth={2} className="shrink-0" />
                       <span>{t(item.label)}</span>
-                    </button>
+                    </Link>
                   </li>
                 );
               })}
@@ -238,10 +236,9 @@ export function AppShell({
                 <Menu size={22} />
               </button>
 
-              <button
-                type="button"
-                onClick={goHome}
-                className="inline-flex h-9 shrink-0 items-center lg:hidden"
+              <Link
+                href="/"
+                className="inline-flex h-9 shrink-0 items-center no-underline lg:hidden"
                 aria-label={t("Home Cruscotto {comune}", { comune: COMUNE_NOME })}
               >
                 <Image
@@ -252,25 +249,15 @@ export function AppShell({
                   className="h-8 w-auto"
                   priority
                 />
-              </button>
+              </Link>
 
               <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5 lg:max-w-[14rem] xl:max-w-none">
-                <h1
-                  id={titleId}
-                  className="m-0 truncate text-base font-bold leading-tight text-[var(--pa-ink)]"
-                >
-                  <button
-                    type="button"
-                    onClick={goHome}
-                    className="m-0 truncate bg-transparent p-0 text-left text-base font-bold leading-tight text-[var(--pa-ink)] lg:hidden"
-                    aria-label={t("Torna alla home")}
-                  >
-                    Cruscotto {COMUNE_NOME}
-                  </button>
-                  <span className="hidden lg:inline">
-                    {active?.label ?? `Cruscotto ${COMUNE_NOME}`}
-                  </span>
-                </h1>
+              <p
+                id={titleId}
+                className="m-0 truncate text-base font-bold leading-tight text-[var(--pa-ink)]"
+              >
+                {active?.label ?? `Cruscotto ${COMUNE_NOME}`}
+              </p>
                 <p className="m-0 truncate text-xs leading-tight text-[var(--pa-muted)]">
                   {generatedAt
                     ? `${t("Aggiornato")} ${formatDateTime(generatedAt)}`

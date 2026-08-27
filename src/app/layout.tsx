@@ -4,10 +4,9 @@ import { CookieBanner } from "@/components/CookieBanner";
 import { InstallPrompt } from "@/components/InstallPrompt";
 import { Providers } from "@/components/Providers";
 import { PwaRegister } from "@/components/PwaRegister";
-import { AUTHOR, COMUNE_NOME } from "@/lib/constants";
+import { AUTHOR, COMUNE_NOME, COMUNE_PROVINCIA } from "@/lib/constants";
 import {
   SITE_DESCRIPTION,
-  SITE_KEYWORDS,
   SITE_NAME,
   SITE_TITLE_DEFAULT,
   absoluteUrl,
@@ -41,7 +40,6 @@ export const metadata: Metadata = {
   authors: [{ name: AUTHOR.name, url: `mailto:${AUTHOR.email}` }],
   creator: AUTHOR.name,
   publisher: AUTHOR.name,
-  keywords: [...SITE_KEYWORDS],
   category: "open data",
   alternates: {
     canonical: "/",
@@ -90,10 +88,8 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
   },
   other: {
-    author: AUTHOR.name,
-    "geo.region": "IT-LI",
+    "geo.region": `IT-${COMUNE_PROVINCIA}`,
     "geo.placename": COMUNE_NOME,
-    "mobile-web-app-capable": "yes",
   },
 };
 
