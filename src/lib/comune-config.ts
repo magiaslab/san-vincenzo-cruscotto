@@ -37,6 +37,26 @@ export type ComuneFeatures = {
    * Default true: nazionale, filtro ISTAT. Non sostituisce SIOPE AgID.
    */
   finanza_dvns: boolean;
+  /** Sindaco, giunta e consiglio (DAIT Ministero dell'Interno). */
+  chi_amministra: boolean;
+  /** Terremoti INGV nel bbox comunale. */
+  terremoti: boolean;
+  /** Domicili digitali IPA (PEC, codice univoco). */
+  ipa: boolean;
+  /** Bilancio demografico mensile ISTAT D7B. */
+  demografia_mensile: boolean;
+  /** WMS EFFIS / Copernicus (incendi). Default false. */
+  incendi: boolean;
+  /** Alberi monumentali MASAF (GeoJSON locale). Default false. */
+  alberi_monumentali: boolean;
+  /** Stazioni meteo-idro regionali via WFS. Default false. */
+  stazioni_regionali: boolean;
+  /** Agenzia regionale rifiuti (es. ARRR). Default false. */
+  rifiuti_agenzia_regionale: boolean;
+  /** Pericolosità idraulica PAI/PGRA ArcGIS. Default false. */
+  pericolosita_idraulica: boolean;
+  /** Snapshot giornaliero dati volatili. Default false. */
+  snapshot_storico: boolean;
 };
 
 export type ComuneConfig = {
@@ -87,6 +107,8 @@ export type ComuneConfig = {
     ciclabili_geojson_local: string;
     pedonali_geojson_local: string;
     trasporti_gtfs_local: string;
+    /** API SIT comunale (es. LDP GIS metarepo2). */
+    sit_api: string;
   };
   brand: {
     stemma_path: string;
@@ -110,6 +132,11 @@ export type ComuneConfig = {
     cfr_url: string;
     arpat_base_url: string;
     nota: string;
+    /** Slug file DAIT, es. `livorno` → provincia_di_livorno.csv */
+    dait_provincia_slug: string;
+    stazioni_wfs: StazioniWfsConfig;
+    geoportale_wms: GeoportaleWmsLayer[];
+    pgra_arcgis: PgraArcgisConfig;
   };
   /**
    * Gestori locali (acqua / rifiuti). URL vuoti = modulo solo con fonti nazionali.
@@ -121,6 +148,8 @@ export type ComuneConfig = {
   };
   features: ComuneFeatures;
   eventi_filtro_extra: string[];
+  /** Codici ISTAT dei comuni da affiancare in /confronto. Vuoto = sezione nascosta. */
+  comuni_confronto: string[];
   /**
    * Metadati del fork. `is_upstream: true` = deploy ufficiale San Vincenzo.
    * Nei fork: `is_upstream: false` + nome/email/url del maintainer.
@@ -162,6 +191,31 @@ export type GestoreRifiutiConfig = {
   calendario_url: string;
   centri_url: string;
   centro_url: string;
+  agenzia_regionale: {
+    nome: string;
+    pagina_indice: string;
+    pattern_file: string;
+  };
+};
+
+export type StazioniWfsConfig = {
+  base_url: string;
+  layer_stazioni: string[];
+  layer_valori: string[];
+  srs: string;
+};
+
+export type GeoportaleWmsLayer = {
+  label: string;
+  url: string;
+  layer: string;
+  attribution: string;
+  tipo: "wms" | "wfs";
+};
+
+export type PgraArcgisConfig = {
+  base_url: string;
+  cartelle: string[];
 };
 
 export type TerrainSeaSide = "west" | "east" | "south" | "north" | "none";
@@ -200,6 +254,57 @@ function asPair(v: unknown, fallback: [number, number]): [number, number] {
     return [v[0], v[1]];
   }
   return fallback;
+}
+
+function parseAgenziaRifiuti(v: unknown): GestoreRifiutiConfig["agenzia_regionale"] {
+  const o = (v && typeof v === "object" ? v : {}) as Record<string, unknown>;
+  return {
+    nome: str(o.nome),
+    pagina_indice: str(o.pagina_indice),
+    pattern_file: str(o.pattern_file),
+  };
+}
+
+function parseStazioniWfs(v: unknown): StazioniWfsConfig {
+  const o = (v && typeof v === "object" ? v : {}) as Record<string, unknown>;
+  const layers = (x: unknown) =>
+    Array.isArray(x) ? x.filter((s): s is string => typeof s === "string") : [];
+  return {
+    base_url: str(o.base_url),
+    layer_stazioni: layers(o.layer_stazioni),
+    layer_valori: layers(o.layer_valori),
+    srs: str(o.srs, "EPSG:4326"),
+  };
+}
+
+function parseGeoportaleWms(v: unknown): GeoportaleWmsLayer[] {
+  if (!Array.isArray(v)) return [];
+  const out: GeoportaleWmsLayer[] = [];
+  for (const row of v) {
+    if (!row || typeof row !== "object") continue;
+    const r = row as Record<string, unknown>;
+    const url = str(r.url);
+    const layer = str(r.layer);
+    if (!url || !layer) continue;
+    out.push({
+      label: str(r.label, layer),
+      url,
+      layer,
+      attribution: str(r.attribution),
+      tipo: r.tipo === "wfs" ? "wfs" : "wms",
+    });
+  }
+  return out;
+}
+
+function parsePgra(v: unknown): PgraArcgisConfig {
+  const o = (v && typeof v === "object" ? v : {}) as Record<string, unknown>;
+  return {
+    base_url: str(o.base_url),
+    cartelle: Array.isArray(o.cartelle)
+      ? o.cartelle.filter((s): s is string => typeof s === "string")
+      : [],
+  };
 }
 
 function bool(v: unknown, fallback: boolean): boolean {
@@ -277,6 +382,7 @@ function parseConfig(input: unknown): ComuneConfig {
       ciclabili_geojson_local: str(urls.ciclabili_geojson_local),
       pedonali_geojson_local: str(urls.pedonali_geojson_local),
       trasporti_gtfs_local: str(urls.trasporti_gtfs_local),
+      sit_api: str(urls.sit_api),
     },
     brand: {
       stemma_path: str(brand.stemma_path, "/stemma.png"),
@@ -303,6 +409,10 @@ function parseConfig(input: unknown): ComuneConfig {
       cfr_url: str(reg.cfr_url),
       arpat_base_url: str(reg.arpat_base_url, "https://www.arpat.toscana.it"),
       nota: str(reg.nota),
+      dait_provincia_slug: str(reg.dait_provincia_slug),
+      stazioni_wfs: parseStazioniWfs(reg.stazioni_wfs),
+      geoportale_wms: parseGeoportaleWms(reg.geoportale_wms),
+      pgra_arcgis: parsePgra(reg.pgra_arcgis),
     },
     features: {
       porto: bool(features.porto, false),
@@ -324,6 +434,19 @@ function parseConfig(input: unknown): ComuneConfig {
       rifiuti_ispra: bool(features.rifiuti_ispra, true),
       acqua_sii: bool(features.acqua_sii, false),
       finanza_dvns: bool(features.finanza_dvns, true),
+      chi_amministra: bool(features.chi_amministra, true),
+      terremoti: bool(features.terremoti, true),
+      ipa: bool(features.ipa, true),
+      demografia_mensile: bool(features.demografia_mensile, true),
+      incendi: bool(features.incendi, false),
+      alberi_monumentali: bool(features.alberi_monumentali, false),
+      stazioni_regionali: bool(features.stazioni_regionali, false),
+      rifiuti_agenzia_regionale: bool(
+        features.rifiuti_agenzia_regionale,
+        false,
+      ),
+      pericolosita_idraulica: bool(features.pericolosita_idraulica, false),
+      snapshot_storico: bool(features.snapshot_storico, false),
     },
     gestori: {
       acqua: {
@@ -347,10 +470,16 @@ function parseConfig(input: unknown): ComuneConfig {
         calendario_url: str(rifiuti.calendario_url),
         centri_url: str(rifiuti.centri_url),
         centro_url: str(rifiuti.centro_url),
+        agenzia_regionale: parseAgenziaRifiuti(rifiuti.agenzia_regionale),
       },
     },
     eventi_filtro_extra: Array.isArray(c.eventi_filtro_extra)
       ? c.eventi_filtro_extra.filter((x): x is string => typeof x === "string")
+      : [],
+    comuni_confronto: Array.isArray(c.comuni_confronto)
+      ? c.comuni_confronto.filter(
+          (x): x is string => typeof x === "string" && /^\d{6}$/.test(x),
+        )
       : [],
     fork: {
       // Default true: il repo originale è upstream finché un fork non lo spegne
@@ -401,6 +530,13 @@ export function isTabEnabled(tabId: string): boolean {
       return isFeatureEnabled("porto");
     case "sostieni":
       return COMUNE.sostieni.buymeacoffee_slug.trim().length > 0;
+    case "chi-amministra":
+      return (
+        isFeatureEnabled("chi_amministra") &&
+        COMUNE.regione_opendata.dait_provincia_slug.trim().length > 0
+      );
+    case "confronto":
+      return COMUNE.comuni_confronto.length > 0;
     default:
       return true;
   }

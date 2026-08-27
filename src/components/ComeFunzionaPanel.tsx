@@ -103,6 +103,12 @@ const API_ROWS: { route: string; desc: string }[] = [
   { route: "GET /api/dae", desc: "Defibrillatori da GeoJSON locale / OSM" },
   { route: "POST /api/feedback", desc: "Suggerimenti → issue GitHub" },
   { route: "POST /api/assistente", desc: "Proxy RAG su Modal (se configurato)" },
+  { route: "GET /api/amministratori", desc: "Anagrafe DAIT (empty-safe)" },
+  { route: "GET /api/terremoti", desc: "INGV nel bbox comunale" },
+  { route: "GET /api/ipa", desc: "Domicili digitali IPA" },
+  { route: "GET /api/demografia-mensile", desc: "ISTAT D7B (ZIP latin-1)" },
+  { route: "GET /api/stazioni", desc: "WFS stazioni meteo-idro regionali" },
+  { route: "GET /api/pubblico/*", desc: "Export JSON/CSV indicizzabili" },
 ];
 
 const SEZIONI: { name: string; desc: string }[] = [
@@ -116,7 +122,7 @@ const SEZIONI: { name: string; desc: string }[] = [
   },
   {
     name: "Economia e PA",
-    desc: "Economia, Istruzione, Società, Finanza",
+    desc: "Economia, Istruzione, Società, Chi amministra, Confronto, Finanza",
   },
 ];
 

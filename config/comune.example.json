@@ -43,7 +43,8 @@
     "stalli_disabili": "",
     "ciclabili_geojson_local": "",
     "pedonali_geojson_local": "",
-    "trasporti_gtfs_local": ""
+    "trasporti_gtfs_local": "",
+    "sit_api": ""
   },
   "brand": {
     "stemma_path": "/stemma.png",
@@ -66,6 +67,18 @@
     "allerta_url": "",
     "cfr_url": "",
     "arpat_base_url": "",
+    "dait_provincia_slug": "",
+    "stazioni_wfs": {
+      "base_url": "",
+      "layer_stazioni": [],
+      "layer_valori": [],
+      "srs": "EPSG:4326"
+    },
+    "geoportale_wms": [],
+    "pgra_arcgis": {
+      "base_url": "",
+      "cartelle": []
+    },
     "nota": "Cerca il portale open data della tua Regione (spesso dati.<regione>.it / CKAN), GTFS TPL, turismo ISTAT, allerte PC. Catalogo nazionale: https://www.dati.gov.it/ — elenco portali: https://www.dati.gov.it/view-dataset?organization=regioni"
   },
   "features": {
@@ -87,7 +100,17 @@
     "arpat_aria": false,
     "rifiuti_ispra": true,
     "acqua_sii": false,
-    "finanza_dvns": true
+    "finanza_dvns": true,
+    "chi_amministra": true,
+    "terremoti": true,
+    "ipa": true,
+    "demografia_mensile": true,
+    "incendi": false,
+    "alberi_monumentali": false,
+    "stazioni_regionali": false,
+    "rifiuti_agenzia_regionale": false,
+    "pericolosita_idraulica": false,
+    "snapshot_storico": false
   },
   "gestori": {
     "acqua": {
@@ -109,10 +132,16 @@
       "calendario_url": "",
       "centri_url": "",
       "centro_url": "",
-      "nota": "ISPRA (features.rifiuti_ispra) è nazionale via ISTAT. url = pagina comunale del gestore se pubblica le RD% in HTML (pattern SEI Toscana perc_raccolta)."
+      "agenzia_regionale": {
+        "nome": "",
+        "pagina_indice": "",
+        "pattern_file": "\\.xlsx?"
+      },
+      "nota": "ISPRA (features.rifiuti_ispra) è nazionale via ISTAT. url = pagina comunale del gestore se pubblica le RD% in HTML (pattern SEI Toscana perc_raccolta). agenzia_regionale: pagina indice da cui si risolve il file, mai l’URL diretto."
     }
   },
   "eventi_filtro_extra": [],
+  "comuni_confronto": [],
   "sostieni": {
     "buymeacoffee_slug": "",
     "_comment": "Slug Buy Me a Coffee del maintainer del fork (es. tuonome). Vuoto = pagina /sostieni e tab nascosti. Non copiare lo slug dell’upstream. I ringraziamenti stanno in config/sostegni.json."

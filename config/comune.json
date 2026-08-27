@@ -41,7 +41,8 @@
     "stalli_disabili": "https://www.comune.sanvincenzo.li.it/Servizi/Disciplina-delle-riserve-di-stalli-di-sosta-personali-per-disabili-e-istituzione-sosta-gratuita-su-stalli-a-pagamento-per-disabili",
     "ciclabili_geojson_local": "/data/ciclabili-san-vincenzo.geojson",
     "pedonali_geojson_local": "/data/pedonali-san-vincenzo.geojson",
-    "trasporti_gtfs_local": "/data/trasporti-gtfs-sv.json"
+    "trasporti_gtfs_local": "/data/trasporti-gtfs-sv.json",
+    "sit_api": "https://sanvincenzo.ldpgis.it/metarepo2/api/datasets"
   },
   "brand": {
     "stemma_path": "/stemma-san-vincenzo.png",
@@ -64,6 +65,49 @@
     "allerta_url": "https://www.regione.toscana.it/allertameteo",
     "cfr_url": "https://www.cfr.toscana.it/",
     "arpat_base_url": "https://www.arpat.toscana.it",
+    "dait_provincia_slug": "livorno",
+    "stazioni_wfs": {
+      "base_url": "https://geo.sir.toscana.it/geoserver/geo/ows",
+      "layer_stazioni": [
+        "cf_pluviometri",
+        "cf_anemometri",
+        "cf_termometri",
+        "cf_idrometri"
+      ],
+      "layer_valori": [
+        "sir_pluviometri_valori_ieri_pubblico",
+        "sir_termometri_valori_ieri_pubblico",
+        "sir_idrometri_valori_ieri_pubblico"
+      ],
+      "srs": "EPSG:4326"
+    },
+    "geoportale_wms": [
+      {
+        "label": "Aree protette (ANPIL)",
+        "url": "https://www502.regione.toscana.it/wmsraster/com.rt.wms.RTmap/wms?map=wmsarprot",
+        "layer": "rt_arprot.idanpil.rt.poly",
+        "attribution": "Regione Toscana — Geoscopio, CC BY 4.0",
+        "tipo": "wms"
+      },
+      {
+        "label": "Natura 2000 SIC",
+        "url": "https://www502.regione.toscana.it/wmsraster/com.rt.wms.RTmap/wms?map=wmsarprot",
+        "layer": "rt_arprot.idnat2000_sic.rt.poly",
+        "attribution": "Regione Toscana — Geoscopio, CC BY 4.0",
+        "tipo": "wms"
+      },
+      {
+        "label": "Vincoli paesaggistici (300 m costa)",
+        "url": "https://www502.regione.toscana.it/wmsraster/com.rt.wms.RTmap/wms?map=wmspiapae",
+        "layer": "rt_piapae.idpae1_a_2019.rt",
+        "attribution": "Regione Toscana — Geoscopio, CC BY 4.0",
+        "tipo": "wms"
+      }
+    ],
+    "pgra_arcgis": {
+      "base_url": "https://geodataserver.appenninosettentrionale.it/arcgis/rest/services",
+      "cartelle": ["Pericolosita_Alluvione", "PAI_Frane"]
+    },
     "nota": "Per altre regioni: cerca il portale open data regionale (spesso CKAN su dati.<regione>.it), il dataset turismo ISTAT/movimenti ricettivi, GTFS TPL e allerte Protezione Civile regionali. Catalogo nazionale: https://www.dati.gov.it/"
   },
   "features": {
@@ -85,7 +129,17 @@
     "arpat_aria": true,
     "rifiuti_ispra": true,
     "acqua_sii": true,
-    "finanza_dvns": true
+    "finanza_dvns": true,
+    "chi_amministra": true,
+    "terremoti": true,
+    "ipa": true,
+    "demografia_mensile": true,
+    "incendi": true,
+    "alberi_monumentali": true,
+    "stazioni_regionali": true,
+    "rifiuti_agenzia_regionale": true,
+    "pericolosita_idraulica": true,
+    "snapshot_storico": false
   },
   "gestori": {
     "acqua": {
@@ -105,7 +159,12 @@
       "url": "https://seitoscana.it/comuni/san-vincenzo",
       "calendario_url": "https://seitoscana.it/comuni/san-vincenzo/raccolta-rifiuti",
       "centri_url": "https://seitoscana.it/centri-di-raccolta",
-      "centro_url": "https://seitoscana.it/comuni/san-vincenzo/centro-di-raccolta"
+      "centro_url": "https://seitoscana.it/comuni/san-vincenzo/centro-di-raccolta",
+      "agenzia_regionale": {
+        "nome": "ARRR",
+        "pagina_indice": "https://www.arrr.it/dati-comunali",
+        "pattern_file": "\\.xlsx?"
+      }
     }
   },
   "eventi_filtro_extra": [
@@ -114,6 +173,15 @@
     "castagneto",
     "populonia",
     "baratti"
+  ],
+  "comuni_confronto": [
+    "049012",
+    "049002",
+    "049006",
+    "049007",
+    "049001",
+    "049017",
+    "049019"
   ],
   "sostieni": {
     "buymeacoffee_slug": "acipriani",

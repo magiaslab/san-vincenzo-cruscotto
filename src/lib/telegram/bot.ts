@@ -27,6 +27,12 @@ import {
   newSegnalazioneId,
   type DaeSegnalazioneFeature,
 } from "@/lib/telegram/types";
+import {
+  testoAllerta,
+  testoBalneazione,
+  testoFarmacia,
+  testoIncendi,
+} from "@/lib/telegram/servizi";
 
 const CRUSCOTTO_SANITA = getSiteUrl();
 
@@ -40,6 +46,10 @@ function helpText(): string {
     "Comandi:",
     "/nuovo — avvia una segnalazione",
     "/vicini — DAE già mappati vicino a te",
+    "/allerta — colore allerta meteo",
+    "/farmacia — farmacie di turno",
+    "/balneazione — acque di balneazione",
+    "/incendi — rischio incendi EFFIS",
     "/annulla — esci dalla procedura",
     "/aiuto — questo messaggio",
     "",
@@ -401,6 +411,23 @@ export async function handleTelegramUpdate(update: TelegramUpdate) {
       msg,
       "Invia la tua <b>posizione</b>: ti elenco i DAE già noti e potrai segnalarne uno nuovo rispondendo al messaggio.",
     );
+    return;
+  }
+
+  if (/^\/allerta\b/i.test(text)) {
+    await sendMessage(msg.chat.id, await testoAllerta());
+    return;
+  }
+  if (/^\/farmacia\b/i.test(text)) {
+    await sendMessage(msg.chat.id, await testoFarmacia());
+    return;
+  }
+  if (/^\/balneazione\b/i.test(text)) {
+    await sendMessage(msg.chat.id, await testoBalneazione());
+    return;
+  }
+  if (/^\/incendi\b/i.test(text)) {
+    await sendMessage(msg.chat.id, await testoIncendi());
     return;
   }
 

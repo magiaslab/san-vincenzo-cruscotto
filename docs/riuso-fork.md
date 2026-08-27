@@ -302,6 +302,18 @@ Vedi anche [`.env.example`](../.env.example). Su Vercel: Settings → Environmen
 
 ## 11. Moduli opzionali
 
+Da 0.3.0 il catalogo fonti è in `src/lib/fonti.ts`. Le nuove fonti nazionali
+(DAIT, INGV, IPA, ISTAT D7B) si accendono con `features.*` e, per DAIT,
+`regione_opendata.dait_provincia_slug`. Gli adattatori regionali (WFS stazioni,
+WMS geoportale, PAI/PGRA, agenzia rifiuti) restano **spenti di default** nel
+template: su San Vincenzo sono accesi in `config/comune.json`.
+
+Gli abitanti equivalenti (residenti + presenze/365) comparono in Ambiente,
+Sanità e Mobilità quando i flussi turistici sono disponibili.
+
+Catalogo export: `/dati` e `/api/pubblico/*`. Fonti cercate e non collegate:
+[`docs/fonti-non-disponibili.md`](fonti-non-disponibili.md).
+
 ### 11.1 OpenWeather
 
 1. Registrati su OpenWeather → crea API key (piano free)

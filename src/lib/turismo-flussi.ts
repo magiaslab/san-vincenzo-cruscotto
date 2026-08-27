@@ -240,7 +240,7 @@ async function fetchText(url: string): Promise<{ text: string; contentType: stri
     text = new TextDecoder("utf-8").decode(buf);
     if (text.includes("\uFFFD")) throw new Error("bad utf8");
   } catch {
-    text = new TextDecoder("latin-1").decode(buf);
+    text = new TextDecoder("latin1").decode(buf);
   }
   return { text, contentType };
 }

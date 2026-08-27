@@ -16,6 +16,9 @@ export type SectionId =
   | "economia"
   | "istruzione"
   | "societa"
+  | "chi-amministra"
+  | "confronto"
+  | "dati"
   | "finanza"
   | "partecipa"
   | "come-funziona"
@@ -201,6 +204,39 @@ function sections(): SectionDef[] {
       group: "economia",
       kind: "dashboard",
     }),
+    d("chi-amministra", {
+      path: "/chi-amministra",
+      slug: "chi-amministra",
+      label: "Chi amministra",
+      title: `Chi amministra ${c}`,
+      description: `Sindaco, giunta e consiglio di ${c} dall’anagrafe DAIT. Dati aperti, progetto non ufficiale.`,
+      h1: `Chi amministra ${c}`,
+      intro: `Amministratori locali di ${c} dall’anagrafe DAIT del Ministero dell’Interno (CSV provinciale).`,
+      group: "economia",
+      kind: "dashboard",
+    }),
+    d("confronto", {
+      path: "/confronto",
+      slug: "confronto",
+      label: "Confronto",
+      title: `Confronto — Cruscotto ${c}`,
+      description: `Confronto tra ${c} e i comuni vicini sugli stessi indicatori AgID. Progetto non ufficiale.`,
+      h1: `Confronto tra comuni`,
+      intro: `Stessi KPI AgID affiancati per i comuni vicini configurati, incluso ${c}.`,
+      group: "economia",
+      kind: "dashboard",
+    }),
+    d("dati", {
+      path: "/dati",
+      slug: "dati",
+      label: "Dati aperti",
+      title: `Dati aperti — Cruscotto ${c}`,
+      description: `Catalogo fonti e export JSON/CSV del Cruscotto ${c}. Progetto indipendente, non ufficiale.`,
+      h1: `Dati aperti di ${c}`,
+      intro: `Fonti usate dal cruscotto di ${c} e dataset esportabili in JSON e CSV. Progetto indipendente, non ufficiale.`,
+      group: "progetto",
+      kind: "dashboard",
+    }),
     d("finanza", {
       path: "/finanza",
       slug: "finanza",
@@ -352,12 +388,13 @@ export const NAV_GROUP_DEFS: {
   {
     label: "Economia e società",
     group: "economia",
-    ids: ["economia", "istruzione", "societa", "finanza"],
+    ids: ["economia", "istruzione", "societa", "chi-amministra", "confronto", "finanza"],
   },
   {
     label: "Progetto",
     group: "progetto",
     ids: [
+      "dati",
       "partecipa",
       "sostieni",
       "come-funziona",

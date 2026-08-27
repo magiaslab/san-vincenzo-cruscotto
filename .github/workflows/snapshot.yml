@@ -1,0 +1,25 @@
+name: Snapshot storico
+
+# Disattivato: solo avvio manuale. Accendere features.snapshot_storico
+# e schedulare `cron` solo se si vuole archiviare i JSON in public/data/snapshot/.
+on:
+  workflow_dispatch:
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - name: Snapshot (richiede un base URL raggiungibile)
+        env:
+          SNAPSHOT_BASE_URL: ${{ vars.SNAPSHOT_BASE_URL }}
+        run: node scripts/snapshot.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: snapshot
+          path: public/data/snapshot/

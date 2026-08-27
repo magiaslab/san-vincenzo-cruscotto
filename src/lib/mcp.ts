@@ -81,16 +81,20 @@ export async function callMcpToolHttp<T>(
   return extractJson<T>(obj.result ?? {});
 }
 
-export async function fetchComuneKpi() {
+export async function fetchComuneKpiFor(istatCode: string) {
   try {
     return await callMcpTool<Record<string, unknown>>("comune_kpi", {
-      istat_code: ISTAT_CODE,
+      istat_code: istatCode,
     });
   } catch {
     return callMcpToolHttp<Record<string, unknown>>("comune_kpi", {
-      istat_code: ISTAT_CODE,
+      istat_code: istatCode,
     });
   }
+}
+
+export async function fetchComuneKpi() {
+  return fetchComuneKpiFor(ISTAT_CODE);
 }
 
 export async function fetchComuneDashboard() {
