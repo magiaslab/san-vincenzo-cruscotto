@@ -51,8 +51,8 @@
     "stemma_attribution": "",
     "stemma_license_url": "",
     "stemma_source_url": "",
-    "site_url": "",
-    "user_agent": "Cruscotto-Comune/1.0 (+https://github.com/magiaslab/san-vincenzo-cruscotto)"
+    "site_url": "https://www.cruscottocomune.it",
+    "user_agent": "Cruscotto-Comune/1.0 (+https://www.cruscottocomune.it; +https://github.com/magiaslab/cruscotto-comune)"
   },
   "regione_opendata": {
     "portal_url": "https://www.dati.gov.it/",
@@ -120,7 +120,7 @@
     "mode": "landing",
     "demo_url": "https://www.cruscottosanvincenzo.it",
     "demo_label": "Cruscotto San Vincenzo",
-    "github_repo_url": "https://github.com/magiaslab/san-vincenzo-cruscotto"
+    "github_repo_url": "https://github.com/magiaslab/cruscotto-comune"
   },
   "sostieni": {
     "buymeacoffee_slug": "acipriani",
@@ -131,8 +131,8 @@
     "is_template": true,
     "maintainer_name": "Alessandro Cipriani",
     "maintainer_email": "cipriani.alessandro@gmail.com",
-    "maintainer_url": "",
-    "github_repo_url": "https://github.com/magiaslab/san-vincenzo-cruscotto",
+    "maintainer_url": "https://www.cruscottocomune.it",
+    "github_repo_url": "https://github.com/magiaslab/cruscotto-comune",
     "_comment": "is_template=true: questo deploy è il minisito/template, non un comune. Nei fork comunali: is_template=false, is_upstream=false, i tuoi contatti. Non modificare src/lib/project-origin.ts."
   }
 }

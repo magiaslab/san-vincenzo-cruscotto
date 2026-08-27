@@ -1,10 +1,15 @@
 import { LandingDoc } from "@/components/landing/LandingDoc";
 import { PROJECT_ORIGIN } from "@/lib/project-origin";
-import { getDemoLabel, getDemoUrl, getProductName } from "@/lib/product";
+import {
+  getDemoLabel,
+  getDemoUrl,
+  getProductName,
+  getTemplateGithubUrl,
+} from "@/lib/product";
 
 const SNIPPET_FOOTER = `Basato su ${getProductName()}, progetto di ${PROJECT_ORIGIN.author.name}, nato dal ${getDemoLabel()}.`;
 
-const SNIPPET_README = `Questo sito è un fork di [${getProductName()}](${PROJECT_ORIGIN.github_repo_url}), template open source di ${PROJECT_ORIGIN.author.name}.
+const SNIPPET_README = `Questo sito è un fork di [${getProductName()}](${getTemplateGithubUrl()}), template open source di ${PROJECT_ORIGIN.author.name}.
 Primo esemplare in produzione: [${getDemoLabel()}](${getDemoUrl()}).
 Progetto indipendente, non ufficiale: non affiliato al Comune, ad AgID o al Governo italiano.`;
 

@@ -4,10 +4,11 @@ Guida passo-passo per duplicare **questo template** su un comune italiano,
 dall’account GitHub alla messa online su Vercel.
 
 Il Cruscotto San Vincenzo resta l’esemplare in produzione
-(<https://www.cruscottosanvincenzo.it>): i fork nuovi partono da qui, non da
-quel sito.
+(<https://www.cruscottosanvincenzo.it>): i fork nuovi partono da
+**questo** template (<https://github.com/magiaslab/cruscotto-comune> /
+<https://www.cruscottocomune.it>), non da quel sito.
 
-La stessa guida è in-app su [`/riuso`](/riuso).
+La stessa guida è in-app su [`/riusa`](/riusa) (`/riuso` reindirizza).
 
 Checklist dati: [`config/comune.example.json`](../config/comune.example.json)  
 Env di esempio: [`.env.example`](../.env.example)  
@@ -126,14 +127,14 @@ indipendente se la fonte è giù.
 
 ### Opzione A — Fork (consigliata)
 
-1. Apri <https://github.com/magiaslab/san-vincenzo-cruscotto>
+1. Apri <https://github.com/magiaslab/cruscotto-comune>
 2. Pulsante **Fork** → scegli account/org → Create fork
-3. Otterrai `https://github.com/TUO_USER/san-vincenzo-cruscotto` (o rinominalo)
+3. Otterrai `https://github.com/TUO_USER/cruscotto-comune` (o rinominalo)
 
 ### Opzione B — Mirror in un repo nuovo
 
 ```bash
-git clone --depth 1 https://github.com/magiaslab/san-vincenzo-cruscotto.git mio-cruscotto
+git clone --depth 1 https://github.com/magiaslab/cruscotto-comune.git mio-cruscotto
 cd mio-cruscotto
 rm -rf .git
 git init
@@ -239,7 +240,7 @@ Dopo le modifiche: commit + push sul tuo repo.
 ## 8. Passo E — Deploy su Vercel
 
 1. Vai su [vercel.com](https://vercel.com) → **Add New… → Project**
-   (oppure usa il [Deploy Button](https://vercel.com/new/clone?repository-url=https://github.com/magiaslab/san-vincenzo-cruscotto)
+   (oppure usa il [Deploy Button](https://vercel.com/new/clone?repository-url=https://github.com/magiaslab/cruscotto-comune)
    sul repo / fork)
 2. Importa il repository forkato (autorizza GitHub se richiesto)
 3. Framework Preset: **Next.js** (già in `vercel.json`, region `fra1`)

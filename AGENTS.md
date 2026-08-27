@@ -10,7 +10,8 @@ KPI da AgID Cruscotto Italia MCP
 sono proxy/cache.
 
 **San Vincenzo** è il primo esemplare in produzione
-(`https://www.cruscottosanvincenzo.it`), repo separato. Questo template non deve
+(`https://www.cruscottosanvincenzo.it`), repo separata. Il minisito del
+template è `https://www.cruscottocomune.it`. Questo template non deve
 reintrodurre dati hardcoded di quel comune.
 
 **Standard commands:** `npm run dev` (port 3000, Turbopack), `npm run build`,

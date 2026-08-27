@@ -77,7 +77,7 @@ export function ProgettoContent() {
             <Link href="/fonti">Fonti</Link> — catalogo nazionale vs opzionale
           </li>
           <li>
-            <Link href="/riuso">Riuso</Link> — fork, Vercel, config, env
+            <Link href="/riusa">Riuso</Link> — fork, Vercel, config, env
           </li>
           <li>
             <Link href="/menzioni">Menzioni</Link> — testi da tenere nei fork

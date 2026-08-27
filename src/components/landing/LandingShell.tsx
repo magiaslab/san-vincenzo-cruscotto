@@ -23,7 +23,7 @@ import {
 const NAV: { href: string; label: string }[] = [
   { href: "/progetto", label: "Progetto" },
   { href: "/fonti", label: "Fonti" },
-  { href: "/riuso", label: "Riuso" },
+  { href: "/riusa", label: "Riuso" },
   { href: "/menzioni", label: "Menzioni" },
 ];
 
@@ -169,7 +169,7 @@ export function LandingShell({ children }: { children: ReactNode }) {
               </Link>
             </li>
             <li>
-              <Link href="/riuso" className="underline-offset-2 hover:underline">
+              <Link href="/riusa" className="underline-offset-2 hover:underline">
                 Guida al riuso
               </Link>
             </li>

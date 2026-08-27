@@ -45,7 +45,7 @@ export function DashboardSetup() {
       </ol>
       <p className="flex flex-wrap gap-3">
         <Link
-          href="/riuso"
+          href="/riusa"
           className="inline-flex min-h-11 items-center rounded-lg bg-[var(--pa-primary)] px-4 text-sm font-bold text-white no-underline"
         >
           Guida al riuso

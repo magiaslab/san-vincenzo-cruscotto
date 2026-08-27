@@ -2,7 +2,7 @@
 
 import { useId } from "react";
 import { Accessibility } from "lucide-react";
-import { GITHUB_REPO_URL } from "@/lib/constants";
+import { getTemplateBlobUrl } from "@/lib/product";
 import { useT } from "@/lib/i18n";
 import { OutlineLink } from "@/components/ui";
 
@@ -67,7 +67,7 @@ export function AccessibilitaCompliance({
             W3C WCAG 2.1
           </OutlineLink>
           <OutlineLink
-            href={`${GITHUB_REPO_URL}/blob/master/docs/a11y-checklist.md`}
+            href={getTemplateBlobUrl("docs/a11y-checklist.md")}
           >
             {t("Checklist del progetto")}
           </OutlineLink>

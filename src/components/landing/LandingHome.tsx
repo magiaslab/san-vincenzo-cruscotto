@@ -76,7 +76,7 @@ export function LandingHome() {
               <GitHubMark size={18} />
               Fork su GitHub
             </Cta>
-            <Cta href="/riuso" variant="ghost">
+            <Cta href="/riusa" variant="ghost">
               Guida al riuso
             </Cta>
             <Cta href={demo} variant="ghost" external>
@@ -221,7 +221,7 @@ export function LandingHome() {
           </li>
         </ol>
         <div className="mt-6 flex flex-wrap gap-3">
-          <Cta href="/riuso">Apri la guida completa</Cta>
+          <Cta href="/riusa">Apri la guida completa</Cta>
           <Cta href={getVercelDeployUrl()} variant="ghost" external>
             <VercelMark size={16} />
             Deploy su Vercel

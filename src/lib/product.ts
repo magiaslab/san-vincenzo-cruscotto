@@ -41,6 +41,14 @@ export function getTemplateForkUrl(): string {
   return `${getTemplateGithubUrl()}/fork`;
 }
 
+/** Branch di default del template (repo nuova = `main`). */
+export const TEMPLATE_DEFAULT_BRANCH = "main";
+
+export function getTemplateBlobUrl(path: string): string {
+  const clean = path.replace(/^\//, "");
+  return `${getTemplateGithubUrl()}/blob/${TEMPLATE_DEFAULT_BRANCH}/${clean}`;
+}
+
 export function getVercelDeployUrl(): string {
   return `https://vercel.com/new/clone?repository-url=${encodeURIComponent(getTemplateGithubUrl())}`;
 }
@@ -78,6 +86,6 @@ export function getGithubRepoSlug(): string {
   const fromSite = githubRepoSlugFromUrl(COMUNE.site.github_repo_url);
   if (fromSite) return fromSite;
   const fromOrigin = githubRepoSlugFromUrl(PROJECT_ORIGIN.github_repo_url);
-  return fromOrigin || "magiaslab/san-vincenzo-cruscotto";
+  return fromOrigin || "magiaslab/cruscotto-comune";
 }
 

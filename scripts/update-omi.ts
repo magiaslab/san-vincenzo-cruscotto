@@ -41,7 +41,7 @@ const MIRROR_RAW =
   "https://raw.githubusercontent.com/ondata/quotazioni-immobiliari-agenzia-entrate/master/data";
 const OUT_DIR = path.join(process.cwd(), "src", "data", "omi");
 const UA =
-  "Mozilla/5.0 (compatible; CruscottoComune/1.0; +https://github.com/magiaslab/san-vincenzo-cruscotto)";
+  "Mozilla/5.0 (compatible; CruscottoComune/1.0; +https://www.cruscottocomune.it; +https://github.com/magiaslab/cruscotto-comune)";
 
 type Tipologia = {
   tipologia: string;
