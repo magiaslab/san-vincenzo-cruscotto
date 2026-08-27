@@ -13,6 +13,11 @@ const nextConfig: NextConfig = {
         destination: "/sostieni",
         permanent: false,
       },
+      {
+        source: "/riuso",
+        destination: "/riusa",
+        permanent: false,
+      },
     ];
   },
 };

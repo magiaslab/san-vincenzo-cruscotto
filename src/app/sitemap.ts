@@ -24,7 +24,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.75,
     },
     {
-      url: absoluteUrl("/riuso"),
+      url: absoluteUrl("/riusa"),
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.8,

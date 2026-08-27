@@ -114,7 +114,7 @@ export function LandingShell({ children }: { children: ReactNode }) {
               className="inline-flex min-h-11 items-center gap-1.5 rounded-lg bg-[var(--pa-primary)] px-3 text-sm font-bold text-white no-underline hover:bg-[var(--pa-primary-hover)]"
             >
               <GitHubMark size={16} />
-              Fork
+              Fork su GitHub
             </a>
           </nav>
         </div>
