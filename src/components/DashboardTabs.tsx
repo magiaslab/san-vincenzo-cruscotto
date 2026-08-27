@@ -1137,7 +1137,10 @@ function Turismo({
       {flussi ? (
         <div className="mt-4 panel bg-[#fff8e6]">
           <h3 className="m-0 mb-3 text-base font-bold text-[var(--pa-ink)]">
-            {t("Flussi provinciali (Livorno) — anno")} {String(flussi.anno ?? "")}
+            {t("Flussi provinciali ({provincia}) — anno", {
+              provincia: COMUNE_PROVINCIA,
+            })}{" "}
+            {String(flussi.anno ?? "")}
           </h3>
           {flussi._warning ? <p className="text-sm text-[#5b6f82]">{String(flussi._warning)}</p> : null}
           <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
