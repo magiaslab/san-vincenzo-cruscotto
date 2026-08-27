@@ -8,7 +8,9 @@ import {
   SITE_NAME,
   absoluteUrl,
   buildBreadcrumbJsonLd,
+  buildDatasetJsonLd,
   buildOgImages,
+  datasetsForSection,
 } from "@/lib/seo";
 import {
   getSectionBySlug,
@@ -76,10 +78,15 @@ export default async function SezionePage({ params }: Props) {
   return (
     <>
       <JsonLd
+        id={`jsonld-breadcrumb-${section.slug}`}
         data={buildBreadcrumbJsonLd([
           { name: SITE_NAME, path: "/" },
           { name: section.label, path: section.path },
         ])}
+      />
+      <JsonLd
+        id={`jsonld-dataset-${section.slug}`}
+        data={buildDatasetJsonLd(datasetsForSection(section.id))}
       />
       <DashboardTabs
         kpi={kpi}
