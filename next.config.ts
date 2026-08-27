@@ -14,6 +14,11 @@ const nextConfig: NextConfig = {
         permanent: false,
       },
       {
+        source: "/supporto",
+        destination: "/sostieni",
+        permanent: false,
+      },
+      {
         source: "/infra",
         destination: "/mobilita",
         permanent: false,
