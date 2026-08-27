@@ -350,11 +350,16 @@ const OPTIONAL_MODULES: { area: string; cerca: string }[] = [
   },
 ];
 
-export function RiusaPanel() {
+export function RiusaPanel({ asPage = false }: { asPage?: boolean }) {
   return (
     <section>
       <SectionIntro
-        title="Riusa questo cruscotto"
+        asPage={asPage}
+        title={
+          asPage
+            ? `Riusa il Cruscotto ${COMUNE_NOME}`
+            : "Riusa questo cruscotto"
+        }
         description={`Guida per adattare questo stack a qualsiasi comune italiano: GitHub → config/comune.json → Vercel. I link di fork e la documentazione puntano sempre al progetto originale di ${AUTHOR.name} (Cruscotto ${PROJECT_ORIGIN.comune_demo}).`}
       />
 

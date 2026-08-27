@@ -54,13 +54,18 @@ function Section({
   );
 }
 
-export function AttribuzioniPanel() {
+export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
   const t = useT();
   const forkMaintainer = getForkMaintainer();
   return (
     <section>
       <SectionIntro
-        title="Attribuzioni e regole"
+        asPage={asPage}
+        title={
+          asPage
+            ? `Attribuzioni e regole del Cruscotto ${COMUNE_NOME}`
+            : "Attribuzioni e regole"
+        }
         description={`Fonti, licenze e condizioni d'uso del Cruscotto ${COMUNE_NOME}.`}
       />
 

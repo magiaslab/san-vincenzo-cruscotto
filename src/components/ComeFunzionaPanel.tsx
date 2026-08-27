@@ -120,11 +120,16 @@ const SEZIONI: { name: string; desc: string }[] = [
   },
 ];
 
-export function ComeFunzionaPanel() {
+export function ComeFunzionaPanel({ asPage = false }: { asPage?: boolean }) {
   return (
     <section>
       <SectionIntro
-        title="Come funziona"
+        asPage={asPage}
+        title={
+          asPage
+            ? `Come funziona il Cruscotto ${COMUNE_NOME}`
+            : "Come funziona"
+        }
         description={`Architettura, stack tecnologico e flusso operativo del Cruscotto ${COMUNE_NOME}: come i dati aperti diventano la dashboard che vedi.`}
       />
 

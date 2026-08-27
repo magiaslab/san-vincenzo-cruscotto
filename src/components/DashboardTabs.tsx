@@ -357,7 +357,7 @@ export function DashboardTabs({
         if (isTabId(id)) navigate(id);
       }}
       generatedAt={generatedAt}
-      footer={<Footer onNavigate={(id) => { if (isTabId(id)) navigate(id); }} />}
+      footer={<Footer />}
     >
       <div aria-label={t(tabLabel(tab))}>
         {tab === "panoramica" && (

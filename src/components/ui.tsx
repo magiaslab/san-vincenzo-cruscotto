@@ -149,6 +149,7 @@ export function SectionIntro({
   description,
   updatedAt,
   sourceNote,
+  asPage = false,
 }: {
   title: string;
   description?: string;
@@ -156,13 +157,17 @@ export function SectionIntro({
   updatedAt?: string | null;
   /** Nota breve sulla fonte o sul perché un dato manca. */
   sourceNote?: string | null;
+  /** Pagina SEO isolata: H1 proprio invece di H2 da tab. */
+  asPage?: boolean;
 }) {
   const t = useT();
+  const Heading = asPage ? "h1" : "h2";
+  const headingClass = asPage
+    ? "m-0 text-2xl font-bold text-[var(--pa-ink)] sm:text-3xl"
+    : "m-0 text-lg font-bold text-[var(--pa-ink)] sm:text-xl";
   return (
     <div className="mb-4 sm:mb-5">
-      <h2 className="m-0 text-lg font-bold text-[var(--pa-ink)] sm:text-xl">
-        {title}
-      </h2>
+      <Heading className={headingClass}>{title}</Heading>
       {description ? (
         <p className="m-0 mt-1 max-w-prose text-xs text-[var(--pa-muted)] sm:text-sm">
           {description}
