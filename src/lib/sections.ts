@@ -20,7 +20,6 @@ export type SectionId =
   | "partecipa"
   | "come-funziona"
   | "riusa"
-  | "esempi"
   | "attribuzioni"
   | "sostieni";
 
@@ -66,7 +65,7 @@ function sections(): SectionDef[] {
       title: `Panoramica — Cruscotto ${c}`,
       description: `Panoramica dei dati aperti di ${c}: KPI AgID, servizi utili e accesso alle sezioni. Progetto indipendente, non ufficiale.`,
       h1: `Cruscotto ${c}`,
-      intro: `Dati aperti del Comune di ${c}, raccolti in un unico sito. Progetto indipendente, non ufficiale.`,
+      intro: `Dashboard indipendente dei dati aperti del Comune di ${c}. KPI da Cruscotto Italia (AgID) e altre fonti pubbliche; progetto non ufficiale.`,
       group: "evidenza",
       kind: "dashboard",
     }),
@@ -229,33 +228,20 @@ function sections(): SectionDef[] {
       slug: "come-funziona",
       label: "Come funziona",
       title: `Come funziona il Cruscotto ${c}`,
-      description: `Come è fatto il Cruscotto ${c}: da dove arrivano i numeri e come leggerli. Progetto indipendente, non ufficiale.`,
+      description: `Architettura e fonti del Cruscotto ${c}: Next.js, MCP AgID, mappe e API. Progetto non ufficiale.`,
       h1: `Come funziona il Cruscotto ${c}`,
-      intro: `Come è fatto il Cruscotto ${c}: da dove arrivano i numeri, cosa non è, e come leggerlo.`,
+      intro: `Come i dati aperti diventano la dashboard di ${c}: stack, proxy API e moduli opzionali.`,
       group: "progetto",
       kind: "project",
     }),
     d("riusa", {
       path: "/riusa",
       slug: "riusa",
-      label: "Porta nel tuo comune",
-      title: `Porta il cruscotto in un altro comune`,
-      description: `Come copiare il cruscotto per un altro comune italiano, anche senza programmare. GitHub, Vercel e file del comune. Progetto non ufficiale.`,
-      h1: `Porta il cruscotto nel tuo comune`,
-      intro: `Guida passo passo, anche per chi non programma: account gratuiti, duplica il progetto, pubblica il sito.`,
-      group: "progetto",
-      kind: "project",
-    }),
-    d("esempi", {
-      path: "/esempi",
-      slug: "esempi",
-      label: "Cruscotti online",
-      title: "Cruscotti comunali già online",
-      description:
-        "I cruscotti già pubblicati (San Vincenzo, Campiglia Marittima) e quelli in lavorazione. Progetto indipendente, non ufficiale.",
-      h1: "Cruscotti online",
-      intro:
-        "I comuni che hanno già un cruscotto pubblico, e quelli ancora in anteprima.",
+      label: "Riusa / fork",
+      title: `Riusa il Cruscotto ${c}`,
+      description: `Come forkare il cruscotto per un altro comune italiano. Guida ISTAT, Vercel e moduli. Progetto non ufficiale.`,
+      h1: `Riusa il Cruscotto ${c}`,
+      intro: `Guida al riuso del template per un altro comune: fork GitHub, identità ISTAT e deploy.`,
       group: "progetto",
       kind: "project",
     }),
@@ -273,11 +259,11 @@ function sections(): SectionDef[] {
     d("sostieni", {
       path: "/sostieni",
       slug: "sostieni",
-      label: "Supporto",
-      title: `Supporto — Cruscotto ${c}`,
-      description: `Come sostenere il Cruscotto ${c}: un caffè per hosting e dominio, o una segnalazione. Progetto indipendente, non ufficiale.`,
-      h1: `Supporto al Cruscotto ${c}`,
-      intro: `Niente budget pubblico: un contributo volontario copre hosting e dominio. Non è una donazione al Comune di ${c}.`,
+      label: "Sostieni",
+      title: `Sostieni il Cruscotto ${c}`,
+      description: `Sostieni il Cruscotto ${c}: contributo volontario per hosting e compute. Progetto indipendente, non ufficiale.`,
+      h1: `Sostieni il Cruscotto ${c}`,
+      intro: `Contributo volontario per hosting e compute. Non è una donazione al Comune di ${c}.`,
       group: "progetto",
       kind: "project",
     }),
@@ -375,7 +361,6 @@ export const NAV_GROUP_DEFS: {
       "partecipa",
       "sostieni",
       "come-funziona",
-      "esempi",
       "riusa",
       "attribuzioni",
     ],

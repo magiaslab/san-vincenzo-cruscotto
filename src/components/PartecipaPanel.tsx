@@ -275,7 +275,7 @@ export function PartecipaPanel({ asPage = false }: { asPage?: boolean }) {
               href="/come-funziona"
               className="font-semibold underline underline-offset-2"
             >
-              {t("Come è fatto questo sito")}
+              {t("Come funziona lo stack e l’architettura")}
             </Link>
           </p>
         </article>

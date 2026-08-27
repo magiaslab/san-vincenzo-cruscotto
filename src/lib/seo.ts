@@ -82,7 +82,7 @@ export const SITE_NAME = `Cruscotto ${COMUNE_NOME}`;
 export const SITE_TITLE_DEFAULT = `${SITE_NAME} | Dati aperti (${COMUNE_PROVINCIA})`;
 
 export const SITE_DESCRIPTION = clipMeta(
-  `Dati aperti di ${COMUNE_NOME} (${COMUNE_PROVINCIA}): popolazione, scuole, meteo, mobilità e finanza in un unico sito. Progetto indipendente, non ufficiale.`,
+  `Dashboard indipendente (non ufficiale) dei dati aperti di ${COMUNE_NOME} (${COMUNE_PROVINCIA}): KPI AgID, mobilità, sanità, scuole, meteo e finanza.`,
 );
 
 export const SITE_KEYWORDS = [
@@ -365,23 +365,18 @@ export function datasetsForSection(sectionId: string): DatasetInput[] {
 export function comeFunzionaFaq() {
   return [
     {
-      question: `Il Cruscotto ${COMUNE_NOME} è il sito ufficiale del Comune?`,
-      answer: `No. È un progetto civico indipendente, non affiliato ad AgID, al Governo o al Comune di ${COMUNE_NOME}. Riunisce dati pubblici già aperti.`,
+      question: `Il Cruscotto ${COMUNE_NOME} è un sito ufficiale del Comune?`,
+      answer: `No. È un progetto indipendente e non ufficiale, non affiliato ad AgID, al Governo italiano o al Comune di ${COMUNE_NOME}. Aggrega dati pubblici aperti.`,
     },
     {
       question: "Da dove arrivano i dati?",
       answer:
-        "I numeri principali arrivano da Cruscotto Italia (AgID). Meteo, treni, mappe e scuole arrivano da altre fonti pubbliche, ciascuna per conto proprio.",
+        "La fonte principale è Cruscotto Italia (AgID), via MCP. Altre fonti (meteo, trasporti, ARPAT, mappe, MIUR) arrivano da API pubbliche dedicate, in sola lettura.",
     },
     {
-      question: "Devo registrarmi o installare qualcosa?",
+      question: "Serve un account o un database?",
       answer:
-        "No. Si consulta dal browser, senza account. Il sito non ha un database proprio: legge fonti pubbliche e le mostra.",
-    },
-    {
-      question: "Posso farne uno per un altro comune?",
-      answer:
-        "Sì. La guida «Porta nel tuo comune» spiega i passi anche a chi non programma. Servono un account GitHub e uno su Vercel, entrambi gratuiti.",
+        "No. Il cruscotto è solo lettura: nessun database proprio e nessuna autenticazione obbligatoria. Le route /api/* fanno da proxy e cache.",
     },
   ];
 }

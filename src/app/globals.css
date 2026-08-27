@@ -46,13 +46,6 @@ a {
   color: var(--pa-primary);
 }
 
-/* Bottoni pieni: il colore globale dei link non deve vincolare il testo */
-a.bg-\[var\(--pa-primary\)\],
-a[style*="color: #ffffff"],
-a[style*="color:#ffffff"] {
-  color: #ffffff;
-}
-
 /* Link nel footer: sempre chiari sul blu scuro (override colore globale) */
 footer a,
 footer a:visited {
@@ -132,189 +125,21 @@ footer a:hover {
   }
 }
 
-.panel > h3 {
-  margin: 0 0 0.75rem;
+.panel h3 {
+  margin: 0;
   font-size: 0.95rem;
   font-weight: 700;
   color: var(--pa-ink);
 }
 
+.panel > h3 {
+  margin-bottom: 0.75rem;
+}
+
 @media (min-width: 640px) {
-  .panel > h3 {
+  .panel h3 {
     font-size: 1rem;
   }
-}
-
-code {
-  font-size: 0.9em;
-  word-break: break-word;
-  border-radius: 0.25rem;
-  background: var(--pa-surface-soft);
-  padding: 0.1em 0.35em;
-}
-
-pre {
-  margin: 0;
-  overflow-x: auto;
-  border-radius: 0.5rem;
-  border: 1px solid var(--pa-border);
-  background: #fff;
-  padding: 0.75rem 1rem;
-  font-size: 0.8125rem;
-  line-height: 1.55;
-}
-
-pre code {
-  background: none;
-  padding: 0;
-  font-size: inherit;
-}
-
-.guide-prose {
-  color: var(--pa-ink);
-  font-size: 1rem;
-  line-height: 1.65;
-}
-
-.guide-prose p {
-  margin: 0 0 1rem;
-  max-width: 42rem;
-}
-
-.guide-prose p:last-child {
-  margin-bottom: 0;
-}
-
-.guide-prose a {
-  font-weight: 600;
-  text-underline-offset: 2px;
-}
-
-.guide-h2 {
-  margin: 2rem 0 0.75rem;
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--pa-ink);
-}
-
-@media (min-width: 640px) {
-  .guide-h2 {
-    font-size: 1.375rem;
-  }
-}
-
-.guide-h3 {
-  margin: 1.5rem 0 0.5rem;
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--pa-ink);
-}
-
-.guide-card {
-  border-radius: 0.75rem;
-  border: 1px solid var(--pa-border);
-  background: var(--pa-surface);
-  padding: 1rem 1.1rem;
-}
-
-.guide-card summary {
-  display: flex;
-  min-height: 2.75rem;
-  align-items: center;
-}
-
-.guide-prose details + details {
-  margin-top: 0.65rem;
-}
-
-@media (min-width: 640px) {
-  .guide-card {
-    padding: 1.25rem 1.35rem;
-  }
-}
-
-.guide-callout {
-  margin: 1.5rem 0 0;
-  border-radius: 0.75rem;
-  border: 1px solid color-mix(in srgb, var(--pa-primary) 28%, var(--pa-border));
-  background: var(--pa-surface-soft);
-  padding: 1rem 1.15rem;
-}
-
-.guide-callout p,
-.guide-callout ul {
-  max-width: none;
-}
-
-.step-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: 0.85rem;
-}
-
-.step-list > li {
-  display: flex;
-  gap: 0.85rem;
-  align-items: flex-start;
-  border-radius: 0.75rem;
-  border: 1px solid var(--pa-border);
-  background: #fff;
-  padding: 0.9rem 1rem;
-}
-
-.step-num {
-  display: flex;
-  height: 2.25rem;
-  width: 2.25rem;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-  background: var(--pa-primary);
-  color: #fff;
-  font-size: 0.9rem;
-  font-weight: 700;
-}
-
-.status-pill {
-  display: inline-flex;
-  align-items: center;
-  border-radius: 999px;
-  padding: 0.2rem 0.65rem;
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-}
-
-.status-pill-ok {
-  background: color-mix(in srgb, var(--pa-success) 16%, white);
-  color: var(--pa-success);
-}
-
-.status-pill-wip {
-  background: color-mix(in srgb, var(--pa-warning) 18%, white);
-  color: var(--pa-warning);
-}
-
-.account-grid {
-  display: grid;
-  gap: 0.75rem;
-}
-
-@media (min-width: 640px) {
-  .account-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-.project-nav {
-  -webkit-overflow-scrolling: touch;
-}
-
-.project-nav ul {
-  scrollbar-width: thin;
 }
 
 * {

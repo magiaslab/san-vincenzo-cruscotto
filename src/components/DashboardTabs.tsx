@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
-import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   CloudSun,
@@ -61,7 +60,6 @@ import { AcquaPanel } from "@/components/AcquaPanel";
 import { DvnsFinanzaPanel } from "@/components/DvnsFinanzaPanel";
 import { PartecipaPanel } from "@/components/PartecipaPanel";
 import { ComeFunzionaPanel } from "@/components/ComeFunzionaPanel";
-import { CruscottiRetePanel } from "@/components/CruscottiRetePanel";
 import { RiusaPanel } from "@/components/RiusaPanel";
 import { AttribuzioniPanel } from "@/components/AttribuzioniPanel";
 import { SostieniPanel } from "@/components/SostieniPanel";
@@ -237,10 +235,9 @@ const NAV_GROUPS: NavGroup[] = [
     label: "Progetto",
     items: [
       { id: "partecipa", href: "/partecipa", label: "Partecipa", Icon: MessageSquarePlus },
-      { id: "sostieni", href: "/sostieni", label: "Supporto", Icon: Coffee },
+      { id: "sostieni", href: "/sostieni", label: "Sostieni", Icon: Coffee },
       { id: "come-funziona", href: "/come-funziona", label: "Come funziona", Icon: Info },
-      { id: "esempi", href: "/esempi", label: "Cruscotti online", Icon: Globe2 },
-      { id: "riusa", href: "/riusa", label: "Porta nel tuo comune", Icon: GitFork },
+      { id: "riusa", href: "/riusa", label: "Riusa / fork", Icon: GitFork },
       { id: "attribuzioni", href: "/attribuzioni", label: "Attribuzioni e regole", Icon: Scale },
     ],
   },
@@ -374,7 +371,6 @@ export function DashboardTabs({
         {tab === "partecipa" && <PartecipaPanel />}
         {tab === "sostieni" && <SostieniPanel />}
         {tab === "come-funziona" && <ComeFunzionaPanel />}
-        {tab === "esempi" && <CruscottiRetePanel />}
         {tab === "riusa" && <RiusaPanel />}
         {tab === "attribuzioni" && <AttribuzioniPanel />}
       </div>
@@ -428,15 +424,6 @@ function Panoramica({
         title={t("Cosa ti serve oggi?")}
         description={`${t("Dati aperti di")} ${String(anagrafica?.nome ?? COMUNE_NOME)}: ${t("parti dai servizi utili, poi esplora le sezioni dedicate.")}`}
       />
-
-      <p className="mb-5">
-        <Link
-          href="/esempi"
-          className="inline-flex min-h-11 items-center rounded-lg border border-[var(--pa-border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--pa-ink)] no-underline hover:border-[var(--pa-primary)]"
-        >
-          {t("Altri comuni con un cruscotto come questo")}
-        </Link>
-      </p>
 
       <AllertaHomeBanner onOpenMeteo={() => onNavigate("meteo")} />
 

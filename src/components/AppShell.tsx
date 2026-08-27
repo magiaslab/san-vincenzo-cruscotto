@@ -251,10 +251,10 @@ export function AppShell({
                 />
               </Link>
 
-              <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5">
+              <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5 lg:max-w-[14rem] xl:max-w-none">
               <p
                 id={titleId}
-                className="m-0 truncate text-base font-bold leading-tight text-[var(--pa-ink)] sm:text-lg"
+                className="m-0 truncate text-base font-bold leading-tight text-[var(--pa-ink)]"
               >
                 {active?.label ?? `Cruscotto ${COMUNE_NOME}`}
               </p>
@@ -279,7 +279,7 @@ export function AppShell({
             </div>
             <div className="bg-[var(--pa-primary)] px-3 py-2 text-xs font-semibold leading-snug text-white sm:px-4 sm:text-sm">
               {t(
-                "Progetto indipendente, non ufficiale: non è il sito del Comune di {comune}.",
+                "Progetto non ufficiale: non affiliato ad AgID, al Governo italiano o al Comune di {comune}.",
                 { comune: COMUNE_NOME },
               )}
             </div>
