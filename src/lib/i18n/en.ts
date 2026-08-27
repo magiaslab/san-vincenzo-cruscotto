@@ -825,7 +825,8 @@ export const en: Record<string, string> = {
   "Chiarimento su dati, fonti o come usare il sito": "Clarification about data, sources or how to use the site",
   "Codice e issue su": "Code and issues on",
   "Come funziona il cruscotto e come puoi suggerire miglioramenti. I suggerimenti diventano issue su GitHub.": "How the dashboard works and how you can suggest improvements. Suggestions become GitHub issues.",
-  "Come funziona lo stack e l’architettura": "How the stack and architecture work",
+  "Come funziona lo stack e l’architettura": "How this site is built",
+  "Come è fatto questo sito": "How this site is built",
   "Come puoi aiutare": "How you can help",
   "Contatti:": "Contacts:",
   "Contatto": "Contact",
@@ -1048,6 +1049,53 @@ export const en: Record<string, string> = {
   "Fonte": "Source",
   "Meteo non disponibile al momento.": "Weather unavailable right now.",
   "Sostieni": "Support",
+  "Supporto": "Support",
+  "Pagine del progetto": "Project pages",
+  "Cruscotti online": "Live dashboards",
+  "Porta nel tuo comune": "Bring it to your town",
+  "Pubblico": "Live",
+  "In sviluppo": "In progress",
+  "Progetto originale": "Original project",
+  "Già consultabili": "Already online",
+  "In lavorazione": "In progress",
+  "Vuoi il tuo?": "Want yours?",
+  "Idee per il minisito": "Ideas for this mini-site",
+  "Altri comuni con un cruscotto come questo":
+    "Other towns with a dashboard like this",
+  "Progetto indipendente, non ufficiale: non è il sito del Comune di {comune}.":
+    "Independent, unofficial project: this is not the website of the Municipality of {comune}.",
+  "In questo sito non è configurato un account Buy Me a Coffee.":
+    "This site has no Buy Me a Coffee account configured.",
+  "Puoi comunque segnalare errori da Partecipa o scrivere a {email}.":
+    "You can still report mistakes from Get involved or write to {email}.",
+  "Il cruscotto non ha un budget pubblico. Un caffè volontario aiuta a pagare hosting e dominio. Non è una donazione al Comune e non cambia i numeri che leggi.":
+    "The dashboard has no public budget. A voluntary coffee helps pay for hosting and domain. It is not a donation to the municipality and does not change the figures you read.",
+  "Il sostegno va a {name}, che tiene in vita il progetto nel tempo libero. Serve a coprire le spese tecniche, non il Comune di {comune}.":
+    "Support goes to {name}, who keeps this project alive in their spare time. It covers technical costs, not the Municipality of {comune}.",
+  "L’importo è libero: anche un caffè conta. I dati restano pubblici e il codice resta aperto.":
+    "Any amount is fine: even one coffee counts. Data stay public and the code stays open.",
+  "Altri modi per aiutare": "Other ways to help",
+  "Lascia una stella su GitHub": "Star the project on GitHub",
+  "Aiuta altre persone a trovare il progetto.":
+    "Helps other people find the project.",
+  "Portalo in un altro comune": "Bring it to another town",
+  "La guida è scritta anche per chi non programma.":
+    "The guide is written also for people who do not code.",
+  "Segnala un errore": "Report a mistake",
+  "Un dato sbagliato o una pagina rotta si sistemano prima se lo dici.":
+    "A wrong figure or a broken page gets fixed sooner if you say so.",
+  "Apri Partecipa": "Open Get involved",
+  "Scrivi due righe": "Write a short note",
+  "Un messaggio all’autore vale quanto un caffè, e a volte di più.":
+    "A message to the author is worth as much as a coffee, sometimes more.",
+  "Nomi resi pubblici su Buy Me a Coffee (1 persona). Il contributo è volontario e non cambia i numeri.":
+    "Names made public on Buy Me a Coffee (1 person). Support is voluntary and does not change the figures.",
+  "Nomi resi pubblici su Buy Me a Coffee ({count} persone). Il contributo è volontario e non cambia i numeri.":
+    "Names made public on Buy Me a Coffee ({count} people). Support is voluntary and does not change the figures.",
+  "Quando qualcuno lascia il nome visibile su Buy Me a Coffee, compare qui. Se hai già offerto un caffè e vuoi essere ringraziato, scrivi a {email}.":
+    "When someone leaves their name visible on Buy Me a Coffee, it appears here. If you already bought a coffee and want to be thanked, write to {email}.",
+  "Ancora nessuno in elenco. Il primo caffè può essere il tuo.":
+    "Nobody in the list yet. The first coffee can be yours.",
   "Sostieni il cruscotto": "Support the dashboard",
   "Sostieni il progetto": "Support the project",
   "Pagina Sostieni e ringraziamenti": "Support page and thanks",

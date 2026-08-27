@@ -1,21 +1,21 @@
-# Riusare / forkare il Cruscotto — guida completa
+# Porta il cruscotto nel tuo comune
 
-Guida passo-passo per duplicare questo progetto su un **altro comune italiano**,
-dall’account GitHub alla messa online su Vercel, con i servizi esterni opzionali
-(Telegram, Modal, Hugging Face, OpenWeather, …) e indicazioni per usare
-Cursor o Claude ad adattare il fork.
+Guida per copiare questo sito su **un altro comune italiano**. Non serve
+essere programmatori: con GitHub, Vercel e circa un’ora hai un indirizzo
+pubblico con i dati aperti del tuo comune.
 
-La stessa guida è riassunta in-app su [`/#riusa`](https://www.cruscottosanvincenzo.it/#riusa)
-(tab **Progetto → Riusa / fork**). Redirect legacy: `/riusa`.
+La stessa guida, più breve e illustrata, è sulla pagina
+[Porta nel tuo comune](https://www.cruscottosanvincenzo.it/riusa).
+Esempi già nati: [Cruscotti online](https://www.cruscottosanvincenzo.it/esempi).
 
-Checklist dati: [`config/comune.example.json`](../config/comune.example.json)  
-Env di esempio: [`.env.example`](../.env.example)
+File da compilare: [`config/comune.example.json`](../config/comune.example.json)  
+Chiavi facoltative: [`.env.example`](../.env.example)
 
 ---
 
 ## Indice
 
-1. [Due percorsi: principiante vs esperto](#1-due-percorsi-principiante-vs-esperto)
+1. [Due percorsi](#1-due-percorsi)
 2. [Cosa ottieni (e cosa no)](#2-cosa-ottieni-e-cosa-no)
 3. [Account e tool esterni](#3-account-e-tool-esterni)
 4. [Passo A — Account GitHub](#4-passo-a--account-github)
@@ -32,28 +32,31 @@ Env di esempio: [`.env.example`](../.env.example)
 
 ---
 
-## 1. Due percorsi: principiante vs esperto
+## 1. Due percorsi
 
-### Percorso rapido (MVP, ~mezz’ora di lavoro attivo)
+### Dal browser, senza installare nulla
 
-Obiettivo: sito online con KPI AgID del tuo comune, senza bot né AI.
+Obiettivo: un sito con i dati AgID del tuo comune, senza bot e senza
+assistente.
 
-1. Crea account **GitHub** e **Vercel** (gratis).
-2. **Fork** di questo repo.
-3. Su Vercel: Import Project → repo forkato → Deploy (nessuna env obbligatoria).
-4. In locale o su GitHub: adatta `config/comune.json` (ISTAT, nome, coordinate,
-   `features`, `fork.maintainer_*`). Non modificare `src/lib/project-origin.ts`.
-5. Push → Vercel ridistribuisce → apri l’URL `*.vercel.app`.
-6. Smoke test: `https://TUO-PROGETTO.vercel.app/api/kpi` deve mostrare
-   demografia del tuo codice ISTAT.
+1. Apri un account **GitHub** e uno **Vercel** (gratis; Vercel con login GitHub).
+2. Sul repository originale premi **Fork**.
+3. Su Vercel: Add New → Project → la tua copia → **Deploy**. Non compilare
+   variabili.
+4. Su GitHub, nella tua copia, apri `config/comune.json` e premi la matita.
+   Cambia nome, codice ISTAT, coordinate, `features` e `fork.maintainer_*`.
+   Non toccare `src/lib/project-origin.ts`.
+5. Salva (**Commit changes**). Vercel rifà il sito da solo.
+6. Apri `https://TUO-SITO.vercel.app/api/kpi`: deve comparire il tuo comune,
+   non San Vincenzo.
 
-Fine. Il resto di questa guida è opzionale.
+Fine. Il resto di questa guida è facoltativo.
 
-### Percorso completo (esperto / produzione)
+### Se programmi, o vuoi il sito «completo»
 
-Dopo l’MVP: dominio custom, OpenWeather, bot Telegram DAE, assistente RAG
-(Modal + Hugging Face), token GitHub per feedback/segnalazioni, Wheelmap,
-adattamento moduli regionali (ARPAT, GTFS, allerte).
+Dopo il primo online: dominio, OpenWeather, bot Telegram per i defibrillatori,
+assistente (Modal + Hugging Face), token GitHub per i suggerimenti, adattamento
+delle fonti della tua Regione.
 
 ---
 

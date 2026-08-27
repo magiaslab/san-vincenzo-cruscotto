@@ -169,7 +169,7 @@ export function SectionIntro({
     <div className="mb-4 sm:mb-5">
       <Heading className={headingClass}>{title}</Heading>
       {description ? (
-        <p className="m-0 mt-1 max-w-prose text-xs text-[var(--pa-muted)] sm:text-sm">
+        <p className="m-0 mt-2 max-w-prose text-sm leading-relaxed text-[var(--pa-muted)] sm:text-base">
           {description}
         </p>
       ) : null}

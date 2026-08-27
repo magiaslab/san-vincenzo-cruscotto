@@ -8,26 +8,26 @@ import {
 import { isSostieniEnabled } from "@/lib/sostieni";
 
 const PAGE_DESCRIPTION =
-  `Sostieni il ${SITE_NAME}: contributo volontario per hosting. Progetto indipendente, non ufficiale, non del Comune di ${COMUNE_NOME}.`;
+  `Come sostenere il Cruscotto ${COMUNE_NOME}: un caffè per hosting e dominio, o una segnalazione. Progetto indipendente, non ufficiale.`;
 
 export const metadata: Metadata = {
-  title: "Sostieni il cruscotto",
+  title: "Supporto",
   description: PAGE_DESCRIPTION,
   alternates: {
     canonical: "/sostieni",
   },
   openGraph: {
-    title: `Sostieni | ${SITE_NAME}`,
+    title: `Supporto | ${SITE_NAME}`,
     description: PAGE_DESCRIPTION,
     url: absoluteUrl("/sostieni"),
     type: "article",
     siteName: SITE_NAME,
     locale: "it_IT",
-    images: buildOgImages(`${SITE_NAME} — sostieni il progetto`),
+    images: buildOgImages(`${SITE_NAME} — supporto`),
   },
   twitter: {
     card: "summary_large_image",
-    title: `Sostieni | ${SITE_NAME}`,
+    title: `Supporto | ${SITE_NAME}`,
     description: PAGE_DESCRIPTION,
     images: [absoluteUrl("/og-image.jpg")],
   },
