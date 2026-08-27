@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
+import { usePathname, useRouter } from "next/navigation";
 import {
   CloudSun,
   Factory,
@@ -76,6 +77,12 @@ import {
 } from "@/components/ui";
 import { COMUNE_NOME, COMUNE_PROVINCIA, COMUNI_LOOKUP } from "@/lib/constants";
 import { isFeatureEnabled, isTabEnabled } from "@/lib/comune-config";
+import {
+  isSectionId,
+  sectionIdFromPathname,
+  sectionPath,
+  type SectionId,
+} from "@/lib/sections";
 import {
   formatDecimal,
   formatEuro,
@@ -192,65 +199,46 @@ const DisabilitaPanel = dynamic(() => import("@/components/DisabilitaPanel"), {
 
 type Kpi = Record<string, unknown>;
 
-type TabId =
-  | "panoramica"
-  | "turismo"
-  | "porto"
-  | "economia"
-  | "istruzione"
-  | "societa"
-  | "disabilita"
-  | "finanza"
-  | "territorio"
-  | "ambiente"
-  | "infra"
-  | "sanita"
-  | "meteo"
-  | "mappa"
-  | "partecipa"
-  | "come-funziona"
-  | "riusa"
-  | "attribuzioni"
-  | "sostieni";
+type TabId = SectionId;
 
 const NAV_GROUPS: NavGroup[] = [
   {
     label: "In evidenza",
     items: [
-      { id: "panoramica", label: "Panoramica", Icon: Globe2 },
-      { id: "sanita", label: "Sanità", Icon: Stethoscope },
-      { id: "disabilita", label: "Disabilità", Icon: Accessibility },
-      { id: "infra", label: "Mobilità", Icon: Train },
-      { id: "meteo", label: "Meteo", Icon: CloudSun },
+      { id: "panoramica", href: "/", label: "Panoramica", Icon: Globe2 },
+      { id: "sanita", href: "/sanita", label: "Sanità", Icon: Stethoscope },
+      { id: "disabilita", href: "/disabilita", label: "Disabilità", Icon: Accessibility },
+      { id: "infra", href: "/mobilita", label: "Mobilità", Icon: Train },
+      { id: "meteo", href: "/meteo", label: "Meteo", Icon: CloudSun },
     ],
   },
   {
     label: "Territorio",
     items: [
-      { id: "turismo", label: "Turismo", Icon: Palmtree },
-      { id: "porto", label: "Porto", Icon: Ship },
-      { id: "ambiente", label: "Ambiente", Icon: Waves },
-      { id: "territorio", label: "Territorio", Icon: Mountain },
-      { id: "mappa", label: "Mappa", Icon: Map },
+      { id: "turismo", href: "/turismo", label: "Turismo", Icon: Palmtree },
+      { id: "porto", href: "/porto", label: "Porto", Icon: Ship },
+      { id: "ambiente", href: "/ambiente", label: "Ambiente", Icon: Waves },
+      { id: "territorio", href: "/territorio", label: "Territorio", Icon: Mountain },
+      { id: "mappa", href: "/mappa", label: "Mappa", Icon: Map },
     ],
   },
   {
     label: "Economia e società",
     items: [
-      { id: "economia", label: "Economia", Icon: Factory },
-      { id: "istruzione", label: "Istruzione", Icon: School },
-      { id: "societa", label: "Società", Icon: Handshake },
-      { id: "finanza", label: "Finanza", Icon: Landmark },
+      { id: "economia", href: "/economia", label: "Economia", Icon: Factory },
+      { id: "istruzione", href: "/istruzione", label: "Istruzione", Icon: School },
+      { id: "societa", href: "/societa", label: "Società", Icon: Handshake },
+      { id: "finanza", href: "/finanza", label: "Finanza", Icon: Landmark },
     ],
   },
   {
     label: "Progetto",
     items: [
-      { id: "partecipa", label: "Partecipa", Icon: MessageSquarePlus },
-      { id: "sostieni", label: "Sostieni", Icon: Coffee },
-      { id: "come-funziona", label: "Come funziona", Icon: Info },
-      { id: "riusa", label: "Riusa / fork", Icon: GitFork },
-      { id: "attribuzioni", label: "Attribuzioni e regole", Icon: Scale },
+      { id: "partecipa", href: "/partecipa", label: "Partecipa", Icon: MessageSquarePlus },
+      { id: "sostieni", href: "/sostieni", label: "Sostieni", Icon: Coffee },
+      { id: "come-funziona", href: "/come-funziona", label: "Come funziona", Icon: Info },
+      { id: "riusa", href: "/riusa", label: "Riusa / fork", Icon: GitFork },
+      { id: "attribuzioni", href: "/attribuzioni", label: "Attribuzioni e regole", Icon: Scale },
     ],
   },
 ];
@@ -266,10 +254,8 @@ function filterNavGroups(groups: readonly NavGroup[]): NavGroup[] {
 
 const TABS = NAV_GROUPS.flatMap((g) => [...g.items]);
 
-const TAB_IDS = new Set<string>(TABS.map((t) => t.id));
-
 function isTabId(v: string): v is TabId {
-  return TAB_IDS.has(v);
+  return isSectionId(v);
 }
 
 function asRecord(v: unknown): Record<string, unknown> | null {
@@ -320,32 +306,28 @@ function useDettaglio(sezioni: string) {
 export function DashboardTabs({
   kpi,
   generatedAt,
+  seoIntro,
 }: {
   kpi: Kpi;
   generatedAt?: string | null;
+  seoIntro?: { h1: string; intro: string };
 }) {
   const t = useT();
-  const [tab, setTab] = useState<TabId>("panoramica");
+  const router = useRouter();
+  const pathname = usePathname() || "/";
+  const tab = sectionIdFromPathname(pathname);
 
   useEffect(() => {
-    const fromHash = window.location.hash.replace(/^#/, "");
-    if (fromHash && isTabId(fromHash)) setTab(fromHash);
-    const onHash = () => {
-      const id = window.location.hash.replace(/^#/, "");
-      if (id && isTabId(id)) setTab(id);
-    };
-    window.addEventListener("hashchange", onHash);
-    return () => window.removeEventListener("hashchange", onHash);
-  }, []);
+    const hash = window.location.hash.replace(/^#/, "");
+    if (!hash || hash === "assistente") return;
+    const id = hash === "infra" ? "infra" : hash;
+    if (!isTabId(id)) return;
+    const path = sectionPath(id);
+    if (path !== pathname) router.replace(path);
+  }, [pathname, router]);
 
   function navigate(id: TabId) {
-    setTab(id);
-    if (typeof window !== "undefined") {
-      const next = `#${id}`;
-      if (window.location.hash !== next) {
-        window.history.replaceState(null, "", next);
-      }
-    }
+    router.push(sectionPath(id));
     scrollToTopSmooth();
   }
 
@@ -359,6 +341,16 @@ export function DashboardTabs({
       generatedAt={generatedAt}
       footer={<Footer />}
     >
+      {seoIntro ? (
+        <header className="mb-5">
+          <h1 className="m-0 text-2xl font-bold text-[var(--pa-ink)] sm:text-3xl">
+            {seoIntro.h1}
+          </h1>
+          <p className="mb-0 mt-2 max-w-prose text-sm text-[var(--pa-muted)] sm:text-base">
+            {seoIntro.intro}
+          </p>
+        </header>
+      ) : null}
       <div aria-label={t(tabLabel(tab))}>
         {tab === "panoramica" && (
           <Panoramica kpi={kpi} onNavigate={navigate} />

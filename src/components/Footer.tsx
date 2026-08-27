@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   AUTHOR,
   COMUNE_NOME,
@@ -90,21 +91,21 @@ export function Footer() {
                 ["/partecipa", "Suggerimenti"],
               ] as const
             ).map(([href, label]) => (
-              <a
+              <Link
                 key={href}
                 href={href}
                 className="inline-flex min-h-11 items-center font-semibold text-white underline underline-offset-2"
               >
                 {t(label)}
-              </a>
+              </Link>
             ))}
             {isSostieniEnabled() ? (
-              <a
+              <Link
                 href="/sostieni"
                 className="inline-flex min-h-11 items-center font-semibold text-white underline underline-offset-2"
               >
                 {t("Sostieni")}
-              </a>
+              </Link>
             ) : null}
             <a
               href={`mailto:${AUTHOR.email}`}

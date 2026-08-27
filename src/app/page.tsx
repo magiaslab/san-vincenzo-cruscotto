@@ -9,6 +9,7 @@ import {
   SITE_TITLE_DEFAULT,
   buildHomeJsonLd,
 } from "@/lib/seo";
+import { getSection } from "@/lib/sections";
 
 export const revalidate = 86400;
 
@@ -34,6 +35,7 @@ export default async function Home() {
 
   const generatedAt =
     typeof kpi._generated_at === "string" ? kpi._generated_at : null;
+  const home = getSection("panoramica");
   const homeJsonLd = <JsonLd data={buildHomeJsonLd()} />;
 
   if (error) {
@@ -43,6 +45,9 @@ export default async function Home() {
         <Header generatedAt={generatedAt} />
         <main id="contenuto-principale" className="flex-1">
           <div className="mx-auto max-w-3xl px-4 py-8">
+            <h1 className="mb-4 text-2xl font-bold text-[var(--pa-ink)]">
+              {home.h1}
+            </h1>
             <div className="rounded-lg border border-[#d9364f] bg-[#fce8eb] p-4 text-[#17324d]">
               {error}
             </div>
@@ -56,7 +61,11 @@ export default async function Home() {
   return (
     <>
       {homeJsonLd}
-      <DashboardTabs kpi={kpi} generatedAt={generatedAt} />
+      <DashboardTabs
+        kpi={kpi}
+        generatedAt={generatedAt}
+        seoIntro={{ h1: home.h1, intro: home.intro }}
+      />
     </>
   );
 }

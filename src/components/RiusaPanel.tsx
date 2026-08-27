@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import Link from "next/link";
 import {
   Accessibility,
   BookOpen,
@@ -450,9 +451,9 @@ export function RiusaPanel({ asPage = false }: { asPage?: boolean }) {
           </p>
           <p className="text-[var(--pa-muted)]">
             Architettura dello stack:{" "}
-            <a href="/come-funziona" className="underline">
+            <Link href="/come-funziona" className="underline">
               Come funziona
-            </a>
+            </Link>
             .
           </p>
         </Section>
@@ -784,9 +785,9 @@ git branch -M main && git push -u origin main`}
             </li>
             <li>
               Non rimuovere disclaimer e{" "}
-              <a href="/attribuzioni" className="underline">
+              <Link href="/attribuzioni" className="underline">
                 attribuzioni
-              </a>
+              </Link>
               . Nei fork lascia intatto{" "}
               <code>src/lib/project-origin.ts</code> e indica te stesso in{" "}
               <code>config/comune.json → fork</code>.
@@ -807,9 +808,9 @@ git branch -M main && git push -u origin main`}
               {AUTHOR.email}
             </a>{" "}
             oppure{" "}
-            <a href="/partecipa" className="underline">
+            <Link href="/partecipa" className="underline">
               Partecipa
-            </a>
+            </Link>
             .
           </p>
         </Section>

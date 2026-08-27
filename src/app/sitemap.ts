@@ -1,16 +1,17 @@
 import type { MetadataRoute } from "next";
 import { absoluteUrl } from "@/lib/seo";
+import { sitemapSectionPaths } from "@/lib/sections";
 import { isSostieniEnabled } from "@/lib/sostieni";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
-  const pages: MetadataRoute.Sitemap = [
-    {
-      url: absoluteUrl("/"),
-      lastModified: now,
-      changeFrequency: "daily",
-      priority: 1,
-    },
+  const pages: MetadataRoute.Sitemap = sitemapSectionPaths().map((path) => ({
+    url: absoluteUrl(path),
+    lastModified: now,
+    changeFrequency: path === "/" ? "daily" : "weekly",
+    priority: path === "/" ? 1 : 0.7,
+  }));
+  pages.push(
     {
       url: absoluteUrl("/come-funziona"),
       lastModified: now,
@@ -35,7 +36,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.5,
     },
-  ];
+  );
   if (isSostieniEnabled()) {
     pages.push({
       url: absoluteUrl("/sostieni"),

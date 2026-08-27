@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import Link from "next/link";
 import {
   ARPAT_BALNEAZIONE_URL,
   ARPAT_OPENDATA_URL,
@@ -154,9 +155,9 @@ export function AttribuzioniPanel({ asPage = false }: { asPage?: boolean }) {
               {t(
                 "Il cruscotto non ha budget pubblico. Un contributo volontario su Buy Me a Coffee aiuta a coprire hosting e compute; non è una donazione al Comune e non influenza i dati.",
               )}{" "}
-              <a className="text-[#0066CC] underline" href="/sostieni">
+              <Link className="text-[#0066CC] underline" href="/sostieni">
                 {t("Pagina Sostieni e ringraziamenti")}
-              </a>
+              </Link>
               .
             </p>
           </Section>
