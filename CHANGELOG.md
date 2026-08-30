@@ -4,6 +4,7 @@
 
 ### Layout
 - Pagine Progetto (`/partecipa`, `/sostieni`, `/come-funziona`, `/riusa`, `/attribuzioni`, `/fonti-non-disponibili`) usano lo stesso shell della dashboard; la voce attiva in sidebar resta coerente con l’URL.
+- Popup Leaflet (mappa DAE e altre): sfondo bianco, larghezza limitata e testo che non esce dal box.
 
 ## 0.3.0 — 2026-08-27
 
