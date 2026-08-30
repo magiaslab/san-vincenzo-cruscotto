@@ -40,6 +40,22 @@ type FeatureCollection = {
   meta?: Record<string, unknown>;
 };
 
+function uniqueLines(...values: Array<string | null | undefined>): string[] {
+  const seen = new Set<string>();
+  const lines: string[] = [];
+  for (const raw of values) {
+    const line = String(raw ?? "")
+      .replace(/\s+/g, " ")
+      .trim();
+    if (!line) continue;
+    const key = line.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    lines.push(line);
+  }
+  return lines;
+}
+
 function FitPoints({ points }: { points: [number, number][] }) {
   const map = useMap();
   useEffect(() => {
@@ -163,13 +179,16 @@ export function DaeMap() {
             <FitPoints points={points} />
             {(data?.features ?? []).map((f, i) => {
               const [lon, lat] = f.geometry.coordinates;
-              const nome = String(f.properties.nome ?? "DAE");
-              const ubicazione = String(f.properties.ubicazione ?? "");
-              const orari = String(f.properties.orari ?? "");
-              const accesso = String(f.properties.accesso ?? "");
-              const operatore = String(f.properties.operatore ?? "");
-              const immagine = String(f.properties.immagine ?? "");
-              const osmUrl = String(f.properties.osm_url ?? "");
+              const [titolo, ...note] = uniqueLines(
+                String(f.properties.nome ?? ""),
+                String(f.properties.ubicazione ?? ""),
+                String(f.properties.operatore ?? ""),
+              );
+              const titoloVisibile = titolo || "DAE";
+              const orari = String(f.properties.orari ?? "").trim();
+              const accesso = String(f.properties.accesso ?? "").trim();
+              const immagine = String(f.properties.immagine ?? "").trim();
+              const osmUrl = String(f.properties.osm_url ?? "").trim();
               return (
                 <CircleMarker
                   key={`dae-${String(f.properties.osm_id ?? i)}`}
@@ -182,49 +201,35 @@ export function DaeMap() {
                     weight: 1,
                   }}
                 >
-                  <Popup>
-                    <strong>{nome}</strong>
-                    <br />
-                    {t("Defibrillatore automatico esterno (DAE)")}
-                    {ubicazione ? (
-                      <>
-                        <br />
-                        {ubicazione}
-                      </>
-                    ) : null}
-                    {operatore ? (
-                      <>
-                        <br />
-                        {operatore}
-                      </>
-                    ) : null}
+                  <Popup maxWidth={260} minWidth={180} autoPanPadding={[16, 16]}>
+                    <strong>{titoloVisibile}</strong>
+                    <div>{t("Defibrillatore automatico esterno (DAE)")}</div>
+                    {note.map((line) => (
+                      <div key={line}>{line}</div>
+                    ))}
                     {accesso ? (
-                      <>
-                        <br />
+                      <div>
                         {t("Accesso")}: {accesso}
-                      </>
+                      </div>
                     ) : null}
                     {orari ? (
-                      <>
-                        <br />
+                      <div>
                         {t("Orari")}: {orari}
-                      </>
+                      </div>
                     ) : null}
                     {immagine ? (
-                      <>
-                        <br />
+                      <div>
                         <a href={immagine} target="_blank" rel="noopener noreferrer">
                           Foto
                         </a>
-                      </>
+                      </div>
                     ) : null}
                     {osmUrl ? (
-                      <>
-                        <br />
+                      <div>
                         <a href={osmUrl} target="_blank" rel="noopener noreferrer">
                           OpenStreetMap
                         </a>
-                      </>
+                      </div>
                     ) : null}
                   </Popup>
                 </CircleMarker>
@@ -247,16 +252,14 @@ export function DaeMap() {
                     dashArray: "2 4",
                   }}
                 >
-                  <Popup>
+                  <Popup maxWidth={260} minWidth={180} autoPanPadding={[16, 16]}>
                     <strong>{nome}</strong>
-                    <br />
-                    {t("Segnalazione cittadina (in attesa di OSM)")}
-                    {ubicazione ? (
-                      <>
-                        <br />
-                        {ubicazione}
-                      </>
-                    ) : null}
+                    <div>{t("Segnalazione cittadina (in attesa di OSM)")}</div>
+                    {uniqueLines(nome, ubicazione)
+                      .slice(1)
+                      .map((line) => (
+                        <div key={line}>{line}</div>
+                      ))}
                   </Popup>
                 </CircleMarker>
               );

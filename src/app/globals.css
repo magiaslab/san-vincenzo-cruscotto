@@ -116,10 +116,34 @@ footer a:hover {
   z-index: 5;
 }
 
-/* Contiene i controlli Leaflet dentro il pannello mappa */
-.panel .leaflet-container,
-.panel [class*="leaflet"] {
+/* Solo il canvas: [class*="leaflet"] schiacciava anche popup e tooltip.
+   Non usare max-width in % sul popup: il pane Leaflet ha larghezza 0. */
+.panel .leaflet-container {
   max-width: 100%;
+}
+
+.leaflet-container .leaflet-popup-content-wrapper {
+  background: #fff;
+  color: var(--pa-ink);
+  min-width: 12rem;
+  max-width: 16.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 18px rgba(23, 50, 77, 0.22);
+}
+
+.leaflet-container .leaflet-popup-tip {
+  background: #fff;
+}
+
+.leaflet-container .leaflet-popup-content {
+  margin: 0.7rem 0.85rem !important;
+  width: 14rem !important;
+  max-height: 12rem;
+  overflow: auto;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-height: 1.35;
+  font-size: 0.8125rem;
 }
 
 .radar-tiles {
